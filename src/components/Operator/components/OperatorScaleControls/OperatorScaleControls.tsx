@@ -61,7 +61,7 @@ export const OperatorScaleControls = ({
               <Flex gap={10} p={4}>
                 <Knob
                   label='Time'
-                  propertyPath={`${opId}.Time`}
+                  propertyPath={`OP${opId}.Time`}
                   onChange={updateValues}
                   valueMin={0}
                   valueMax={127}
@@ -72,7 +72,7 @@ export const OperatorScaleControls = ({
                 />
                 <Knob
                   label='Position'
-                  propertyPath={`${opId}.Scale`}
+                  propertyPath={`OP${opId}.Scale`}
                   onChange={updateValues}
                   valueMin={0}
                   valueMax={6}
@@ -90,7 +90,7 @@ export const OperatorScaleControls = ({
               <Flex gap={10} p={4}>
                 <Knob
                   label='Gain'
-                  propertyPath={`${opId}.LGain`}
+                  propertyPath={`OP${opId}.LGain`}
                   onChange={updateValues}
                   valueMin={0}
                   valueMax={127}
@@ -101,7 +101,7 @@ export const OperatorScaleControls = ({
                 />
                 <Knob
                   label='Curve'
-                  propertyPath={`${opId}.LCurve`}
+                  propertyPath={`OP${opId}.LCurve`}
                   onChange={updateValues}
                   valueMin={-18}
                   valueMax={18}
@@ -119,7 +119,7 @@ export const OperatorScaleControls = ({
               <Flex gap={10} p={4}>
                 <Knob
                   label='Gain'
-                  propertyPath={`${opId}.RGain`}
+                  propertyPath={`OP${opId}.RGain`}
                   onChange={updateValues}
                   valueMin={0}
                   valueMax={127}
@@ -130,7 +130,7 @@ export const OperatorScaleControls = ({
                 />
                 <Knob
                   label='Curve'
-                  propertyPath={`${opId}.RCurve`}
+                  propertyPath={`OP${opId}.RCurve`}
                   onChange={updateValues}
                   valueMin={-18}
                   valueMax={18}
