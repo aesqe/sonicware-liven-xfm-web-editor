@@ -162,14 +162,21 @@ export const ADSREnvelope = ({
   )
 
   const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
+    (e: MouseEvent | TouchEvent) => {
       if (!dragging || !svgRef.current) {
         return
       }
 
+      if ('touches' in e && e.cancelable) {
+        e.preventDefault()
+      }
+
+      const cx = 'clientX' in e ? e.clientX : e.touches[0].clientX
+      const cy = 'clientY' in e ? e.clientY : e.touches[0].clientY
+
       const svgRect = svgRef.current.getBoundingClientRect()
-      const x = e.clientX - svgRect.left
-      const y = e.clientY - svgRect.top
+      const x = cx - svgRect.left
+      const y = cy - svgRect.top
 
       const xPos = Math.max(padding, Math.min(width - padding, x))
       const yPos = Math.max(padding, Math.min(height - padding, y))
@@ -228,11 +235,14 @@ export const ADSREnvelope = ({
     if (dragging) {
       window.addEventListener('mousemove', handleMouseMove)
       window.addEventListener('mouseup', handleMouseUp)
-    }
+    window.addEventListener('touchmove', handleMouseMove, { passive: false })
+    window.addEventListener('touchend', handleMouseUp)
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
+      window.removeEventListener('touchmove', handleMouseMove)
+      window.removeEventListener('touchend', handleMouseUp)
     }
   }, [dragging, handleMouseMove, handleMouseUp])
 
@@ -362,6 +372,7 @@ export const ADSREnvelope = ({
                   strokeWidth={1.5}
                   style={{ cursor: 'move' }}
                   onMouseDown={handleMouseDown('attack')}
+                  onTouchStart={handleMouseDown('attack')}
                 />
 
                 {/* Decay control point */}
@@ -374,6 +385,7 @@ export const ADSREnvelope = ({
                   strokeWidth={1.5}
                   style={{ cursor: 'move' }}
                   onMouseDown={handleMouseDown('decay')}
+                  onTouchStart={handleMouseDown('decay')}
                 />
 
                 {/* Sustain control point */}
@@ -386,6 +398,7 @@ export const ADSREnvelope = ({
                   strokeWidth={1.5}
                   style={{ cursor: 'move' }}
                   onMouseDown={handleMouseDown('sustain')}
+                  onTouchStart={handleMouseDown('sustain')}
                 />
 
                 {/* Key Off point */}
@@ -409,6 +422,7 @@ export const ADSREnvelope = ({
                   strokeWidth={1.5}
                   style={{ cursor: 'move' }}
                   onMouseDown={handleMouseDown('release')}
+                  onTouchStart={handleMouseDown('release')}
                 />
               </g>
             </svg>

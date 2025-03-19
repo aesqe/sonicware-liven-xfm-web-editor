@@ -54,6 +54,7 @@ export const PatchNameEditor = ({ onChange }: { onChange: (patchName: string) =>
             multiline
             color='#F0F0F0'
             c='#000000'
+            events={{ hover: true, focus: true, touch: true }}
             label='Patch name must be 1-4 characters long and contain only uppercase letters, numbers or spaces. Optionally, you can add a period between any two characters. The name cannot contain 2 or more periods in a row. The name cannot start with a period. The name can end with a period only if there are 4 or less characters in front of it.'
           >
             <IconInfoCircle />
