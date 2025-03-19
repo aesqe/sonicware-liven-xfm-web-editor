@@ -1,6 +1,7 @@
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react'
 import { useAtomValue } from 'jotai'
 import { ActionIcon, Divider, Flex, InputLabel, Stack, Switch, Text } from '@mantine/core'
+import { clamp } from '@mantine/hooks'
 import { IconDice5, IconReload } from '@tabler/icons-react'
 
 import { Knob } from '../Knob/Knob'
@@ -36,6 +37,8 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   const [fixed, setFixed] = useState(values.Fixed === 1)
   const [scaleControlsOpen, setScaleControlsOpen] = useState(false)
   const [ADSRControlsOpen, setADSRControlsOpen] = useState(true)
+  const [adsrEnvelopeWidth, setADSREnvelopeWidth] = useState(600)
+  const [containerWidth, setContainerWidth] = useState(0)
   const levelRef = useRef<KnobRefType>(null)
   const outputRef = useRef<KnobRefType>(null)
   const velSensRef = useRef<KnobRefType>(null)
@@ -53,6 +56,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   const ratioSwitchRef = useRef<HTMLInputElement | null>(null)
   const fixedSwitchRef = useRef<HTMLInputElement | null>(null)
   const adsrRef = useRef<PitchAdsrRef>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const opInRefs = [
     { id: 1, ref: op1InRef },
@@ -90,16 +94,6 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
     [opInRefs]
   )
 
-  useEffect(() => {
-    if (ref) {
-      ref.current = {
-        setInternalValue: setValues,
-        setScaleControlsOpen,
-        setADSRControlsOpen
-      }
-    }
-  }, [ref, setValues])
-
   const ratioFormatter = (val: number) =>
     freeRatio ? Math.round(val) : roundToNearestStep(val, val < 75 ? 50 : 100)
 
@@ -122,6 +116,38 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
 
     updateValues(update)
   }
+
+  useEffect(() => {
+    if (ref) {
+      ref.current = {
+        setInternalValue: setValues,
+        setScaleControlsOpen,
+        setADSRControlsOpen
+      }
+    }
+  }, [ref, setValues])
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        const clientWidth = containerRef.current.clientWidth
+        const minWidth = 385
+        const maxWidth = clientWidth > 800 ? 450 : 385
+        const width = clamp(clientWidth, minWidth, maxWidth)
+
+        setContainerWidth(clientWidth)
+        setADSREnvelopeWidth(width)
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    handleResize()
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
 
   return (
     <Flex gap={0} align='start' w='100%'>
@@ -184,7 +210,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
         </Stack>
         <Divider orientation='vertical' color='#FFFFFF' w={5} />
       </Flex>
-      <Flex w='100%' wrap='wrap'>
+      <Flex wrap='wrap' ref={containerRef} w='auto'>
         <Stack gap={10} p={10} bg='#F5F5F5' w={400} h='100%'>
           <Flex align='start' justify='start' gap={12}>
             <Knob
@@ -328,7 +354,8 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
         {ADSRControlsOpen && (
           <ADSREnvelope
             initialState={values}
-            width={450}
+            width={adsrEnvelopeWidth}
+            containerWidth={containerWidth}
             height={140}
             onChange={updateEnvelope}
             ref={adsrRef}

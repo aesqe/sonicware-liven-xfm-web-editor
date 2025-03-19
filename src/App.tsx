@@ -118,9 +118,9 @@ export const App = () => {
   useEffect(() => {
     const handleResize = () => {
       if (containerRef.current) {
-        const maxWidth = 370
+        const minWidth = 370
         const width = containerRef.current.clientWidth - 300
-        setADSREnvelopeWidth(Math.max(width, maxWidth))
+        setADSREnvelopeWidth(Math.max(width, minWidth))
       }
     }
 

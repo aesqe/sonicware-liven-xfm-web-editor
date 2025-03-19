@@ -26,6 +26,7 @@ type Props = {
   pitchEnv?: boolean
   ref?: RefObject<PitchAdsrRef | null>
   knobSize?: CSSProperties['width']
+  containerWidth?: number
   padding?: number
 }
 
@@ -34,6 +35,7 @@ type DragPoint = 'attack' | 'decay' | 'sustain' | 'release' | null
 export const ADSREnvelope = ({
   ref,
   width = 320,
+  containerWidth = width,
   height = 160,
   padding = 10,
   knobSize = '2rem',
@@ -417,7 +419,7 @@ export const ADSREnvelope = ({
           values={convertOutput(values, range)}
           range={range}
           handleKnobChange={handleKnobChange}
-          knobSize={knobSize}
+          knobSize={containerWidth < 800 ? '1.5rem' : knobSize}
           pitchEnv={pitchEnv}
           ref={knobsRef}
         />
