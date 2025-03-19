@@ -34,8 +34,9 @@ export const ADSREnvelopeKnobs = ({
   const dnCurveRef = useRef<KnobRefType>(null)
 
   useEffect(() => {
-    if (ref.current) {
-      ref.current.setInternalValue = (vals: ADSRValues) => {
+    if (ref) {
+      ref.current = {
+        setInternalValue: (vals: ADSRValues) => {
         aTimeRef.current?.setValueRaw(vals.ATime)
         aLevelRef.current?.setValueRaw(vals.ALevel)
         dTimeRef.current?.setValueRaw(vals.DTime)
@@ -48,6 +49,7 @@ export const ADSREnvelopeKnobs = ({
         if (vals.UpCurve !== undefined && vals.DnCurve !== undefined) {
           upCurveRef.current?.setValueRaw(vals.UpCurve)
           dnCurveRef.current?.setValueRaw(vals.DnCurve)
+          }
         }
       }
     }
