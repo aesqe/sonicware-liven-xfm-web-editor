@@ -83,7 +83,7 @@ export const App = () => {
       setPatch(data)
       setTimeout(() => {
         throttledRefUpdates(data)
-      }, 10)
+      }, 50)
     },
     [setPatch, throttledRefUpdates]
   )

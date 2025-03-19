@@ -14,7 +14,7 @@ export const midiOutputListAtom = atom<Output[]>([])
 export const patchAtom = atom<XFMPatch>(initPatch)
 
 export const messagesDelayAtom = atom<number>(16.7)
-export const sysexSendThrottleTimeAtom = atom<number>(100)
+export const sysexSendThrottleTimeAtom = atom<number>(200)
 
 export const patchClipboardAtom = atom<XFMPatch | null>(null)
 export const envelopeClipboardAtom = atom<ADSRValues | null>(null)

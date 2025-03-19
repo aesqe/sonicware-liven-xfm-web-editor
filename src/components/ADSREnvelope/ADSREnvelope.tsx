@@ -135,16 +135,15 @@ export const ADSREnvelope = ({
   }, [range, ref, setEnvelopeValues])
 
   const handleMouseDown = useCallback(
-    (point: DragPoint) => (e: React.MouseEvent) => {
-      e.preventDefault()
+    (point: DragPoint) => () => {
       setDragging(point)
     },
     []
   )
 
-  const handleMouseUp = useCallback(() => {
+  const handleMouseUp = () => {
     setDragging(null)
-  }, [])
+  }
 
   const getTimePosition = useCallback(
     (xpos: number, segmentStartPos: number) => {
@@ -230,9 +229,8 @@ export const ADSREnvelope = ({
   )
 
   useEffect(() => {
-    if (dragging) {
-      window.addEventListener('mousemove', handleMouseMove)
-      window.addEventListener('mouseup', handleMouseUp)
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
     window.addEventListener('touchmove', handleMouseMove, { passive: false })
     window.addEventListener('touchend', handleMouseUp)
 
@@ -242,7 +240,7 @@ export const ADSREnvelope = ({
       window.removeEventListener('touchmove', handleMouseMove)
       window.removeEventListener('touchend', handleMouseUp)
     }
-  }, [dragging, handleMouseMove, handleMouseUp])
+  }, [handleMouseMove])
 
   const attackSegment = createCurvedPath(startPoint, attackPoint, values)
   const decaySegment = createCurvedPath(attackPoint, decayPoint, values)

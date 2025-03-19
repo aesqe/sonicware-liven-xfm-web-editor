@@ -153,7 +153,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
 
   return (
     <Flex gap={0} align='start' w='100%'>
-      <Flex h='100%' w={60}>
+      <Flex h='100%' w={62}>
         <Stack
           align='center'
           justify='center'
@@ -210,7 +210,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
             <IconDice5 size={48} color='#999' />
           </ActionIcon>
         </Stack>
-        <Divider orientation='vertical' color='#FFFFFF' w={5} />
+        <Divider orientation='vertical' />
       </Flex>
       <Flex wrap='wrap' ref={containerRef} w='auto'>
         <Stack gap={10} p={10} bg='#F5F5F5' w={400} h='100%'>
