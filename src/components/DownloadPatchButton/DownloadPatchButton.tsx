@@ -1,0 +1,26 @@
+import { useAtomValue } from 'jotai'
+import { IconDownload } from '@tabler/icons-react'
+import { ActionIcon } from '@mantine/core'
+
+import { patchAtom } from '../../store/atoms'
+
+export const DownloadPatchButton = () => {
+  const patch = useAtomValue(patchAtom)
+
+  const handleDownload = () => {
+    const blob = new Blob([JSON.stringify(patch, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${patch.Name}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    a.remove()
+  }
+
+  return (
+    <ActionIcon h={50} w={50} color='#e6e3e1' c='dark' onClick={handleDownload}>
+      <IconDownload />
+    </ActionIcon>
+  )
+}

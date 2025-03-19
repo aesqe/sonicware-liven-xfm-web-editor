@@ -12,6 +12,7 @@ import { useWebMidi } from './services/use-web-midi/use-web-midi'
 import { ADSREnvelope } from './components/ADSREnvelope/ADSREnvelope'
 import { PatchNameEditor } from './components/PatchNameEditor/PatchNameEditor'
 import { useSendPatchToXFM } from './services/use-send-patch-to-xfm/use-send-patch-to-xfm'
+import { DownloadPatchButton } from './components/DownloadPatchButton/DownloadPatchButton'
 import { MidiDevicesSelection } from './components/MidiDevicesSelection/MidiDevicesSelection'
 import { updateObjectValueByPath } from './services/update-object-value-by-path/update-object-value-by-path'
 import { midiInputAtom, patchAtom, sysexSendThrottleTimeAtom } from './store/atoms'
@@ -122,6 +123,7 @@ export const App = () => {
       if (containerRef.current) {
         const minWidth = 370
         const width = containerRef.current.clientWidth - 300
+
         setADSREnvelopeWidth(Math.max(width, minWidth))
       }
     }
@@ -171,7 +173,10 @@ export const App = () => {
             >
               Toggle all ADSR controls
             </Button>
-            <PatchNameEditor onChange={updatePatchName} ref={patchNameRef} />
+            <Flex align='end' justify='space-between' gap={10}>
+              <PatchNameEditor onChange={updatePatchName} ref={patchNameRef} />
+              <DownloadPatchButton />
+            </Flex>
           </Stack>
 
           <ADSREnvelope

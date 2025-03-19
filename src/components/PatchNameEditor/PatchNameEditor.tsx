@@ -45,36 +45,35 @@ export const PatchNameEditor = ({ onChange, ref }: Props) => {
   }
 
   return (
-    <>
-      <TextInput
-        label='Patch Name'
-        value={patchName}
-        onChange={handleChange}
-        error={!valid}
-        maxLength={7}
-        rightSection={
-          <Tooltip
-            withArrow
-            maw={300}
-            multiline
-            color='#F0F0F0'
-            c='#000000'
-            events={{ hover: true, focus: true, touch: true }}
-            label='Patch name must be 1-4 characters long and contain only uppercase letters, numbers or spaces. Optionally, you can add a period between any two characters. The name cannot contain 2 or more periods in a row. The name cannot start with a period. The name can end with a period only if there are 4 or less characters in front of it.'
-          >
-            <IconInfoCircle />
-          </Tooltip>
+    <TextInput
+      flex={1}
+      label='Patch Name'
+      value={patchName}
+      onChange={handleChange}
+      error={!valid}
+      maxLength={7}
+      pt={10}
+      styles={{
+        input: {
+          fontWeight: 700,
+          fontSize: 40,
+          padding: 10,
+          height: 50
         }
-        pt={10}
-        styles={{
-          input: {
-            fontWeight: 700,
-            fontSize: 40,
-            padding: 10,
-            height: 50
-          }
-        }}
-      />
-    </>
+      }}
+      rightSection={
+        <Tooltip
+          withArrow
+          maw={300}
+          multiline
+          color='#F0F0F0'
+          c='#000000'
+          events={{ hover: true, focus: true, touch: true }}
+          label='Patch name must be 1-4 characters long and contain only uppercase letters, numbers or spaces. Optionally, you can add a period between any two characters. The name cannot contain 2 or more periods in a row. The name cannot start with a period. The name can end with a period only if there are 4 or less characters in front of it.'
+        >
+          <IconInfoCircle />
+        </Tooltip>
+      }
+    />
   )
 }
