@@ -16,7 +16,7 @@ import { ADSREnvelopeKnobs } from './components/ADSREnvelopeKnobs/ADSREnvelopeKn
 import { getRandomValues01 } from './services/get-random-values-01/get-random-values-01'
 import { envelopeClipboardAtom } from '../../store/atoms'
 import { range0127, range_1818, range_4848 } from './constants'
-import { ADSRValues, UpdatedProperty, PitchAdsrRef } from '../../types'
+import { ADSRValues, UpdatedProperty, SetInternalValueRef } from '../../types'
 
 type Props = {
   initialState?: ADSRValues
@@ -24,7 +24,7 @@ type Props = {
   width?: number
   height?: number
   pitchEnv?: boolean
-  ref?: RefObject<PitchAdsrRef | null>
+  ref?: RefObject<SetInternalValueRef<ADSRValues> | undefined>
   knobSize?: CSSProperties['width']
   containerWidth?: number
   padding?: number
@@ -47,12 +47,10 @@ export const ADSREnvelope = ({
   const range = pitchEnv ? range_4848 : range0127
   // values are in 0..1 range
   const [values, setValues] = useState<ADSRValues>(convertInput(initialState, range))
-  const svgRef = useRef<SVGSVGElement>(null)
-  const knobsRef = useRef<{ setInternalValue: (values: ADSRValues) => void }>({
-    setInternalValue: () => {}
-  })
   const [dragging, setDragging] = useState<DragPoint>(null)
   const [envelopeClipboard, setEnvelopeClipboard] = useAtom(envelopeClipboardAtom)
+  const svgRef = useRef<SVGSVGElement>(null)
+  const knobsRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
 
   // Calculate the effective drawing dimensions with padding
   const drawingWidth = width - padding * 2

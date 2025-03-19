@@ -162,12 +162,11 @@ export type KnobRefType = {
 
 export type OperatorProps = XFMPatch['OP1'] | XFMPatch['OP2'] | XFMPatch['OP3'] | XFMPatch['OP4']
 
-export type OperatorRef = {
-  setInternalValue: (values: OperatorProps) => void
-  setScaleControlsOpen: (open: boolean) => void
-  setADSRControlsOpen: (open: boolean) => void
+export type SetInternalValueRef<T> = {
+  setInternalValue: (value: T) => void
 }
 
-export type PitchAdsrRef = {
-  setInternalValue: (values: ADSRValues) => void
+export type OperatorRef = SetInternalValueRef<OperatorProps> & {
+  setScaleControlsOpen: (open: boolean) => void
+  setADSRControlsOpen: (open: boolean) => void
 }

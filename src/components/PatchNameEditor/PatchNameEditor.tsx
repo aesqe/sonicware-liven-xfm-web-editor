@@ -1,25 +1,19 @@
-import { useEffect, useState } from 'react'
+import { RefObject, useEffect, useState } from 'react'
 import { useAtomValue } from 'jotai'
 import { TextInput, Tooltip } from '@mantine/core'
 import { IconInfoCircle } from '@tabler/icons-react'
 
 import { patchAtom } from '../../store/atoms'
+import { SetInternalValueRef } from '../../types'
 
 const regex = /^[A-Z 0-9]((\.){0,1}[A-Z 0-9]){0,2}(\.){0,1}[A-Z 0-9]?$/
 
-const padPatchName = (patchName: string) => {
-  if (patchName.length > 7) {
-    return patchName.slice(0, 7)
-  }
-
-  if (patchName.length < 7 && patchName.length > 4) {
-    return patchName.padEnd(7, ' ')
-  }
-
-  return patchName.padEnd(4, ' ')
+type Props = {
+  onChange: (patchName: string) => void
+  ref: RefObject<SetInternalValueRef<string> | undefined>
 }
 
-export const PatchNameEditor = ({ onChange }: { onChange: (patchName: string) => void }) => {
+export const PatchNameEditor = ({ onChange, ref }: Props) => {
   const patch = useAtomValue(patchAtom)
   const [patchName, setPatchName] = useState(patch.Name)
   const [valid, setValid] = useState(false)

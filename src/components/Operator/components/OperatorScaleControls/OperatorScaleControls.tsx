@@ -1,16 +1,15 @@
+import { RefObject, useCallback, useEffect, useRef } from 'react'
 import { Flex, InputLabel, Stack } from '@mantine/core'
 import { Accordion } from '@mantine/core'
 
 import { Knob } from '../../../Knob/Knob'
-import { OperatorProps } from '../../../../types'
-import { KnobRefType, UpdatedProperty } from '../../../../types'
-import { RefObject, useCallback, useEffect, useRef } from 'react'
+import { KnobRefType, OperatorProps, SetInternalValueRef, UpdatedProperty } from '../../../../types'
 
 type Props = {
   opId: number
   updateValues: (props: UpdatedProperty[]) => void
   values: OperatorProps
-  ref?: RefObject<{ setInternalValue: (values: OperatorProps) => void } | null>
+  ref?: RefObject<SetInternalValueRef<OperatorProps> | undefined>
   open?: boolean
   toggleScaleControls: () => void
 }

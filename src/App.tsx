@@ -10,12 +10,12 @@ import { decode8bit } from './services/decode8bit/decode8bit'
 import { FileUpload } from './components/FileUpload/FileUpload'
 import { useWebMidi } from './services/use-web-midi/use-web-midi'
 import { ADSREnvelope } from './components/ADSREnvelope/ADSREnvelope'
+import { PatchNameEditor } from './components/PatchNameEditor/PatchNameEditor'
 import { useSendPatchToXFM } from './services/use-send-patch-to-xfm/use-send-patch-to-xfm'
 import { MidiDevicesSelection } from './components/MidiDevicesSelection/MidiDevicesSelection'
 import { updateObjectValueByPath } from './services/update-object-value-by-path/update-object-value-by-path'
 import { midiInputAtom, patchAtom, sysexSendThrottleTimeAtom } from './store/atoms'
-import { OperatorRef, PitchAdsrRef, UpdatedProperty, XFMPatch, ADSRValues } from './types'
-import { PatchNameEditor } from './components/PatchNameEditor/PatchNameEditor'
+import { OperatorRef, UpdatedProperty, XFMPatch, ADSRValues, SetInternalValueRef } from './types'
 
 export const App = () => {
   useWebMidi()
@@ -27,12 +27,13 @@ export const App = () => {
   const [scaleControlsOpen, setScaleControlsOpen] = useState(false)
   const [ADSRControlsOpen, setADSRControlsOpen] = useState(true)
   const [adsrEnvelopeWidth, setADSREnvelopeWidth] = useState(600)
-  const op1Ref = useRef<OperatorRef>(null)
-  const op2Ref = useRef<OperatorRef>(null)
-  const op3Ref = useRef<OperatorRef>(null)
-  const op4Ref = useRef<OperatorRef>(null)
-  const pitchAdsrRef = useRef<PitchAdsrRef>(null)
+  const op1Ref = useRef<OperatorRef>(undefined)
+  const op2Ref = useRef<OperatorRef>(undefined)
+  const op3Ref = useRef<OperatorRef>(undefined)
+  const op4Ref = useRef<OperatorRef>(undefined)
   const containerRef = useRef<HTMLDivElement>(null)
+  const pitchAdsrRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
+  const patchNameRef = useRef<SetInternalValueRef<string>>(undefined)
 
   const updateValues = useThrottledCallback((props: UpdatedProperty[]) => {
     const updatedPatch = props.reduce(

@@ -4,6 +4,14 @@ import { ActionIcon, Divider, Flex, InputLabel, Stack, Switch, Text } from '@man
 import { clamp } from '@mantine/hooks'
 import { IconDice5, IconReload } from '@tabler/icons-react'
 
+import {
+  ADSRValues,
+  KnobRefType,
+  OperatorProps,
+  SetInternalValueRef,
+  UpdatedProperty,
+  OperatorRef
+} from '../../types'
 import { Knob } from '../Knob/Knob'
 import { patchAtom } from '../../store/atoms'
 import { ADSREnvelope } from '../ADSREnvelope/ADSREnvelope'
@@ -11,16 +19,11 @@ import { randomizeOperator } from './services/randomize-operator/randomize-opera
 import { initializeOperator } from './services/initialize-operator/initialize-operator'
 import { roundToNearestStep } from '../../services/round-to-nearest-step/round-to-nearest-step'
 import { OperatorScaleControls } from './components/OperatorScaleControls/OperatorScaleControls'
-import { ADSRValues, KnobRefType, OperatorProps, PitchAdsrRef, UpdatedProperty } from '../../types'
 
 type Props = {
   id: number
   updateValues: (props: UpdatedProperty[]) => void
-  ref?: RefObject<{
-    setInternalValue: (values: OperatorProps) => void
-    setScaleControlsOpen: (open: boolean) => void
-    setADSRControlsOpen: (open: boolean) => void
-  } | null>
+  ref?: RefObject<OperatorRef | undefined>
 }
 
 const isFreeRatio = (ratio: number) => ratio % 100 > 0 && ratio !== 50
@@ -46,8 +49,6 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   const freqRef = useRef<KnobRefType>(null)
   const detuneRef = useRef<KnobRefType>(null)
   const feedbackRef = useRef<KnobRefType>(null)
-
-  const scaleControlsRef = useRef<{ setInternalValue: (vals: OperatorProps) => void } | null>(null)
   const op1InRef = useRef<KnobRefType>(null)
   const op2InRef = useRef<KnobRefType>(null)
   const op3InRef = useRef<KnobRefType>(null)
@@ -55,8 +56,9 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   const pitchEnvRef = useRef<HTMLInputElement | null>(null)
   const ratioSwitchRef = useRef<HTMLInputElement | null>(null)
   const fixedSwitchRef = useRef<HTMLInputElement | null>(null)
-  const adsrRef = useRef<PitchAdsrRef>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const adsrRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
+  const scaleControlsRef = useRef<SetInternalValueRef<OperatorProps>>(undefined)
 
   const opInRefs = [
     { id: 1, ref: op1InRef },

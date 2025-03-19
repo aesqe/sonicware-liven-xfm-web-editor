@@ -3,7 +3,7 @@ import { Flex, InputLabel, Stack } from '@mantine/core'
 
 import { Knob } from '../../../Knob/Knob'
 import { NormalisableRange } from '../../../../services/normalisable-range/normalisable-range'
-import { ADSRValues, KnobRefType, UpdatedProperty } from '../../../../types'
+import { ADSRValues, KnobRefType, UpdatedProperty, SetInternalValueRef } from '../../../../types'
 
 type Props = {
   values: ADSRValues
@@ -11,7 +11,7 @@ type Props = {
   pitchEnv?: boolean
   knobSize?: CSSProperties['width']
   handleKnobChange: (values: UpdatedProperty[]) => void
-  ref: RefObject<{ setInternalValue: (values: ADSRValues) => void } | null>
+  ref: RefObject<SetInternalValueRef<ADSRValues> | undefined>
 }
 
 export const ADSREnvelopeKnobs = ({
@@ -37,18 +37,18 @@ export const ADSREnvelopeKnobs = ({
     if (ref) {
       ref.current = {
         setInternalValue: (vals: ADSRValues) => {
-        aTimeRef.current?.setValueRaw(vals.ATime)
-        aLevelRef.current?.setValueRaw(vals.ALevel)
-        dTimeRef.current?.setValueRaw(vals.DTime)
-        dLevelRef.current?.setValueRaw(vals.DLevel)
-        sTimeRef.current?.setValueRaw(vals.STime)
-        sLevelRef.current?.setValueRaw(vals.SLevel)
-        rTimeRef.current?.setValueRaw(vals.RTime)
-        rLevelRef.current?.setValueRaw(vals.RLevel)
+          aTimeRef.current?.setValueRaw(vals.ATime)
+          aLevelRef.current?.setValueRaw(vals.ALevel)
+          dTimeRef.current?.setValueRaw(vals.DTime)
+          dLevelRef.current?.setValueRaw(vals.DLevel)
+          sTimeRef.current?.setValueRaw(vals.STime)
+          sLevelRef.current?.setValueRaw(vals.SLevel)
+          rTimeRef.current?.setValueRaw(vals.RTime)
+          rLevelRef.current?.setValueRaw(vals.RLevel)
 
-        if (vals.UpCurve !== undefined && vals.DnCurve !== undefined) {
-          upCurveRef.current?.setValueRaw(vals.UpCurve)
-          dnCurveRef.current?.setValueRaw(vals.DnCurve)
+          if (vals.UpCurve !== undefined && vals.DnCurve !== undefined) {
+            upCurveRef.current?.setValueRaw(vals.UpCurve)
+            dnCurveRef.current?.setValueRaw(vals.DnCurve)
           }
         }
       }
