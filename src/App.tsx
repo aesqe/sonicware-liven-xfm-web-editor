@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAtom, useAtomValue } from 'jotai'
 import { MessageEvent } from 'webmidi'
 import { Box, Button, Divider, Flex, Paper, Stack, Title } from '@mantine/core'
-import { useDebouncedCallback, useThrottledCallback } from '@mantine/hooks'
+import { useThrottledCallback } from '@mantine/hooks'
 
 import { Operator } from './components/Operator/Operator'
 import { convert78 } from './services/convert78/convert78'
@@ -46,8 +46,8 @@ export const App = () => {
     sendPatchToXFM(updatedPatch)
   }, sysexSendThrottleTime)
 
-  const updatePatchName = useDebouncedCallback((patchName: string) => {
-    const updatedPatch = { ...patch, Name: patchName }
+  const updatePatchName = useThrottledCallback((patchName: string) => {
+    const updatedPatch = { ...patch, Name: patchName.padEnd(4, ' ') }
 
     setPatch(updatedPatch)
     sendPatchToXFM(updatedPatch)
@@ -75,6 +75,7 @@ export const App = () => {
     op3Ref.current?.setInternalValue(data.OP3)
     op4Ref.current?.setInternalValue(data.OP4)
     pitchAdsrRef.current?.setInternalValue(data.Pitch)
+    patchNameRef.current?.setInternalValue(data.Name)
   }, sysexSendThrottleTime)
 
   const handlePatchChange = useCallback(
@@ -170,7 +171,7 @@ export const App = () => {
             >
               Toggle all ADSR controls
             </Button>
-            <PatchNameEditor onChange={updatePatchName} />
+            <PatchNameEditor onChange={updatePatchName} ref={patchNameRef} />
           </Stack>
 
           <ADSREnvelope

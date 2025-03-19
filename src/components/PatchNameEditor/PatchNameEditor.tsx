@@ -16,29 +16,40 @@ type Props = {
 export const PatchNameEditor = ({ onChange, ref }: Props) => {
   const patch = useAtomValue(patchAtom)
   const [patchName, setPatchName] = useState(patch.Name)
-  const [valid, setValid] = useState(false)
+  const [valid, setValid] = useState(true)
+
+  const validate = (value: string) => {
+    const isValid = value.length > 0 && value.length < 8 && regex.test(value)
+
+    setValid(isValid)
+
+    return isValid
+  }
 
   useEffect(() => {
-    if (patchName.length === 0 || !regex.test(patchName)) {
-      setValid(false)
-      return
+    if (ref) {
+      ref.current = {
+        setInternalValue: setPatchName
+      }
     }
+  }, [ref])
 
-    setValid(true)
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.toUpperCase()
+    const isValid = validate(value)
 
-    const paddedPatchName = padPatchName(patchName)
-
-    if (paddedPatchName !== patch.Name) {
-      onChange(paddedPatchName)
+    if (isValid && value !== patch.Name) {
+      onChange(value)
+      setPatchName(value)
     }
-  }, [onChange, patch, patchName, valid])
+  }
 
   return (
     <>
       <TextInput
         label='Patch Name'
         value={patchName}
-        onChange={(e) => setPatchName(e.target.value.toUpperCase())}
+        onChange={handleChange}
         error={!valid}
         maxLength={7}
         rightSection={
