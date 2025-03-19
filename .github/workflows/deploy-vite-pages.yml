@@ -1,2 +1,11 @@
-- name: Vite Github Pages Deployer
-  uses: skywarth/vite-github-pages-deployer@v1.5.0
+name: 'Build Vite project and deploy to Github Pages'
+
+on: push
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vite Github Pages Deployer
+        uses: skywarth/vite-github-pages-deployer@v1.5.0
