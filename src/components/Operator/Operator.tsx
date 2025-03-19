@@ -319,6 +319,8 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
               onChange={updateValues}
               valueMin={-630}
               valueMax={640}
+              stepFn={() => 10}
+              stepLargerFn={() => 100}
               valueDefault={values.Feedback}
               center={0}
               formatterFn={Math.round}
