@@ -7,10 +7,10 @@ import { Knob } from '../Knob/Knob'
 import { patchAtom } from '../../store/atoms'
 import { ADSREnvelope } from '../ADSREnvelope/ADSREnvelope'
 import { randomizeOperator } from './services/randomize-operator/randomize-operator'
+import { initializeOperator } from './services/initialize-operator/initialize-operator'
 import { roundToNearestStep } from '../../services/round-to-nearest-step/round-to-nearest-step'
 import { OperatorScaleControls } from './components/OperatorScaleControls/OperatorScaleControls'
 import { ADSRValues, KnobRefType, OperatorProps, PitchAdsrRef, UpdatedProperty } from '../../types'
-import initpatch from '../../assets/presets/initpatch.json'
 
 type Props = {
   id: number
@@ -161,7 +161,10 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
             title='Initialize'
             variant='transparent'
             onClick={() => {
-              setValues(initpatch[opId] as OperatorProps)
+              const init = initializeOperator(opId)
+              setValues(init.values)
+              updateEnvelope(init.values)
+              updateValues(init.updatedValues)
             }}
           >
             <IconReload size={48} color='#999' />
@@ -172,7 +175,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
             variant='transparent'
             onClick={() => {
               const random = randomizeOperator(opId)
-              setValues({ ...values, ...(random.values as OperatorProps) })
+              setValues({ ...values, ...random.values })
               updateValues(random.updatedValues)
             }}
           >
