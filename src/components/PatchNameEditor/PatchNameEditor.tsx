@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAtomValue } from 'jotai'
-import { Group, Text, TextInput, Tooltip } from '@mantine/core'
+import { TextInput, Tooltip } from '@mantine/core'
 import { IconInfoCircle } from '@tabler/icons-react'
 
 import { patchAtom } from '../../store/atoms'
