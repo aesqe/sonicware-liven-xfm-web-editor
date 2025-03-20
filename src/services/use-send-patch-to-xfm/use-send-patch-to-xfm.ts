@@ -2,9 +2,10 @@ import { useAtomValue } from 'jotai'
 
 import { XFMPatch } from '../../types'
 import { encodeBytes } from '../encode-bytes/encode-bytes'
-import { messagesDelayAtom, midiOutputAtom } from '../../store/atoms'
+import { logSysExAtom, messagesDelayAtom, midiOutputAtom } from '../../store/atoms'
 
 export const useSendPatchToXFM = () => {
+  const logSysEx = useAtomValue(logSysExAtom)
   const midiOutput = useAtomValue(midiOutputAtom)
   const messagesDelay = useAtomValue(messagesDelayAtom)
 
@@ -13,7 +14,9 @@ export const useSendPatchToXFM = () => {
       return
     }
 
-    console.log('Sending patch', patch)
+    if (logSysEx) {
+      console.log('Sending patch', patch)
+    }
 
     try {
       // Create the three separate SysEx messages

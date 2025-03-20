@@ -37,9 +37,10 @@ export const PatchNameEditor = ({ onChange, ref }: Props) => {
     const value = e.target.value.toUpperCase()
     const isValid = validate(value)
 
+    setPatchName(value)
+
     if (isValid && value !== patch.Name) {
       onChange(value)
-      setPatchName(value)
     }
   }
 

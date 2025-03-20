@@ -19,3 +19,5 @@ export const sysexSendThrottleTimeAtom = atom<number>(200)
 export const patchClipboardAtom = atom<XFMPatch | null>(null)
 export const envelopeClipboardAtom = atom<ADSRValues | null>(null)
 export const operatorClipboardAtom = atom<OperatorProps | null>(null)
+
+export const logSysExAtom = atom<boolean>(false)

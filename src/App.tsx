@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAtom, useAtomValue } from 'jotai'
 import { MessageEvent } from 'webmidi'
-import { Box, Button, Divider, Flex, Paper, Stack, Title } from '@mantine/core'
+import { ActionIcon, Box, Button, Divider, Flex, Paper, Stack, Title } from '@mantine/core'
 import { useThrottledCallback } from '@mantine/hooks'
+import { IconTerminal2 } from '@tabler/icons-react'
 
 import { Operator } from './components/Operator/Operator'
 import { convert78 } from './services/convert78/convert78'
@@ -15,7 +16,7 @@ import { useSendPatchToXFM } from './services/use-send-patch-to-xfm/use-send-pat
 import { DownloadPatchButton } from './components/DownloadPatchButton/DownloadPatchButton'
 import { MidiDevicesSelection } from './components/MidiDevicesSelection/MidiDevicesSelection'
 import { updateObjectValueByPath } from './services/update-object-value-by-path/update-object-value-by-path'
-import { midiInputAtom, patchAtom, sysexSendThrottleTimeAtom } from './store/atoms'
+import { midiInputAtom, patchAtom, sysexSendThrottleTimeAtom, logSysExAtom } from './store/atoms'
 import { OperatorRef, UpdatedProperty, XFMPatch, ADSRValues, SetInternalValueRef } from './types'
 
 export const App = () => {
@@ -28,6 +29,7 @@ export const App = () => {
   const [scaleControlsOpen, setScaleControlsOpen] = useState(false)
   const [ADSRControlsOpen, setADSRControlsOpen] = useState(true)
   const [adsrEnvelopeWidth, setADSREnvelopeWidth] = useState(600)
+  const [logSysEx, setLogSysEx] = useAtom(logSysExAtom)
   const op1Ref = useRef<OperatorRef>(undefined)
   const op2Ref = useRef<OperatorRef>(undefined)
   const op3Ref = useRef<OperatorRef>(undefined)
@@ -107,7 +109,11 @@ export const App = () => {
     midiInput?.addListener('sysex', (e: MessageEvent) => {
       if (e.message.data.length > 20) {
         const decodedPatch = decode8bit(convert78(e.message.data))
-        console.log('Received SysEx:', decodedPatch)
+
+        if (logSysEx) {
+          console.log('Raw SysEx:', e.message.data)
+          console.log('Decoded SysEx:', decodedPatch)
+        }
 
         handlePatchChange(decodedPatch)
       }
@@ -116,7 +122,7 @@ export const App = () => {
     return () => {
       midiInput?.removeListener('sysex')
     }
-  }, [handlePatchChange, midiInput, setPatch])
+  }, [handlePatchChange, logSysEx, midiInput, setPatch])
 
   useEffect(() => {
     const handleResize = () => {
@@ -143,9 +149,20 @@ export const App = () => {
       <Paper p={0} px={10} w='100%' mx='auto' maw={1900}>
         <Flex justify='space-between' w='100%' mx='auto' wrap='wrap' ref={containerRef}>
           <Stack gap={0} mr={10} w={250} pt={5}>
-            <Title order={2} style={{ cursor: 'default' }}>
-              XFM Web Editor
-            </Title>
+            <Flex justify='space-between' align='center' w='100%'>
+              <Title order={2} style={{ cursor: 'default' }}>
+                XFM Web Editor
+              </Title>
+              <ActionIcon
+                mt={4}
+                color={logSysEx ? 'green' : '#e6e3e1'}
+                c={logSysEx ? 'white' : 'dark'}
+                onClick={() => setLogSysEx(!logSysEx)}
+                title='Toggle logging of SysEx messages to the browser console'
+              >
+                <IconTerminal2 />
+              </ActionIcon>
+            </Flex>
             <MidiDevicesSelection />
             <Button
               color='#e6e3e1'
