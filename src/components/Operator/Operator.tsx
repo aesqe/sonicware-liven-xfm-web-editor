@@ -1,8 +1,8 @@
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react'
-import { useAtomValue } from 'jotai'
+import { useAtom, useAtomValue } from 'jotai'
 import { ActionIcon, Divider, Flex, InputLabel, Stack, Switch, Text } from '@mantine/core'
 import { clamp } from '@mantine/hooks'
-import { IconDice5, IconReload } from '@tabler/icons-react'
+import { IconDice5, IconCopy, IconReload, IconClipboardText } from '@tabler/icons-react'
 
 import {
   ADSRValues,
@@ -17,19 +17,17 @@ import { backgrounds } from './constants'
 import { isFreeRatio } from './services/is-free-ratio/is-free-ratio'
 import { ADSREnvelope } from '../ADSREnvelope/ADSREnvelope'
 import { randomizeOperator } from './services/randomize-operator/randomize-operator'
+import { getOperatorValues } from './services/get-operator-values/get-operator-values'
 import { initializeOperator } from './services/initialize-operator/initialize-operator'
 import { roundToNearestStep } from '../../services/round-to-nearest-step/round-to-nearest-step'
 import { OperatorScaleControls } from './components/OperatorScaleControls/OperatorScaleControls'
+import { operatorClipboardAtom, patchAtom } from '../../store/atoms'
 
 type Props = {
   id: number
   updateValues: (props: UpdatedProperty[]) => void
   ref?: RefObject<OperatorRef | undefined>
 }
-
-const isFreeRatio = (ratio: number) => ratio % 100 > 0 && ratio !== 50
-
-const backgrounds = ['#f5ecec', '#ecf2f5', '#f4f0e3', '#ecf5ee']
 
 export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   const patch = useAtomValue(patchAtom)
@@ -60,6 +58,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const adsrRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
   const scaleControlsRef = useRef<SetInternalValueRef<OperatorProps>>(undefined)
+  const [operatorClipboard, setOperatorClipboard] = useAtom(operatorClipboardAtom)
 
   const opInRefs = [
     { id: 1, ref: op1InRef },
@@ -216,6 +215,31 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
               Pitch EG
             </InputLabel>
           </Stack>
+          <ActionIcon
+            mt={24}
+            title='Copy'
+            size={32}
+            variant='transparent'
+            onClick={() => {
+              setOperatorClipboard(values)
+            }}
+          >
+            <IconCopy size={48} color='#00000044' />
+          </ActionIcon>
+          <ActionIcon
+            title='Paste'
+            size={32}
+            variant='transparent'
+            onClick={() => {
+              if (operatorClipboard) {
+                const fromClipboard = getOperatorValues(opId, operatorClipboard)
+                setValues(fromClipboard.values)
+                updateValues(fromClipboard.updatedValues)
+              }
+            }}
+          >
+            <IconClipboardText size={48} color='#00000044' />
+          </ActionIcon>
           <ActionIcon
             title='Randomize'
             size={32}
