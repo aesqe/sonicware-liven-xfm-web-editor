@@ -121,7 +121,7 @@ export const App = () => {
   useEffect(() => {
     const handleResize = () => {
       if (containerRef.current) {
-        const minWidth = 370
+        const minWidth = 434
         const width = containerRef.current.clientWidth - 300
 
         setADSREnvelopeWidth(Math.max(width, minWidth))
@@ -143,7 +143,9 @@ export const App = () => {
       <Paper p={0} px={10} w='100%' mx='auto' maw={1900}>
         <Flex justify='space-between' w='100%' mx='auto' wrap='wrap' ref={containerRef}>
           <Stack gap={0} mr={10} w={250} pt={5}>
-            <Title order={2}>XFM Web Editor</Title>
+            <Title order={2} style={{ cursor: 'default' }}>
+              XFM Web Editor
+            </Title>
             <MidiDevicesSelection />
             <Button
               color='#e6e3e1'

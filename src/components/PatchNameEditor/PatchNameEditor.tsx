@@ -5,8 +5,7 @@ import { IconInfoCircle } from '@tabler/icons-react'
 
 import { patchAtom } from '../../store/atoms'
 import { SetInternalValueRef } from '../../types'
-
-const regex = /^[A-Z 0-9]((\.){0,1}[A-Z 0-9]){0,2}(\.){0,1}[A-Z 0-9]?$/
+import { tooltipText, validationRegex } from './constants'
 
 type Props = {
   onChange: (patchName: string) => void
@@ -19,7 +18,7 @@ export const PatchNameEditor = ({ onChange, ref }: Props) => {
   const [valid, setValid] = useState(true)
 
   const validate = (value: string) => {
-    const isValid = value.length > 0 && value.length < 8 && regex.test(value)
+    const isValid = value.length > 0 && value.length < 8 && validationRegex.test(value)
 
     setValid(isValid)
 
@@ -69,7 +68,7 @@ export const PatchNameEditor = ({ onChange, ref }: Props) => {
           color='#F0F0F0'
           c='#000000'
           events={{ hover: true, focus: true, touch: true }}
-          label='Patch name must be 1-4 characters long and contain only uppercase letters, numbers or spaces. Optionally, you can add a period between any two characters. The name cannot contain 2 or more periods in a row. The name cannot start with a period. The name can end with a period only if there are 4 or less characters in front of it.'
+          label={tooltipText}
         >
           <IconInfoCircle />
         </Tooltip>

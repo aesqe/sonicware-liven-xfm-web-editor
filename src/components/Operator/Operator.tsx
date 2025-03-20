@@ -13,7 +13,8 @@ import {
   OperatorRef
 } from '../../types'
 import { Knob } from '../Knob/Knob'
-import { patchAtom } from '../../store/atoms'
+import { backgrounds } from './constants'
+import { isFreeRatio } from './services/is-free-ratio/is-free-ratio'
 import { ADSREnvelope } from '../ADSREnvelope/ADSREnvelope'
 import { randomizeOperator } from './services/randomize-operator/randomize-operator'
 import { initializeOperator } from './services/initialize-operator/initialize-operator'
@@ -156,7 +157,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
       <Flex h='100%' w={62}>
         <Stack
           align='center'
-          justify='center'
+          justify='start'
           h='100%'
           gap={10}
           pb={10}
@@ -167,26 +168,16 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
             size='xl'
             fw='bold'
             p={10}
+            mb={-10}
             ta='center'
             component='div'
-            style={{ whiteSpace: 'nowrap' }}
+            style={{ cursor: 'default' }}
           >
             OP{numId}
           </Text>
-          <Switch
-            onChange={(e) => {
-              updateValues([{ value: e.target.checked ? 1 : 0, propertyPath: `${opId}.PitchEnv` }])
-            }}
-            checked={values.PitchEnv === 1}
-            ref={pitchEnvRef}
-          />
-          <InputLabel fw='normal' mt={-10} fz='xs'>
-            Pitch EG
-          </InputLabel>
           <ActionIcon
-            mt='auto'
-            size='xl'
             title='Initialize'
+            size={32}
             variant='transparent'
             onClick={() => {
               const init = initializeOperator(opId)
@@ -195,11 +186,39 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
               updateValues(init.updatedValues)
             }}
           >
-            <IconReload size={48} color='#999' />
+            <IconReload size={48} color='#00000044' />
           </ActionIcon>
+          <Stack
+            align='center'
+            gap={15}
+            bg='#F5F5F5'
+            w='100%'
+            pt={10}
+            pb={5}
+            style={{
+              borderTop: '1px solid #DADADA',
+              borderBottom: '1px solid #DADADA'
+            }}
+          >
+            <Switch
+              onChange={(e) => {
+                updateValues([
+                  {
+                    value: e.target.checked ? 1 : 0,
+                    propertyPath: `${opId}.PitchEnv`
+                  }
+                ])
+              }}
+              checked={values.PitchEnv === 1}
+              ref={pitchEnvRef}
+            />
+            <InputLabel fw='normal' mt={-10} fz='xs'>
+              Pitch EG
+            </InputLabel>
+          </Stack>
           <ActionIcon
-            size='xl'
             title='Randomize'
+            size={32}
             variant='transparent'
             onClick={() => {
               const random = randomizeOperator(opId)
@@ -207,7 +226,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
               updateValues(random.updatedValues)
             }}
           >
-            <IconDice5 size={48} color='#999' />
+            <IconDice5 size={48} color='#00000044' />
           </ActionIcon>
         </Stack>
         <Divider orientation='vertical' />

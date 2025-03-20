@@ -1,6 +1,6 @@
 import { useAtomValue } from 'jotai'
 import { IconDownload } from '@tabler/icons-react'
-import { ActionIcon } from '@mantine/core'
+import { ActionIcon, Tooltip } from '@mantine/core'
 
 import { patchAtom } from '../../store/atoms'
 
@@ -19,8 +19,10 @@ export const DownloadPatchButton = () => {
   }
 
   return (
-    <ActionIcon h={50} w={50} color='#e6e3e1' c='dark' onClick={handleDownload}>
-      <IconDownload />
-    </ActionIcon>
+    <Tooltip label='Download Patch' withArrow color='#F0F0F0' c='#000000'>
+      <ActionIcon h={50} w={50} color='#e6e3e1' c='dark' onClick={handleDownload}>
+        <IconDownload />
+      </ActionIcon>
+    </Tooltip>
   )
 }

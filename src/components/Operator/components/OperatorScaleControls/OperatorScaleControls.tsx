@@ -52,13 +52,13 @@ export const OperatorScaleControls = ({
         <Accordion.Control p={0} px={10} fz='sm' bg='#eaeaea' onClick={toggleScaleControls}>
           Scale Controls
         </Accordion.Control>
-        <Accordion.Panel p={0} pb={10} styles={{ content: { padding: 0 } }}>
-          <Flex gap={16} align='start'>
+        <Accordion.Panel p={0} pl={6} pb={10} styles={{ content: { padding: 0 } }}>
+          <Flex gap={4} align='center' justify='start'>
             <Stack gap={0} align='center'>
               <InputLabel pb={4} w='100%' ta='center' style={{ borderBottom: '1px solid #CCC' }}>
                 Scale
               </InputLabel>
-              <Flex gap={10} p={4}>
+              <Flex gap={12} p={4}>
                 <Knob
                   label='Time'
                   propertyPath={`OP${opId}.Time`}
@@ -87,7 +87,7 @@ export const OperatorScaleControls = ({
               <InputLabel pb={4} w='100%' ta='center' style={{ borderBottom: '1px solid #CCC' }}>
                 Left
               </InputLabel>
-              <Flex gap={10} p={4}>
+              <Flex gap={12} p={4}>
                 <Knob
                   label='Gain'
                   propertyPath={`OP${opId}.LGain`}
@@ -116,7 +116,7 @@ export const OperatorScaleControls = ({
               <InputLabel pb={4} w='100%' ta='center' style={{ borderBottom: '1px solid #CCC' }}>
                 Right
               </InputLabel>
-              <Flex gap={10} p={4}>
+              <Flex gap={12} p={4}>
                 <Knob
                   label='Gain'
                   propertyPath={`OP${opId}.RGain`}

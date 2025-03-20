@@ -272,7 +272,7 @@ export const ADSREnvelope = ({
     <Box px={8} py={10} style={{ overflow: 'hidden' }}>
       <Stack gap={0} w={width}>
         {pitchEnv && (
-          <Title order={4} ta='left' mb={10} mt={0}>
+          <Title order={4} ta='left' mb={10} mt={0} style={{ cursor: 'default' }}>
             Pitch Envelope
           </Title>
         )}
