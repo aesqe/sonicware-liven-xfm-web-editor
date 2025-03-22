@@ -1,7 +1,7 @@
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react'
 import { useAtom, useAtomValue } from 'jotai'
 import { ActionIcon, Divider, Flex, InputLabel, Stack, Switch, Text } from '@mantine/core'
-import { clamp } from '@mantine/hooks'
+import { clamp, useViewportSize } from '@mantine/hooks'
 import { IconDice5, IconCopy, IconReload, IconClipboardText } from '@tabler/icons-react'
 
 import {
@@ -59,6 +59,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   const adsrRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
   const scaleControlsRef = useRef<SetInternalValueRef<OperatorProps>>(undefined)
   const [operatorClipboard, setOperatorClipboard] = useAtom(operatorClipboardAtom)
+  const viewport = useViewportSize()
 
   const opInRefs = [
     { id: 1, ref: op1InRef },
@@ -255,7 +256,11 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
         </Stack>
         <Divider orientation='vertical' />
       </Flex>
-      <Flex wrap='wrap' ref={containerRef} w='auto'>
+      <Flex
+        w='auto'
+        ref={containerRef}
+        style={{ flexFlow: viewport.width > 960 ? 'row wrap' : 'column wrap' }}
+      >
         <Stack gap={10} p={10} bg='#F5F5F5' w={400} h='100%'>
           <Flex align='start' justify='start' gap={12}>
             <Knob

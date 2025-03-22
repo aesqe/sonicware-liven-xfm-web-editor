@@ -56,9 +56,9 @@ export const PatchNameEditor = ({ onChange, ref }: Props) => {
       styles={{
         input: {
           fontWeight: 700,
-          fontSize: 40,
-          padding: 10,
-          height: 50
+          fontSize: 28,
+          padding: 6,
+          height: 40
         }
       }}
       rightSection={

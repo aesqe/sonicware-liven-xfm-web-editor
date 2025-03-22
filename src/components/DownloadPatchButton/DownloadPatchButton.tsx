@@ -20,7 +20,7 @@ export const DownloadPatchButton = () => {
 
   return (
     <Tooltip label='Download Patch' withArrow color='#F0F0F0' c='#000000'>
-      <ActionIcon h={50} w={50} color='#e6e3e1' c='dark' onClick={handleDownload}>
+      <ActionIcon h={40} w={40} color='#e6e3e1' c='dark' onClick={handleDownload}>
         <IconDownload />
       </ActionIcon>
     </Tooltip>

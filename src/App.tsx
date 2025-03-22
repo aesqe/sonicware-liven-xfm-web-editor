@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAtom, useAtomValue } from 'jotai'
 import { MessageEvent } from 'webmidi'
 import { ActionIcon, Box, Button, Divider, Flex, Paper, Stack, Title } from '@mantine/core'
-import { useThrottledCallback } from '@mantine/hooks'
+import { useThrottledCallback, useViewportSize } from '@mantine/hooks'
 import { IconTerminal2 } from '@tabler/icons-react'
 
 import { Operator } from './components/Operator/Operator'
@@ -37,6 +37,7 @@ export const App = () => {
   const containerRef = useRef<HTMLDivElement>(null)
   const pitchAdsrRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
   const patchNameRef = useRef<SetInternalValueRef<string>>(undefined)
+  const viewport = useViewportSize()
 
   const updateValues = useThrottledCallback((props: UpdatedProperty[]) => {
     const updatedPatch = props.reduce(
@@ -141,14 +142,21 @@ export const App = () => {
     return () => {
       window.removeEventListener('resize', handleResize)
     }
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [containerRef.current])
 
   return (
-    <Stack align='center' w='auto' mx='auto' gap={0}>
+    <Stack
+      align='center'
+      w='auto'
+      mx='auto'
+      gap={0}
+      maw={!ADSRControlsOpen ? 960 : viewport.width > 1880 ? 1880 : 960}
+    >
       <FileUpload onDrop={handleDrop} />
-      <Paper p={0} px={10} w='100%' mx='auto' maw={1900}>
+      <Paper p={0} px={10} mx='auto' w={viewport.width > 970 ? '100%' : '480px'}>
         <Flex justify='space-between' w='100%' mx='auto' wrap='wrap' ref={containerRef}>
-          <Stack gap={0} mr={10} w={250} pt={5}>
+          <Stack gap={0} mr={10} w={viewport.width > 960 ? 250 : '100%'} pt={5}>
             <Flex justify='space-between' align='center' w='100%'>
               <Title order={2} style={{ cursor: 'default' }}>
                 XFM Web Editor
@@ -209,7 +217,7 @@ export const App = () => {
         </Flex>
       </Paper>
       <Divider w='100%' />
-      <Flex w='auto' mx='auto' wrap='wrap' maw={1914} mt={18}>
+      <Flex w='auto' mx='auto' wrap='wrap' mt={18}>
         <Box mx='auto' mb={15}>
           <Divider />
           <Flex>
