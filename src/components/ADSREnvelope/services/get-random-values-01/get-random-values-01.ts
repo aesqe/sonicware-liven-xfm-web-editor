@@ -1,4 +1,4 @@
-export const getRandomValues01 = () => ({
+export const getRandomValues01 = (pitchEnvelope: boolean) => ({
   ATime: Math.random(),
   ALevel: Math.random(),
   DTime: Math.random(),
@@ -7,6 +7,6 @@ export const getRandomValues01 = () => ({
   STime: Math.random(),
   RLevel: Math.random(),
   RTime: Math.random(),
-  UpCurve: Math.random(),
-  DnCurve: Math.random()
+  UpCurve: pitchEnvelope ? 0.5 : Math.random(),
+  DnCurve: pitchEnvelope ? 0.5 : Math.random()
 })

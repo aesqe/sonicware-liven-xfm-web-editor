@@ -121,7 +121,7 @@ export const ADSREnvelope = ({
   }
 
   const randomizeEnvelope = () => {
-    setEnvelopeValues(getRandomValues01())
+    setEnvelopeValues(getRandomValues01(pitchEnv))
   }
 
   useEffect(() => {
