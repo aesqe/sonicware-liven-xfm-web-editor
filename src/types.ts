@@ -177,3 +177,5 @@ export type RandomizationOptions = {
   lowOP1In: boolean
   useStartValues: boolean
 }
+
+export type DragPoint = 'attack' | 'decay' | 'sustain' | 'release' | null
