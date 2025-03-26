@@ -16,21 +16,43 @@ import { Knob } from '../Knob/Knob'
 import { backgrounds } from './constants'
 import { isFreeRatio } from './services/is-free-ratio/is-free-ratio'
 import { ADSREnvelope } from '../ADSREnvelope/ADSREnvelope'
-import { randomizeOperator } from './services/randomize-operator/randomize-operator'
 import { getOperatorValues } from './services/get-operator-values/get-operator-values'
-import { initializeOperator } from './services/initialize-operator/initialize-operator'
 import { roundToNearestStep } from '../../services/round-to-nearest-step/round-to-nearest-step'
 import { OperatorScaleControls } from './components/OperatorScaleControls/OperatorScaleControls'
-import { operatorClipboardAtom, patchAtom } from '../../store/atoms'
+import { getInitialOperatorValues } from './services/get-initial-operator-values/get-initial-operator-values'
+import { getRandomizedOperatorValues } from './services/get-randomized-operator-values/get-randomized-operator-values'
+import { operatorClipboardAtom, patchAtom, randomizationOptionsAtom } from '../../store/atoms'
+
+const getUpdatedEnvelopeValues = (numId: number, values: ADSRValues) => {
+  const opId = `OP${numId}` as 'OP1' | 'OP2' | 'OP3' | 'OP4'
+  const updatedValues = [
+    { value: values.ATime, propertyPath: `${opId}.ATime` },
+    { value: values.ALevel, propertyPath: `${opId}.ALevel` },
+    { value: values.DTime, propertyPath: `${opId}.DTime` },
+    { value: values.DLevel, propertyPath: `${opId}.DLevel` },
+    { value: values.STime, propertyPath: `${opId}.STime` },
+    { value: values.SLevel, propertyPath: `${opId}.SLevel` },
+    { value: values.RTime, propertyPath: `${opId}.RTime` },
+    { value: values.RLevel, propertyPath: `${opId}.RLevel` }
+  ]
+
+  if (values.UpCurve !== undefined && values.DnCurve !== undefined) {
+    updatedValues.push({ value: values.UpCurve, propertyPath: `${opId}.UpCurve` })
+    updatedValues.push({ value: values.DnCurve, propertyPath: `${opId}.DnCurve` })
+  }
+
+  return updatedValues
+}
 
 type Props = {
-  id: number
+  id: 1 | 2 | 3 | 4
   updateValues: (props: UpdatedProperty[]) => void
   ref?: RefObject<OperatorRef | undefined>
 }
 
 export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   const patch = useAtomValue(patchAtom)
+  const randomizationOptions = useAtomValue(randomizationOptionsAtom)
 
   const opId = `OP${numId}` as 'OP1' | 'OP2' | 'OP3' | 'OP4'
   const values = patch[opId]
@@ -100,25 +122,31 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   const ratioFormatter = (val: number) =>
     freeRatio ? Math.round(val) : roundToNearestStep(val, val < 75 ? 50 : 100)
 
-  const updateEnvelope = (values: ADSRValues) => {
-    const update = [
-      { value: values.ATime, propertyPath: `${opId}.ATime` },
-      { value: values.ALevel, propertyPath: `${opId}.ALevel` },
-      { value: values.DTime, propertyPath: `${opId}.DTime` },
-      { value: values.DLevel, propertyPath: `${opId}.DLevel` },
-      { value: values.STime, propertyPath: `${opId}.STime` },
-      { value: values.SLevel, propertyPath: `${opId}.SLevel` },
-      { value: values.RTime, propertyPath: `${opId}.RTime` },
-      { value: values.RLevel, propertyPath: `${opId}.RLevel` }
-    ]
+  const updateEnvelope = useCallback(
+    (values: ADSRValues) => {
+      updateValues(getUpdatedEnvelopeValues(numId, values))
+    },
+    [numId, updateValues]
+  )
 
-    if (values.UpCurve !== undefined && values.DnCurve !== undefined) {
-      update.push({ value: values.UpCurve, propertyPath: `${opId}.UpCurve` })
-      update.push({ value: values.DnCurve, propertyPath: `${opId}.DnCurve` })
-    }
+  const initializeOperator = useCallback(() => {
+    const init = getInitialOperatorValues(opId)
+    setValues(init.values)
 
-    updateValues(update)
-  }
+    const envelopeValues = getUpdatedEnvelopeValues(numId, init.values)
+    updateValues([...init.updatedValues, ...envelopeValues])
+  }, [numId, opId, setValues, updateValues])
+
+  const randomizeOperator = useCallback(
+    (adsr = false) => {
+      const random = getRandomizedOperatorValues(numId, adsr, randomizationOptions, values)
+      setValues({ ...values, ...random.values, ...(adsr ? random.adsrValues : {}) })
+
+      const envelopeValues = adsr ? getUpdatedEnvelopeValues(numId, random.adsrValues) : []
+      updateValues([...random.updatedValues, ...envelopeValues])
+    },
+    [numId, setValues, updateValues, values, randomizationOptions]
+  )
 
   useEffect(() => {
     if (ref) {
@@ -179,12 +207,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
             title='Initialize'
             size={32}
             variant='transparent'
-            onClick={() => {
-              const init = initializeOperator(opId)
-              setValues(init.values)
-              updateEnvelope(init.values)
-              updateValues(init.updatedValues)
-            }}
+            onClick={initializeOperator}
           >
             <IconReload size={48} color='#00000044' />
           </ActionIcon>
@@ -245,11 +268,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
             title='Randomize'
             size={32}
             variant='transparent'
-            onClick={() => {
-              const random = randomizeOperator(opId)
-              setValues({ ...values, ...random.values })
-              updateValues(random.updatedValues)
-            }}
+            onClick={() => randomizeOperator(false)}
           >
             <IconDice5 size={48} color='#00000044' />
           </ActionIcon>

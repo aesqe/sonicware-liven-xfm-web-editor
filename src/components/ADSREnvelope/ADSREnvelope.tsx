@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, RefObject, CSSProperties } from 'react'
 import { useAtom } from 'jotai'
-import { Box, Button, Flex, Stack, Title } from '@mantine/core'
+import { Box, Button, Flex, Stack, Title, BoxProps } from '@mantine/core'
 
 import {
   defaultADSRCurve,
@@ -28,7 +28,7 @@ type Props = {
   knobSize?: CSSProperties['width']
   containerWidth?: number
   padding?: number
-}
+} & Partial<BoxProps>
 
 type DragPoint = 'attack' | 'decay' | 'sustain' | 'release' | null
 
@@ -41,7 +41,8 @@ export const ADSREnvelope = ({
   knobSize = '2rem',
   pitchEnv = false,
   initialState = pitchEnv ? defaultPitchADSRCurve : defaultADSRCurve,
-  onChange
+  onChange,
+  ...boxProps
 }: Props) => {
   // pitch env has a different range for levels
   const range = pitchEnv ? range_4848 : range0127
@@ -228,20 +229,6 @@ export const ADSREnvelope = ({
     ]
   )
 
-  useEffect(() => {
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('mouseup', handleMouseUp)
-    window.addEventListener('touchmove', handleMouseMove, { passive: false })
-    window.addEventListener('touchend', handleMouseUp)
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
-      window.removeEventListener('touchmove', handleMouseMove)
-      window.removeEventListener('touchend', handleMouseUp)
-    }
-  }, [handleMouseMove])
-
   const attackSegment = createCurvedPath(startPoint, attackPoint, values)
   const decaySegment = createCurvedPath(attackPoint, decayPoint, values)
   const sustainSegment = createCurvedPath(decayPoint, sustainPoint, values)
@@ -268,70 +255,87 @@ export const ADSREnvelope = ({
     onChange?.(convertOutput(updatedValues, range))
   }
 
+  useEffect(() => {
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+    window.addEventListener('touchmove', handleMouseMove, { passive: false })
+    window.addEventListener('touchend', handleMouseUp)
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+      window.removeEventListener('touchmove', handleMouseMove)
+      window.removeEventListener('touchend', handleMouseUp)
+    }
+  }, [handleMouseMove])
+
   return (
-    <Box px={8} py={10} style={{ overflow: 'hidden' }}>
-      <Stack gap={0} w={width}>
-        {pitchEnv && (
-          <Title order={4} ta='left' mb={10} mt={0} style={{ cursor: 'default' }}>
-            Pitch Envelope
-          </Title>
-        )}
-        <Button.Group>
-          <Button
-            flex={1}
-            size='xs'
-            color='#e6e3e1'
-            c='dark'
-            onClick={resetEnvelope}
-            style={{ '--button-bd': '1px solid #BABABA' }}
-          >
-            Init
-          </Button>
-          {!pitchEnv && (
-            <>
-              <Button
-                flex={1}
-                size='xs'
-                color='#e6e3e1'
-                c='dark'
-                onClick={copyEnvelope}
-                style={{ '--button-bd': '1px solid #BABABA' }}
-              >
-                Copy
-              </Button>
-              <Button
-                flex={1}
-                size='xs'
-                color='#e6e3e1'
-                c='dark'
-                onClick={pasteEnvelope}
-                style={{ '--button-bd': '1px solid #BABABA' }}
-              >
-                Paste
-              </Button>
-              <Button
-                flex={1}
-                size='xs'
-                color='#e6e3e1'
-                c='dark'
-                onClick={spreadEnvelope}
-                style={{ '--button-bd': '1px solid #BABABA' }}
-              >
-                Spread
-              </Button>
-            </>
+    <Box px={8} py={10} style={{ overflow: 'hidden' }} {...boxProps}>
+      <Stack gap={0} w={pitchEnv ? 'auto' : width}>
+        <Flex>
+          {pitchEnv && (
+            <Title order={6} ta='left' mr={20} style={{ cursor: 'default' }} lh={2}>
+              Pitch Envelope
+            </Title>
           )}
-          <Button
-            flex={1}
-            size='xs'
-            color='#e6e3e1'
-            c='dark'
-            onClick={randomizeEnvelope}
-            style={{ '--button-bd': '1px solid #BABABA' }}
-          >
-            Random
-          </Button>
-        </Button.Group>
+
+          <Button.Group w={pitchEnv ? 190 : width}>
+            <Button
+              flex={1}
+              size='xs'
+              color='#e6e3e1'
+              c='dark'
+              onClick={resetEnvelope}
+              style={{ '--button-bd': '1px solid #BABABA' }}
+            >
+              Init
+            </Button>
+            {!pitchEnv && (
+              <>
+                <Button
+                  flex={1}
+                  size='xs'
+                  color='#e6e3e1'
+                  c='dark'
+                  onClick={copyEnvelope}
+                  style={{ '--button-bd': '1px solid #BABABA' }}
+                >
+                  Copy
+                </Button>
+                <Button
+                  flex={1}
+                  size='xs'
+                  color='#e6e3e1'
+                  c='dark'
+                  onClick={pasteEnvelope}
+                  style={{ '--button-bd': '1px solid #BABABA' }}
+                >
+                  Paste
+                </Button>
+                <Button
+                  flex={1}
+                  size='xs'
+                  color='#e6e3e1'
+                  c='dark'
+                  onClick={spreadEnvelope}
+                  style={{ '--button-bd': '1px solid #BABABA' }}
+                >
+                  Spread
+                </Button>
+              </>
+            )}
+            <Button
+              flex={1}
+              size='xs'
+              color='#e6e3e1'
+              c='dark'
+              onClick={randomizeEnvelope}
+              style={{ '--button-bd': '1px solid #BABABA' }}
+            >
+              Random
+            </Button>
+          </Button.Group>
+        </Flex>
         <Flex my={10}>
           <Box w={width} h={height} bd='1px solid #DEDEDE'>
             <svg

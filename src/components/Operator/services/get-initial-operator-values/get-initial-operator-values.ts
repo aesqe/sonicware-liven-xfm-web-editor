@@ -1,7 +1,7 @@
 import { OperatorProps, UpdatedProperty } from '../../../../types'
 import initpatch from '../../../../assets/presets/initpatch.json'
 
-export const initializeOperator = (opId: 'OP1' | 'OP2' | 'OP3' | 'OP4') => {
+export const getInitialOperatorValues = (opId: 'OP1' | 'OP2' | 'OP3' | 'OP4') => {
   const values = initpatch[opId] as OperatorProps
 
   const updatedValues: UpdatedProperty[] = [

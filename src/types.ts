@@ -170,3 +170,10 @@ export type OperatorRef = SetInternalValueRef<OperatorProps> & {
   setScaleControlsOpen: (open: boolean) => void
   setADSRControlsOpen: (open: boolean) => void
 }
+
+export type RandomizationOptions = {
+  amount: number
+  freeRatio: boolean
+  lowOP1In: boolean
+  useStartValues: boolean
+}
