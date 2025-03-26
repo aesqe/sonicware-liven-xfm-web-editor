@@ -39,6 +39,17 @@ import {
   randomizationOptionsAtom
 } from './store/atoms'
 
+const defaultADSR = {
+  ALevel: initPatch.OP1.ALevel,
+  ATime: initPatch.OP1.ATime,
+  DLevel: initPatch.OP1.DLevel,
+  DTime: initPatch.OP1.DTime,
+  SLevel: initPatch.OP1.SLevel,
+  STime: initPatch.OP1.STime,
+  RLevel: initPatch.OP1.RLevel,
+  RTime: initPatch.OP1.RTime
+}
+
 export const App = () => {
   useWebMidi()
 
@@ -232,7 +243,14 @@ export const App = () => {
                   flex={1}
                   style={{ '--button-bd': '1px solid #BABABA' }}
                   onClick={() => {
-                    handlePatchChange(initPatch)
+                    const { Mixer, Pitch, Name } = patch
+
+                    handlePatchChange({
+                      ...initPatch,
+                      Mixer,
+                      Pitch,
+                      Name
+                    })
                   }}
                 >
                   Operators
@@ -245,7 +263,18 @@ export const App = () => {
                   flex={1}
                   style={{ '--button-bd': '1px solid #BABABA' }}
                   onClick={() => {
-                    handlePatchChange(initPatch)
+                    const OP1 = { ...patch.OP1, ...defaultADSR }
+                    const OP2 = { ...patch.OP2, ...defaultADSR }
+                    const OP3 = { ...patch.OP3, ...defaultADSR }
+                    const OP4 = { ...patch.OP4, ...defaultADSR }
+
+                    handlePatchChange({
+                      ...patch,
+                      OP1,
+                      OP2,
+                      OP3,
+                      OP4
+                    })
                   }}
                 >
                   ADSR

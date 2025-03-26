@@ -1,5 +1,6 @@
 export type XFMPatch = {
   Name: string
+  Mixer: { Level: number }
   Pitch: {
     ALevel: number
     ATime: number
@@ -134,7 +135,6 @@ export type XFMPatch = {
     LCurve: number
     RCurve: number
   }
-  Mixer: { Level: number }
 }
 
 export type ADSRValues = {
