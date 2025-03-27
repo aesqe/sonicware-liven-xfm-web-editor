@@ -16,33 +16,13 @@ import { Knob } from '../Knob/Knob'
 import { backgrounds } from './constants'
 import { isFreeRatio } from './services/is-free-ratio/is-free-ratio'
 import { ADSREnvelope } from '../ADSREnvelope/ADSREnvelope'
+import { ratioFormatter } from './services/ratio-formatter/ratio-formatter'
 import { getOperatorValues } from './services/get-operator-values/get-operator-values'
-import { roundToNearestStep } from '../../services/round-to-nearest-step/round-to-nearest-step'
 import { OperatorScaleControls } from './components/OperatorScaleControls/OperatorScaleControls'
 import { getInitialOperatorValues } from './services/get-initial-operator-values/get-initial-operator-values'
+import { getUpdatedEnvelopeValues } from './services/get-updated-envelope-values/get-updated-envelope-values'
 import { getRandomizedOperatorValues } from './services/get-randomized-operator-values/get-randomized-operator-values'
 import { operatorClipboardAtom, patchAtom, randomizationOptionsAtom } from '../../store/atoms'
-
-const getUpdatedEnvelopeValues = (numId: number, values: ADSRValues) => {
-  const opId = `OP${numId}` as 'OP1' | 'OP2' | 'OP3' | 'OP4'
-  const updatedValues = [
-    { value: values.ATime, propertyPath: `${opId}.ATime` },
-    { value: values.ALevel, propertyPath: `${opId}.ALevel` },
-    { value: values.DTime, propertyPath: `${opId}.DTime` },
-    { value: values.DLevel, propertyPath: `${opId}.DLevel` },
-    { value: values.STime, propertyPath: `${opId}.STime` },
-    { value: values.SLevel, propertyPath: `${opId}.SLevel` },
-    { value: values.RTime, propertyPath: `${opId}.RTime` },
-    { value: values.RLevel, propertyPath: `${opId}.RLevel` }
-  ]
-
-  if (values.UpCurve !== undefined && values.DnCurve !== undefined) {
-    updatedValues.push({ value: values.UpCurve, propertyPath: `${opId}.UpCurve` })
-    updatedValues.push({ value: values.DnCurve, propertyPath: `${opId}.DnCurve` })
-  }
-
-  return updatedValues
-}
 
 type Props = {
   id: 1 | 2 | 3 | 4
@@ -119,34 +99,25 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
     [opInRefs]
   )
 
-  const ratioFormatter = (val: number) =>
-    freeRatio ? Math.round(val) : roundToNearestStep(val, val < 75 ? 50 : 100)
+  const updateEnvelope = (values: ADSRValues) => {
+    updateValues(getUpdatedEnvelopeValues(numId, values))
+  }
 
-  const updateEnvelope = useCallback(
-    (values: ADSRValues) => {
-      updateValues(getUpdatedEnvelopeValues(numId, values))
-    },
-    [numId, updateValues]
-  )
-
-  const initializeOperator = useCallback(() => {
+  const initializeOperator = () => {
     const init = getInitialOperatorValues(opId)
     setValues(init.values)
 
     const envelopeValues = getUpdatedEnvelopeValues(numId, init.values)
     updateValues([...init.updatedValues, ...envelopeValues])
-  }, [numId, opId, setValues, updateValues])
+  }
 
-  const randomizeOperator = useCallback(
-    (adsr = false) => {
-      const random = getRandomizedOperatorValues(numId, adsr, randomizationOptions, values)
-      setValues({ ...values, ...random.values, ...(adsr ? random.adsrValues : {}) })
+  const randomizeOperator = (adsr = false) => {
+    const random = getRandomizedOperatorValues(numId, adsr, randomizationOptions, values)
+    setValues({ ...values, ...random.values, ...(adsr ? random.adsrValues : {}) })
 
-      const envelopeValues = adsr ? getUpdatedEnvelopeValues(numId, random.adsrValues) : []
-      updateValues([...random.updatedValues, ...envelopeValues])
-    },
-    [numId, setValues, updateValues, values, randomizationOptions]
-  )
+    const envelopeValues = adsr ? getUpdatedEnvelopeValues(numId, random.adsrValues) : []
+    updateValues([...random.updatedValues, ...envelopeValues])
+  }
 
   useEffect(() => {
     if (ref) {
@@ -326,8 +297,8 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
                 valueMax={3200}
                 valueDefault={values.Ratio}
                 center={1600}
-                formatterFn={ratioFormatter}
-                valueRawDisplayFn={(val) => `${ratioFormatter(val) / 100}`}
+                formatterFn={(val) => ratioFormatter(val, freeRatio)}
+                valueRawDisplayFn={(val) => `${ratioFormatter(val, freeRatio) / 100}`}
                 disabled={fixed}
                 ref={ratioRef}
               />

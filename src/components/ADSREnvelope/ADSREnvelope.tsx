@@ -11,6 +11,7 @@ import {
 } from './constants'
 import { convertInput } from './services/convert-input/convert-input'
 import { convertOutput } from './services/convert-output/convert-output'
+import { compareObjects } from '../../services/compare-objects/compare-objects'
 import { ADSREnvelopeSVG } from './components/ADSREnvelopeSVG/ADSREnvelopeSVG'
 import { ADSREnvelopeKnobs } from './components/ADSREnvelopeKnobs/ADSREnvelopeKnobs'
 import { getRandomValues01 } from './services/get-random-values-01/get-random-values-01'
@@ -44,21 +45,42 @@ export const ADSREnvelope = ({
 }: Props) => {
   // pitch env has a different range for levels
   const range = pitchEnv ? range_4848 : range0127
+
   // values are in 0..1 range
   const [values, setValues] = useState<ADSRValues>(convertInput(initialState, range))
   const [envelopeClipboard, setEnvelopeClipboard] = useAtom(envelopeClipboardAtom)
   const svgRef = useRef<SVGSVGElement>(null)
   const knobsRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
+  const skipOnChange = useRef(false)
 
   const setEnvelopeValues = useCallback(
-    (values: ADSRValues) => {
-      const output = convertOutput(values, range)
-      setValues(values)
+    (updatedValues: ADSRValues) => {
+      if (compareObjects(values, updatedValues)) {
+        return
+      }
+
+      const output = convertOutput(updatedValues, range)
+
+      setValues(updatedValues)
       knobsRef.current?.setInternalValue(output)
-      onChange?.(output)
+
+      if (!skipOnChange.current) {
+        onChange?.(output)
+      }
     },
-    [onChange, range, knobsRef]
+    [onChange, range, knobsRef, values]
   )
+
+  useEffect(() => {
+    if (ref) {
+      ref.current = {
+        setInternalValue: (values: ADSRValues, skipUpdate = false) => {
+          skipOnChange.current = skipUpdate
+          setEnvelopeValues(convertInput(values, range))
+        }
+      }
+    }
+  }, [range, ref, setEnvelopeValues])
 
   const resetEnvelope = () => {
     setEnvelopeValues(pitchEnv ? defaultPitchADSRCurve01 : defaultADSRCurve01)
@@ -82,23 +104,13 @@ export const ADSREnvelope = ({
     setEnvelopeValues(getRandomValues01(pitchEnv))
   }
 
-  useEffect(() => {
-    if (ref) {
-      ref.current = {
-        setInternalValue: (values: ADSRValues) => {
-          setEnvelopeValues(convertInput(values, range))
-        }
-      }
-    }
-  }, [range, ref, setEnvelopeValues])
-
   const handleKnobChange = ([data]: UpdatedProperty[]) => {
     let updatedValue = 0
 
     if (data.propertyPath.endsWith('Level')) {
       updatedValue = range.mapTo01(data.value)
     } else if (data.propertyPath.endsWith('Time')) {
-      updatedValue = data.value / 127
+      updatedValue = range0127.mapTo01(data.value)
     } else {
       updatedValue = range_1818.mapTo01(data.value)
     }
@@ -114,6 +126,7 @@ export const ADSREnvelope = ({
 
   const handleAdsrChange = (updatedValues: ADSRValues) => {
     const output = convertOutput(updatedValues, range)
+
     setValues(updatedValues)
     knobsRef.current?.setInternalValue(output)
     onChange?.(output)
@@ -203,7 +216,7 @@ export const ADSREnvelope = ({
         <ADSREnvelopeKnobs
           values={convertOutput(values, range)}
           range={range}
-          handleKnobChange={handleKnobChange}
+          onChange={handleKnobChange}
           knobSize={containerWidth < 800 ? '1.5rem' : knobSize}
           pitchEnv={pitchEnv}
           ref={knobsRef}

@@ -54,6 +54,7 @@ export const Knob = ({
   const knobId = useId()
   const labelId = useId()
   const [valueRaw, setValueRaw] = useState<number>(valueDefault)
+  const valueSetFromOutside = useRef(false)
 
   const range = new NormalisableRange(valueMin, valueMax, center)
   const mapTo01 = (x: number) => range.mapTo01(x)
@@ -65,6 +66,11 @@ export const Knob = ({
   const stepLarger = stepLargerFn(valueRaw)
 
   const handleOnChange = (value: number) => {
+    if (valueSetFromOutside.current) {
+      valueSetFromOutside.current = false
+      return
+    }
+
     setValueRaw(value)
     onChange([{ value, propertyPath, formatterFn }])
   }
@@ -81,7 +87,10 @@ export const Knob = ({
   useEffect(() => {
     if (ref) {
       ref.current = {
-        setInternalValue: setValueRaw
+        setInternalValue: (value: number) => {
+          valueSetFromOutside.current = true
+          setValueRaw(value)
+        }
       }
     }
   }, [ref, setValueRaw])

@@ -23,7 +23,9 @@ import { convert78 } from './services/convert78/convert78'
 import { decode8bit } from './services/decode8bit/decode8bit'
 import { FileUpload } from './components/FileUpload/FileUpload'
 import { useWebMidi } from './services/use-web-midi/use-web-midi'
+import { defaultADSR } from './constants'
 import { ADSREnvelope } from './components/ADSREnvelope/ADSREnvelope'
+import { compareObjects } from './services/compare-objects/compare-objects'
 import { getRandomPatch } from './services/get-random-patch/get-random-patch'
 import { PatchNameEditor } from './components/PatchNameEditor/PatchNameEditor'
 import { useSendPatchToXFM } from './services/use-send-patch-to-xfm/use-send-patch-to-xfm'
@@ -39,17 +41,6 @@ import {
   randomizationOptionsAtom
 } from './store/atoms'
 
-const defaultADSR = {
-  ALevel: initPatch.OP1.ALevel,
-  ATime: initPatch.OP1.ATime,
-  DLevel: initPatch.OP1.DLevel,
-  DTime: initPatch.OP1.DTime,
-  SLevel: initPatch.OP1.SLevel,
-  STime: initPatch.OP1.STime,
-  RLevel: initPatch.OP1.RLevel,
-  RTime: initPatch.OP1.RTime
-}
-
 export const App = () => {
   useWebMidi()
 
@@ -57,7 +48,7 @@ export const App = () => {
   const sendPatchToXFM = useSendPatchToXFM()
   const [patch, setPatch] = useAtom(patchAtom)
   const midiInput = useAtomValue(midiInputAtom)
-  const [randomizationOptions, setRandomizationOptions] = useAtom(randomizationOptionsAtom)
+  const [randomizationOptions, setRandOptions] = useAtom(randomizationOptionsAtom)
   const sysexSendThrottleTime = useAtomValue(sysexSendThrottleTimeAtom)
   const [scaleControlsOpen, setScaleControlsOpen] = useState(false)
   const [ADSRControlsOpen, setADSRControlsOpen] = useState(true)
@@ -70,17 +61,37 @@ export const App = () => {
   const containerRef = useRef<HTMLDivElement>(null)
   const pitchAdsrRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
   const patchNameRef = useRef<SetInternalValueRef<string>>(undefined)
+  const prevPatchRef = useRef<XFMPatch>(patch)
 
-  const updateValues = useThrottledCallback((props: UpdatedProperty[]) => {
-    const updatedPatch = props.reduce(
-      (acc, { propertyPath, formatterFn, value }) =>
-        updateObjectValueByPath(acc, propertyPath, formatterFn ? formatterFn(value) : value),
-      patch
-    )
+  const setRandomizationOptions = useThrottledCallback(setRandOptions, sysexSendThrottleTime)
 
-    setPatch(updatedPatch)
-    sendPatchToXFM(updatedPatch)
+  const updateValues = useThrottledCallback(
+    useCallback(
+      (props: UpdatedProperty[]) => {
+        const updatedPatch = props.reduce(
+          (acc, { propertyPath, formatterFn, value }) =>
+            updateObjectValueByPath(acc, propertyPath, formatterFn ? formatterFn(value) : value),
+          patch
+        )
+
+        setPatch(updatedPatch)
+      },
+      [patch, setPatch]
+    ),
+    sysexSendThrottleTime
+  )
+
+  const throttledSendPatch = useThrottledCallback(() => {
+    if (!compareObjects(prevPatchRef.current, patch)) {
+      prevPatchRef.current = patch
+      console.log('sending patch', patch)
+      sendPatchToXFM(patch)
+    }
   }, sysexSendThrottleTime)
+
+  useEffect(() => {
+    throttledSendPatch()
+  }, [patch, throttledSendPatch])
 
   const updatePatchName = useThrottledCallback((patchName: string) => {
     const updatedPatch = { ...patch, Name: patchName.padEnd(4, ' ') }

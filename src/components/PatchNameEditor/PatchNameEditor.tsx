@@ -17,14 +17,6 @@ export const PatchNameEditor = ({ onChange, ref }: Props) => {
   const [patchName, setPatchName] = useState(patch.Name)
   const [valid, setValid] = useState(true)
 
-  const validate = (value: string) => {
-    const isValid = value.length > 0 && value.length < 8 && validationRegex.test(value)
-
-    setValid(isValid)
-
-    return isValid
-  }
-
   useEffect(() => {
     if (ref) {
       ref.current = {
@@ -32,6 +24,14 @@ export const PatchNameEditor = ({ onChange, ref }: Props) => {
       }
     }
   }, [ref])
+
+  const validate = (value: string) => {
+    const isValid = value.length > 0 && value.length < 8 && validationRegex.test(value)
+
+    setValid(isValid)
+
+    return isValid
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toUpperCase()
