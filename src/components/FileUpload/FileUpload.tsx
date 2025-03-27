@@ -7,7 +7,6 @@ type Props = Partial<DropzoneFullScreenProps> & { onDrop: (files: File[]) => voi
 export const FileUpload = (props: Props) => (
   <Dropzone.FullScreen
     onReject={(files) => console.log('rejected files', files)}
-    accept={['application/json']}
     maxSize={50 * 1024}
     active
     {...props}

@@ -16,7 +16,9 @@ Visit the online version of the web editor on Github pages https://aesqe.github.
 ## Additional Instructions
 
 * You can download the current patch as a JSON file by clicking the :arrow_down: button next to the patch name editor
-* You can drag and drop a JSON patch file anywhere on the page and the editor will read it and update patch values
+* You can drag and drop a JSON or SYX patch file anywhere on the page and the editor will read it, update its values, and send the patch to the device. **Only single-patch SYX files are supported at the moment**, but I'm working on a more advanced importer which will be able to handle whole preset banks.
+  * You can find all original patches that come with the device in JSON format in the Python editor repo: https://github.com/wrightflyer/XFM/tree/master/factory
+  * And here is a very nice set of 50 basic waveforms in SYX format by Chris Lody: https://www.youtube.com/watch?v=sm_kKbW1FNo
 * If you work on a patch in the web editor and then change a parameter value on the device, that will not be automatically reflected in the web editor. You'll need to press the `MIDI EXPORT` button on the device and then confirm by pressing the `OK` button to send the updated values to the web editor.
 * To toggle logging of `Sysex` messages to the browser console, click the button next to the `XFM Web Editor` title in the top left corner of the page. You can open the browser developer tools and switch to the console tab to view `Sysex` messages when the button is green.
 * The points on the ADSR envelope can be dragged around to change time/level values. Just have in mind that the line/curve display is for illustrative purposes only, as it would take a much bigger area and more complex calculations to display the envelope accurately.

@@ -137,15 +137,27 @@ export const App = () => {
 
   const handleDrop = (files: File[]) => {
     const file = files[0]
+    const reader = new FileReader()
 
     if (file.type === 'application/json') {
-      const reader = new FileReader()
-
       reader.onload = (event) => {
         handlePatchChange(JSON.parse(event.target?.result as string))
       }
 
       reader.readAsText(file)
+    } else if (file.name.endsWith('.syx')) {
+      reader.onload = (event) => {
+        const res = event.target?.result as ArrayBuffer
+
+        if (res.byteLength > 230) {
+          const data = Array.from(new Uint8Array(res).slice(20, 230))
+          const patch = decode8bit(convert78(data))
+
+          handlePatchChange(patch)
+        }
+      }
+
+      reader.readAsArrayBuffer(file)
     }
   }
 
@@ -196,7 +208,8 @@ export const App = () => {
       maw={!ADSRControlsOpen ? 960 : viewport.width > 1900 ? 1900 : 960}
     >
       <FileUpload onDrop={handleDrop} />
-      <Paper p={0} px={10} mx='auto' w={viewport.width > 970 ? '100%' : '480px'}>
+
+      <Paper p={0} px={10} mx='auto' w={viewport.width > 970 ? '100%' : '460px'}>
         <Flex w='100%' mx='auto' wrap='wrap' ref={containerRef}>
           <Stack gap={0} mr={10} w={viewport.width > 960 ? 250 : '100%'} pt={5}>
             <Flex justify='space-between' align='center' w='100%'>
@@ -341,7 +354,7 @@ export const App = () => {
             mr={viewport.width > 960 ? 20 : 0}
             w={viewport.width > 960 ? 280 : '100%'}
           >
-            <Fieldset legend='Randomize' w='100%' px={5} py={8}>
+            <Fieldset legend='Randomize (work in progress)' w='100%' px={5} py={8}>
               <Button.Group w='100%'>
                 <Button
                   color='#e6e3e1'
@@ -386,6 +399,41 @@ export const App = () => {
                 </Button>
               </Button.Group>
               <Flex align='center' gap={10} mt={8} px={10}>
+                <Stack gap={10} align='start'>
+                  <Switch
+                    label='Free ratio'
+                    checked={randomizationOptions.freeRatio}
+                    onChange={(e) =>
+                      setRandomizationOptions({
+                        ...randomizationOptions,
+                        freeRatio: e.target.checked
+                      })
+                    }
+                  />
+                  <Switch
+                    label='Low OP1 In levels'
+                    description='Less noise and distortion'
+                    checked={randomizationOptions.lowOP1In}
+                    onChange={(e) =>
+                      setRandomizationOptions({
+                        ...randomizationOptions,
+                        lowOP1In: e.target.checked
+                      })
+                    }
+                  />
+                  <Switch
+                    label='Use current values'
+                    description='Smaller changes closer to the original values'
+                    checked={randomizationOptions.useStartValues}
+                    onChange={(e) =>
+                      setRandomizationOptions({
+                        ...randomizationOptions,
+                        useStartValues: e.target.checked
+                      })
+                    }
+                  />
+                </Stack>
+                <Divider orientation='vertical' ml={4} />
                 <Knob
                   label='Amount'
                   valueMin={0}
@@ -400,39 +448,6 @@ export const App = () => {
                   formatterFn={(value) => Math.round(value)}
                   size='3.2rem'
                 />
-                <Divider orientation='vertical' ml={4} />
-                <Stack gap={10} align='start'>
-                  <Switch
-                    label='Free ratio'
-                    checked={randomizationOptions.freeRatio}
-                    onChange={(e) =>
-                      setRandomizationOptions({
-                        ...randomizationOptions,
-                        freeRatio: e.target.checked
-                      })
-                    }
-                  />
-                  <Switch
-                    label='Low OP1 In'
-                    checked={randomizationOptions.lowOP1In}
-                    onChange={(e) =>
-                      setRandomizationOptions({
-                        ...randomizationOptions,
-                        lowOP1In: e.target.checked
-                      })
-                    }
-                  />
-                  <Switch
-                    label='Use current values as starting point'
-                    checked={randomizationOptions.useStartValues}
-                    onChange={(e) =>
-                      setRandomizationOptions({
-                        ...randomizationOptions,
-                        useStartValues: e.target.checked
-                      })
-                    }
-                  />
-                </Stack>
               </Flex>
             </Fieldset>
           </Stack>
