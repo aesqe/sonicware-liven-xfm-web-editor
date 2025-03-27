@@ -1,11 +1,11 @@
-import { ComponentProps, CSSProperties, RefObject, useId, useState, useEffect } from 'react'
+import { ComponentProps, CSSProperties, RefObject, useId, useState, useEffect, useRef } from 'react'
 import { KnobHeadless, KnobHeadlessLabel, KnobHeadlessOutput } from 'react-knob-headless'
 import { Stack } from '@mantine/core'
 
 import { KnobBaseThumb } from './components/KnobBaseThumb/KnobBaseThumb'
-import { UpdatedProperty } from '../../types'
 import { NormalisableRange } from '../../services/normalisable-range/normalisable-range'
 import { useKnobKeyboardControls } from './services/use-knob-keyboard-controls/use-knob-keyboard-controls'
+import { UpdatedProperty, SetInternalValueRef } from '../../types'
 
 type KnobHeadlessProps = Pick<
   ComponentProps<typeof KnobHeadless>,
@@ -29,7 +29,7 @@ type Props = KnobHeadlessProps &
     formatterFn?: (x: number) => number
     stepLargerFn?: (valueRaw: number) => number
     size?: CSSProperties['width']
-    ref?: RefObject<{ setValueRaw: (value: number) => void } | null>
+    ref?: RefObject<SetInternalValueRef<number> | null>
   }
 
 export const Knob = ({
@@ -80,7 +80,9 @@ export const Knob = ({
 
   useEffect(() => {
     if (ref) {
-      ref.current = { setValueRaw }
+      ref.current = {
+        setInternalValue: setValueRaw
+      }
     }
   }, [ref, setValueRaw])
 

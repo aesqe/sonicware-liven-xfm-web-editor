@@ -10,7 +10,7 @@ type Props = {
   range: NormalisableRange
   pitchEnv?: boolean
   knobSize?: CSSProperties['width']
-  handleKnobChange: (values: UpdatedProperty[]) => void
+  onChange: (values: UpdatedProperty[]) => void
   ref: RefObject<SetInternalValueRef<ADSRValues> | undefined>
 }
 
@@ -20,7 +20,7 @@ export const ADSREnvelopeKnobs = ({
   range,
   knobSize = '2rem',
   pitchEnv = false,
-  handleKnobChange
+  onChange
 }: Props) => {
   const aTimeRef = useRef<KnobRefType>(null)
   const aLevelRef = useRef<KnobRefType>(null)
@@ -37,18 +37,18 @@ export const ADSREnvelopeKnobs = ({
     if (ref) {
       ref.current = {
         setInternalValue: (vals: ADSRValues) => {
-          aTimeRef.current?.setValueRaw(vals.ATime)
-          aLevelRef.current?.setValueRaw(vals.ALevel)
-          dTimeRef.current?.setValueRaw(vals.DTime)
-          dLevelRef.current?.setValueRaw(vals.DLevel)
-          sTimeRef.current?.setValueRaw(vals.STime)
-          sLevelRef.current?.setValueRaw(vals.SLevel)
-          rTimeRef.current?.setValueRaw(vals.RTime)
-          rLevelRef.current?.setValueRaw(vals.RLevel)
+          aTimeRef.current?.setInternalValue(vals.ATime)
+          aLevelRef.current?.setInternalValue(vals.ALevel)
+          dTimeRef.current?.setInternalValue(vals.DTime)
+          dLevelRef.current?.setInternalValue(vals.DLevel)
+          sTimeRef.current?.setInternalValue(vals.STime)
+          sLevelRef.current?.setInternalValue(vals.SLevel)
+          rTimeRef.current?.setInternalValue(vals.RTime)
+          rLevelRef.current?.setInternalValue(vals.RLevel)
 
           if (vals.UpCurve !== undefined && vals.DnCurve !== undefined) {
-            upCurveRef.current?.setValueRaw(vals.UpCurve)
-            dnCurveRef.current?.setValueRaw(vals.DnCurve)
+            upCurveRef.current?.setInternalValue(vals.UpCurve)
+            dnCurveRef.current?.setInternalValue(vals.DnCurve)
           }
         }
       }
@@ -69,7 +69,7 @@ export const ADSREnvelopeKnobs = ({
             valueRawDisplayFn={(valueRaw) => `${Math.round(valueRaw)}`}
             valueMin={0}
             valueMax={127}
-            onChange={handleKnobChange}
+            onChange={onChange}
             ref={aTimeRef}
             size={knobSize}
           />
@@ -81,7 +81,7 @@ export const ADSREnvelopeKnobs = ({
             valueMin={range.min}
             valueMax={range.max}
             center={range.center}
-            onChange={handleKnobChange}
+            onChange={onChange}
             ref={aLevelRef}
             size={knobSize}
           />
@@ -99,7 +99,7 @@ export const ADSREnvelopeKnobs = ({
             valueRawDisplayFn={(valueRaw) => `${Math.round(valueRaw)}`}
             valueMin={0}
             valueMax={127}
-            onChange={handleKnobChange}
+            onChange={onChange}
             ref={dTimeRef}
             size={knobSize}
           />
@@ -111,7 +111,7 @@ export const ADSREnvelopeKnobs = ({
             valueMin={range.min}
             valueMax={range.max}
             center={range.center}
-            onChange={handleKnobChange}
+            onChange={onChange}
             ref={dLevelRef}
             size={knobSize}
           />
@@ -129,7 +129,7 @@ export const ADSREnvelopeKnobs = ({
             valueRawDisplayFn={(valueRaw) => `${Math.round(valueRaw)}`}
             valueMin={0}
             valueMax={127}
-            onChange={handleKnobChange}
+            onChange={onChange}
             ref={sTimeRef}
             size={knobSize}
           />
@@ -141,7 +141,7 @@ export const ADSREnvelopeKnobs = ({
             valueMin={range.min}
             valueMax={range.max}
             center={range.center}
-            onChange={handleKnobChange}
+            onChange={onChange}
             ref={sLevelRef}
             size={knobSize}
           />
@@ -159,7 +159,7 @@ export const ADSREnvelopeKnobs = ({
             valueRawDisplayFn={(valueRaw) => `${Math.round(valueRaw)}`}
             valueMin={0}
             valueMax={127}
-            onChange={handleKnobChange}
+            onChange={onChange}
             ref={rTimeRef}
             size={knobSize}
           />
@@ -171,7 +171,7 @@ export const ADSREnvelopeKnobs = ({
             valueMin={range.min}
             valueMax={range.max}
             center={range.center}
-            onChange={handleKnobChange}
+            onChange={onChange}
             ref={rLevelRef}
             size={knobSize}
           />
@@ -188,7 +188,7 @@ export const ADSREnvelopeKnobs = ({
               valueDefault={values.UpCurve ?? 0}
               propertyPath='UpCurve'
               valueRawDisplayFn={(valueRaw) => `${Math.round(valueRaw)}`}
-              onChange={handleKnobChange}
+              onChange={onChange}
               formatterFn={Math.round}
               valueMin={-18}
               valueMax={18}
@@ -200,7 +200,7 @@ export const ADSREnvelopeKnobs = ({
               valueDefault={values.DnCurve ?? 0}
               propertyPath='DnCurve'
               valueRawDisplayFn={(valueRaw) => `${Math.round(valueRaw)}`}
-              onChange={handleKnobChange}
+              onChange={onChange}
               formatterFn={Math.round}
               valueMin={-18}
               valueMax={18}

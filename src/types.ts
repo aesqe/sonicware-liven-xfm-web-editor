@@ -156,9 +156,7 @@ export type UpdatedProperty = {
   formatterFn?: (val: number) => number
 }
 
-export type KnobRefType = {
-  setValueRaw: (value: number) => void
-} | null
+export type KnobRefType = SetInternalValueRef<number> | null
 
 export type OperatorProps = XFMPatch['OP1'] | XFMPatch['OP2'] | XFMPatch['OP3'] | XFMPatch['OP4']
 

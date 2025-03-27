@@ -92,13 +92,13 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
 
   const setValues = useCallback(
     (values: OperatorProps) => {
-      levelRef.current?.setValueRaw(values.Level)
-      outputRef.current?.setValueRaw(values.Output)
-      velSensRef.current?.setValueRaw(values.VelSens)
-      ratioRef.current?.setValueRaw(values.Ratio)
-      freqRef.current?.setValueRaw(values.Freq)
-      detuneRef.current?.setValueRaw(values.Detune)
-      feedbackRef.current?.setValueRaw(values.Feedback)
+      levelRef.current?.setInternalValue(values.Level)
+      outputRef.current?.setInternalValue(values.Output)
+      velSensRef.current?.setInternalValue(values.VelSens)
+      ratioRef.current?.setInternalValue(values.Ratio)
+      freqRef.current?.setInternalValue(values.Freq)
+      detuneRef.current?.setInternalValue(values.Detune)
+      feedbackRef.current?.setInternalValue(values.Feedback)
 
       scaleControlsRef.current?.setInternalValue(values)
       pitchEnvRef.current!.checked = values.PitchEnv === 1
@@ -110,7 +110,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
       opInRefs.forEach(({ id, ref }) => {
         const prop = `OP${id}In` as keyof OperatorProps
         const value = values[prop] as number
-        ref.current?.setValueRaw(value)
+        ref.current?.setInternalValue(value)
       })
 
       setFreeRatio(isFreeRatio(values.Ratio))
@@ -409,7 +409,9 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
               />
             ))}
           </Flex>
+
           <Divider />
+
           <OperatorScaleControls
             opId={numId}
             updateValues={updateValues}

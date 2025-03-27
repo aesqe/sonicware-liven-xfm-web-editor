@@ -2,10 +2,10 @@ import { ADSRValues } from '../../types'
 import { NormalisableRange } from '../../services/normalisable-range/normalisable-range'
 
 export const range_1818 = new NormalisableRange(-18, 18, 0)
-export const range0127 = new NormalisableRange(0, 127, 63)
 export const range_4848 = new NormalisableRange(-48, 48, 0)
 export const range_6364 = new NormalisableRange(-63, 64, 0)
 export const range_6363 = new NormalisableRange(-63, 63, 0)
+export const range0127 = new NormalisableRange(0, 127, 63)
 export const range503200 = new NormalisableRange(50, 3200, 1600)
 export const range1097550 = new NormalisableRange(10, 97550, 48775)
 

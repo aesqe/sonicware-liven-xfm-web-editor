@@ -1,4 +1,4 @@
-import { RefObject, useCallback, useEffect, useRef } from 'react'
+import { RefObject, useEffect, useRef } from 'react'
 import { Flex, InputLabel, Stack } from '@mantine/core'
 import { Accordion } from '@mantine/core'
 
@@ -29,22 +29,20 @@ export const OperatorScaleControls = ({
   const rGainRef = useRef<KnobRefType>(null)
   const rCurveRef = useRef<KnobRefType>(null)
 
-  const setInternalValue = useCallback((values: OperatorProps) => {
-    timeRef.current?.setValueRaw(values.Time)
-    scaleRef.current?.setValueRaw(values.Scale)
-    lGainRef.current?.setValueRaw(values.LGain)
-    lCurveRef.current?.setValueRaw(values.LCurve)
-    rGainRef.current?.setValueRaw(values.RGain)
-    rCurveRef.current?.setValueRaw(values.RCurve)
-  }, [])
-
   useEffect(() => {
     if (ref) {
       ref.current = {
-        setInternalValue
+        setInternalValue: (values: OperatorProps) => {
+          timeRef.current?.setInternalValue(values.Time)
+          scaleRef.current?.setInternalValue(values.Scale)
+          lGainRef.current?.setInternalValue(values.LGain)
+          lCurveRef.current?.setInternalValue(values.LCurve)
+          rGainRef.current?.setInternalValue(values.RGain)
+          rCurveRef.current?.setInternalValue(values.RCurve)
+        }
       }
     }
-  }, [setInternalValue, ref])
+  }, [ref])
 
   return (
     <Accordion p={0} m={-10} mt={-10} value={open ? 'scale' : ''}>

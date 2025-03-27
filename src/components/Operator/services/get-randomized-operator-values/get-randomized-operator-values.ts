@@ -17,8 +17,6 @@ export const getRandomizedOperatorValues = (
 ) => {
   const opId = `OP${numId}`
 
-  console.log(randomizationOptions)
-
   const { amount, freeRatio, lowOP1In, useStartValues } = randomizationOptions
 
   const randomAmount = amount / 100
