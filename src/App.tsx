@@ -8,14 +8,23 @@ import {
   Divider,
   Fieldset,
   Flex,
+  Modal,
   Paper,
   Stack,
   Switch,
+  Text,
   Title
 } from '@mantine/core'
 import { useThrottledCallback, useViewportSize } from '@mantine/hooks'
 import { IconTerminal2 } from '@tabler/icons-react'
 
+import {
+  midiInputAtom,
+  patchAtom,
+  sysexSendThrottleTimeAtom,
+  logSysExAtom,
+  randomizationOptionsAtom
+} from './store/atoms'
 import initPatch from './assets/presets/initpatch.json'
 import { Knob } from './components/Knob/Knob'
 import { Operator } from './components/Operator/Operator'
@@ -32,14 +41,15 @@ import { useSendPatchToXFM } from './services/use-send-patch-to-xfm/use-send-pat
 import { DownloadPatchButton } from './components/DownloadPatchButton/DownloadPatchButton'
 import { MidiDevicesSelection } from './components/MidiDevicesSelection/MidiDevicesSelection'
 import { updateObjectValueByPath } from './services/update-object-value-by-path/update-object-value-by-path'
-import { OperatorRef, UpdatedProperty, XFMPatch, ADSRValues, SetInternalValueRef } from './types'
+import { extractPatchesFromSyxBank } from './extract-patches-from-syx-bank/extract-patches-from-syx-bank'
 import {
-  midiInputAtom,
-  patchAtom,
-  sysexSendThrottleTimeAtom,
-  logSysExAtom,
-  randomizationOptionsAtom
-} from './store/atoms'
+  OperatorRef,
+  UpdatedProperty,
+  XFMPatch,
+  ADSRValues,
+  SetInternalValueRef,
+  Banks
+} from './types'
 
 export const App = () => {
   useWebMidi()
@@ -62,7 +72,8 @@ export const App = () => {
   const pitchAdsrRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
   const patchNameRef = useRef<SetInternalValueRef<string>>(undefined)
   const prevPatchRef = useRef<XFMPatch>(patch)
-
+  const [modalOpened, setModalOpened] = useState(false)
+  const [bankData, setBankData] = useState<Banks>({})
   const setRandomizationOptions = useThrottledCallback(setRandOptions, sysexSendThrottleTime)
 
   const updateValues = useThrottledCallback(
@@ -150,10 +161,14 @@ export const App = () => {
         const res = event.target?.result as ArrayBuffer
 
         if (res.byteLength > 230) {
-          const data = Array.from(new Uint8Array(res).slice(20, 230))
-          const patch = decode8bit(convert78(data))
+          const data = extractPatchesFromSyxBank(res)
 
-          handlePatchChange(patch)
+          if (Object.keys(data).length === 1 && data.default?.length === 1) {
+            handlePatchChange(data.default[0])
+          } else {
+            setBankData(data)
+            setModalOpened(true)
+          }
         }
       }
 
@@ -167,8 +182,9 @@ export const App = () => {
         const decodedPatch = decode8bit(convert78(e.message.data))
 
         if (logSysEx) {
-          console.log('Raw SysEx:', e.message.data)
-          console.log('Decoded SysEx:', decodedPatch)
+          console.log('Raw SysEx:', new Uint8Array(e.message.data))
+          console.log('Decoded SysEx:', new Uint8Array(convert78(e.message.data)))
+          console.log('Patch:', decodedPatch)
         }
 
         handlePatchChange(decodedPatch)
@@ -505,6 +521,43 @@ export const App = () => {
           <Divider />
         </Box>
       </Flex>
+
+      <Modal
+        opened={modalOpened}
+        size='lg'
+        onClose={() => setModalOpened(false)}
+        title={`The file contains ${Object.keys(bankData).length} banks with ${Object.values(bankData).reduce((acc, bank) => acc + bank.length, 0)} patches total`}
+      >
+        <Stack>
+          <Text></Text>
+          {Object.keys(bankData).map((bankName) => {
+            const patches = bankData[bankName]
+
+            return (
+              <Stack key={bankName} justify='space-between' align='start' w='100%' gap={0}>
+                <Title order={3}>{bankName}</Title>
+
+                {patches.map((patch) => (
+                  <Flex
+                    px={10}
+                    py={4}
+                    key={patch.Name}
+                    justify='space-between'
+                    align='center'
+                    w='100%'
+                    style={{ borderBottom: '1px solid #e6e3e1' }}
+                  >
+                    <Text>{patch.Name}</Text>
+                    <Button size='xs' onClick={() => handlePatchChange(patch)}>
+                      Load
+                    </Button>
+                  </Flex>
+                ))}
+              </Stack>
+            )
+          })}
+        </Stack>
+      </Modal>
     </Stack>
   )
 }

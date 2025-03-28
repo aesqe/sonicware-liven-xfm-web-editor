@@ -177,3 +177,5 @@ export type RandomizationOptions = {
 }
 
 export type DragPoint = 'attack' | 'decay' | 'sustain' | 'release' | null
+
+export type Banks = Record<string, XFMPatch[]>
