@@ -216,7 +216,10 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
             size={32}
             variant='transparent'
             onClick={() => {
-              setOperatorClipboard(values)
+              setOperatorClipboard({
+                ...values,
+                [`${opId}In`]: 0
+              })
             }}
           >
             <IconCopy size={48} color='#00000044' />
