@@ -15,7 +15,8 @@ export const ratioStepFn = (
 
   if (ratioMode === 'scale') {
     const { index } = roundToNearestNote(val)
-    const nextIndex = direction === 'up' ? index + 1 : index - 1
+    const indexStep = largerStep ? 12 : 1
+    const nextIndex = direction === 'up' ? index + indexStep : index - indexStep
     const nextNote = NOTES[clamp(nextIndex, 0, NOTES.length - 1)]
 
     return Math.abs(nextNote.value - val)
