@@ -477,14 +477,14 @@ export const App = () => {
             pitchEnv
             initialState={patch.Pitch}
             ref={pitchAdsrRef}
-            mt={0}
+            mb={-8}
             mx={-8}
           />
         </Flex>
       </Paper>
       <Divider w='100%' />
-      <Flex w='auto' mx='auto' wrap='wrap' mt={18}>
-        <Box mx='auto' mb={15}>
+      <Flex w='auto' mx='auto' wrap='wrap' mt={10}>
+        <Box mx='auto' mb={10}>
           <Divider />
           <Flex>
             <Divider orientation='vertical' />
@@ -493,7 +493,7 @@ export const App = () => {
           </Flex>
           <Divider />
         </Box>
-        <Box mx='auto' mb={15}>
+        <Box mx='auto' mb={10}>
           <Divider />
           <Flex>
             <Divider orientation='vertical' />
@@ -502,7 +502,7 @@ export const App = () => {
           </Flex>
           <Divider />
         </Box>
-        <Box mx='auto' mb={15}>
+        <Box mx='auto' mb={10}>
           <Divider />
           <Flex>
             <Divider orientation='vertical' />
@@ -511,7 +511,7 @@ export const App = () => {
           </Flex>
           <Divider />
         </Box>
-        <Box mx='auto' mb={15}>
+        <Box mx='auto' mb={10}>
           <Divider />
           <Flex>
             <Divider orientation='vertical' />

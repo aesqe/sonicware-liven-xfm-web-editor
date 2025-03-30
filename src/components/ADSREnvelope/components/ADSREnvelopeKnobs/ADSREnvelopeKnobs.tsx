@@ -56,8 +56,8 @@ export const ADSREnvelopeKnobs = ({
   }, [ref])
 
   return (
-    <Flex w='100%' gap={10}>
-      <Stack gap={0} align='center'>
+    <Flex w='100%' gap={10} my={0}>
+      <Stack gap={0} align='center' mt={-5}>
         <InputLabel pb={4} w='100%' ta='center' style={{ borderBottom: '1px solid #CCC' }}>
           Attack
         </InputLabel>
@@ -87,7 +87,7 @@ export const ADSREnvelopeKnobs = ({
           />
         </Flex>
       </Stack>
-      <Stack gap={0} align='center'>
+      <Stack gap={0} align='center' mt={-5}>
         <InputLabel pb={4} w='100%' ta='center' style={{ borderBottom: '1px solid #CCC' }}>
           Decay
         </InputLabel>
@@ -117,7 +117,7 @@ export const ADSREnvelopeKnobs = ({
           />
         </Flex>
       </Stack>
-      <Stack gap={0} align='center'>
+      <Stack gap={0} align='center' mt={-5}>
         <InputLabel pb={4} w='100%' ta='center' style={{ borderBottom: '1px solid #CCC' }}>
           Sustain
         </InputLabel>
@@ -147,7 +147,7 @@ export const ADSREnvelopeKnobs = ({
           />
         </Flex>
       </Stack>
-      <Stack gap={0} align='center'>
+      <Stack gap={0} align='center' mt={-5}>
         <InputLabel pb={4} w='100%' ta='center' style={{ borderBottom: '1px solid #CCC' }}>
           Release
         </InputLabel>
@@ -178,7 +178,7 @@ export const ADSREnvelopeKnobs = ({
         </Flex>
       </Stack>
       {!pitchEnv && (
-        <Stack gap={0} align='center'>
+        <Stack gap={0} align='center' mt={-5}>
           <InputLabel pb={4} w='100%' ta='center' style={{ borderBottom: '1px solid #CCC' }}>
             Curve
           </InputLabel>
