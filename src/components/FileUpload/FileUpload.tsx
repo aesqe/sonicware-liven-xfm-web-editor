@@ -15,11 +15,12 @@ export const FileUpload = (props: Props) => (
       justify='center'
       gap='xl'
       mih={220}
-      style={{ zIndex: 1000, top: 0, left: 0 }}
+      pos='fixed'
+      top={0}
+      left={0}
       w='100%'
       h='100%'
-      pos='absolute'
-      bg='rgba(255, 255, 255, 0.9)'
+      bg='#FFFFFFDD'
     >
       <Dropzone.Accept>
         <IconUpload size={52} color='var(--mantine-color-blue-6)' stroke={1.5} />

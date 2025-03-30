@@ -24,10 +24,10 @@ type Props = KnobHeadlessProps &
     disabled?: boolean
     valueDefault: number
     propertyPath: string
-    stepFn?: (valueRaw: number) => number
+    stepFn?: (valueRaw: number, direction: 'up' | 'down' | undefined) => number
+    stepLargerFn?: (valueRaw: number, direction: 'up' | 'down' | undefined) => number
     onChange: (props: UpdatedProperty[]) => void
     formatterFn?: (x: number) => number
-    stepLargerFn?: (valueRaw: number) => number
     size?: CSSProperties['width']
     ref?: RefObject<SetInternalValueRef<number> | null>
   }
@@ -55,6 +55,7 @@ export const Knob = ({
   const labelId = useId()
   const [valueRaw, setValueRaw] = useState<number>(valueDefault)
   const valueSetFromOutside = useRef(false)
+  const direction = useRef<'up' | 'down' | undefined>(undefined)
 
   const range = new NormalisableRange(valueMin, valueMax, center)
   const mapTo01 = (x: number) => range.mapTo01(x)
@@ -62,10 +63,12 @@ export const Knob = ({
 
   const dragSensitivity = 0.006
   const value01 = mapTo01(valueRaw)
-  const step = stepFn(valueRaw)
-  const stepLarger = stepLargerFn(valueRaw)
+  const step = stepFn(valueRaw, direction.current)
+  const stepLarger = stepLargerFn(valueRaw, direction.current)
 
-  const handleOnChange = (value: number) => {
+  const handleOnChange = (value: number, dir?: 'up' | 'down') => {
+    direction.current = dir
+
     if (valueSetFromOutside.current) {
       valueSetFromOutside.current = false
       return
@@ -96,7 +99,7 @@ export const Knob = ({
   }, [ref, setValueRaw])
 
   const handleOnDoubleClick = () => {
-    handleOnChange(center)
+    handleOnChange(center, valueRaw < center ? 'up' : 'down')
   }
 
   return (

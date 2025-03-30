@@ -1,6 +1,6 @@
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react'
 import { useAtom, useAtomValue } from 'jotai'
-import { ActionIcon, Divider, Flex, InputLabel, Stack, Switch, Text } from '@mantine/core'
+import { ActionIcon, Divider, Flex, InputLabel, Stack, Switch, Text, Radio } from '@mantine/core'
 import { clamp, useViewportSize } from '@mantine/hooks'
 import { IconDice5, IconCopy, IconReload, IconClipboardText } from '@tabler/icons-react'
 
@@ -15,15 +15,16 @@ import {
 import { Knob } from '../Knob/Knob'
 import { backgrounds } from './constants'
 import { isFreeRatio } from './services/is-free-ratio/is-free-ratio'
+import { ratioStepFn } from './services/ratio-step-fn/ratio-step-fn'
 import { ADSREnvelope } from '../ADSREnvelope/ADSREnvelope'
 import { ratioFormatter } from './services/ratio-formatter/ratio-formatter'
 import { getOperatorValues } from './services/get-operator-values/get-operator-values'
+import { ratioMatchesSomeNote } from '../../services/ratio-matches-some-note/ratio-matches-some-note'
 import { OperatorScaleControls } from './components/OperatorScaleControls/OperatorScaleControls'
 import { getInitialOperatorValues } from './services/get-initial-operator-values/get-initial-operator-values'
 import { getUpdatedEnvelopeValues } from './services/get-updated-envelope-values/get-updated-envelope-values'
 import { getRandomizedOperatorValues } from './services/get-randomized-operator-values/get-randomized-operator-values'
 import { operatorClipboardAtom, patchAtom, randomizationOptionsAtom } from '../../store/atoms'
-
 type Props = {
   id: 1 | 2 | 3 | 4
   updateValues: (props: UpdatedProperty[]) => void
@@ -37,7 +38,6 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   const opId = `OP${numId}` as 'OP1' | 'OP2' | 'OP3' | 'OP4'
   const values = patch[opId]
 
-  const [freeRatio, setFreeRatio] = useState(isFreeRatio(values.Ratio))
   const [fixed, setFixed] = useState(values.Fixed === 1)
   const [scaleControlsOpen, setScaleControlsOpen] = useState(false)
   const [ADSRControlsOpen, setADSRControlsOpen] = useState(true)
@@ -55,13 +55,13 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   const op3InRef = useRef<KnobRefType>(null)
   const op4InRef = useRef<KnobRefType>(null)
   const pitchEnvRef = useRef<HTMLInputElement | null>(null)
-  const ratioSwitchRef = useRef<HTMLInputElement | null>(null)
   const fixedSwitchRef = useRef<HTMLInputElement | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const adsrRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
   const scaleControlsRef = useRef<SetInternalValueRef<OperatorProps>>(undefined)
   const [operatorClipboard, setOperatorClipboard] = useAtom(operatorClipboardAtom)
   const viewport = useViewportSize()
+  const [ratioMode, setRatioMode] = useState<'default' | 'free' | 'scale'>('default')
 
   const opInRefs = [
     { id: 1, ref: op1InRef },
@@ -82,7 +82,6 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
 
       scaleControlsRef.current?.setInternalValue(values)
       pitchEnvRef.current!.checked = values.PitchEnv === 1
-      ratioSwitchRef.current!.checked = values.Fixed === 0
       fixedSwitchRef.current!.checked = values.Fixed === 1
 
       adsrRef.current?.setInternalValue(values)
@@ -93,8 +92,15 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
         ref.current?.setInternalValue(value)
       })
 
-      setFreeRatio(isFreeRatio(values.Ratio))
       setFixed(values.Fixed === 1)
+
+      setRatioMode(
+        ratioMatchesSomeNote(values.Ratio)
+          ? 'scale'
+          : isFreeRatio(values.Ratio)
+            ? 'free'
+            : 'default'
+      )
     },
     [opInRefs]
   )
@@ -109,6 +115,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
 
     const envelopeValues = getUpdatedEnvelopeValues(numId, init.values)
     updateValues([...init.updatedValues, ...envelopeValues])
+    setRatioMode('default')
   }
 
   const randomizeOperator = (adsr = false) => {
@@ -291,29 +298,24 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
                 ref={velSensRef}
               />
             </Flex>
-            <Stack align='center' gap={10}>
+            <Stack align='center' gap={5}>
               <Knob
                 label='Ratio'
                 propertyPath={`${opId}.Ratio`}
-                onChange={updateValues}
-                valueMin={50}
-                valueMax={3200}
-                valueDefault={values.Ratio}
-                center={1600}
-                formatterFn={(val) => ratioFormatter(val, freeRatio)}
-                valueRawDisplayFn={(val) => `${ratioFormatter(val, freeRatio) / 100}`}
                 disabled={fixed}
                 ref={ratioRef}
+                onChange={(val) => {
+                  updateValues(val)
+                }}
+                valueDefault={values.Ratio}
+                valueMin={50}
+                valueMax={3200}
+                center={1600}
+                formatterFn={(val) => ratioFormatter(val, ratioMode).value}
+                valueRawDisplayFn={(val) => ratioFormatter(val, ratioMode).label}
+                stepFn={(val, direction) => ratioStepFn(val, ratioMode, false, direction)}
+                stepLargerFn={(val, direction) => ratioStepFn(val, ratioMode, true, direction)}
               />
-              <Switch
-                ref={ratioSwitchRef}
-                checked={freeRatio}
-                onChange={(e) => setFreeRatio(e.target.checked)}
-                disabled={fixed}
-              />
-              <InputLabel fw='normal' mt={-10} fz='xs'>
-                Free
-              </InputLabel>
             </Stack>
             <Stack align='center' gap={10}>
               <Knob
@@ -351,6 +353,43 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
               valueRawDisplayFn={(val) => `${Math.round(val)}`}
               ref={detuneRef}
             />
+          </Flex>
+          <Flex mt={-10}>
+            <Radio.Group
+              value={ratioMode}
+              defaultValue='default'
+              defaultChecked
+              onChange={(val) => {
+                setRatioMode(val as 'default' | 'free' | 'scale')
+              }}
+            >
+              <Flex gap={10} align='center'>
+                <InputLabel fw='bold' fz='xs'>
+                  Ratio mode:
+                </InputLabel>
+                <Radio
+                  styles={{ label: { paddingInlineStart: 5 } }}
+                  size='xs'
+                  value='default'
+                  label='Default'
+                  checked={ratioMode === 'default'}
+                />
+                <Radio
+                  size='xs'
+                  styles={{ label: { paddingInlineStart: 5 } }}
+                  value='free'
+                  label='Free '
+                  checked={ratioMode === 'free'}
+                />
+                <Radio
+                  size='xs'
+                  styles={{ label: { paddingInlineStart: 5 } }}
+                  value='scale'
+                  label='Scale '
+                  checked={ratioMode === 'scale'}
+                />
+              </Flex>
+            </Radio.Group>
           </Flex>
           <Divider />
           <Flex align='start' justify='start' gap={12}>
@@ -403,7 +442,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
             initialState={values}
             width={adsrEnvelopeWidth}
             containerWidth={containerWidth}
-            height={140}
+            height={165}
             onChange={updateEnvelope}
             ref={adsrRef}
             knobSize='2rem'

@@ -25,7 +25,11 @@ type Props = {
   /**
    * Same callback as `KnobHeadless` has, with "event" in 2nd argument.
    */
-  readonly onValueRawChange: (newValueRaw: number, event: KeyboardEvent) => void
+  readonly onValueRawChange: (
+    newValueRaw: number,
+    direction: 'up' | 'down',
+    event: KeyboardEvent
+  ) => void
   /**
    * To prevent scrolling, "event.preventDefault()" is called when the value changes,
    * but for most cases you don't need to change this behaviour.
@@ -51,34 +55,34 @@ export const useKnobKeyboardControls = ({
     const largeStepPlus = clamp(valueRaw + stepLarger, valueMin, valueMax)
     const largeStepMinus = clamp(valueRaw - stepLarger, valueMin, valueMax)
 
-    const handleKey = (value: number, event: KeyboardEvent) => {
+    const handleKey = (value: number, event: KeyboardEvent, direction: 'up' | 'down') => {
       if (!noDefaultPrevention) {
         event.preventDefault()
       }
 
-      onValueRawChange(value, event)
+      onValueRawChange(value, direction, event)
     }
 
     switch (code) {
       case 'ArrowUp':
       case 'ArrowRight':
-        handleKey(shiftKey ? largeStepPlus : smallStepPlus, event)
+        handleKey(shiftKey ? largeStepPlus : smallStepPlus, event, 'up')
         break
       case 'ArrowDown':
       case 'ArrowLeft':
-        handleKey(shiftKey ? largeStepMinus : smallStepMinus, event)
+        handleKey(shiftKey ? largeStepMinus : smallStepMinus, event, 'down')
         break
       case 'PageUp':
-        handleKey(largeStepPlus, event)
+        handleKey(largeStepPlus, event, 'up')
         break
       case 'PageDown':
-        handleKey(largeStepMinus, event)
+        handleKey(largeStepMinus, event, 'down')
         break
       case 'Home':
-        handleKey(valueMin, event)
+        handleKey(valueMin, event, 'down')
         break
       case 'End':
-        handleKey(valueMax, event)
+        handleKey(valueMax, event, 'up')
         break
       /* v8 ignore start */
       default:

@@ -95,7 +95,11 @@ export const App = () => {
   const throttledSendPatch = useThrottledCallback(() => {
     if (!compareObjects(prevPatchRef.current, patch)) {
       prevPatchRef.current = patch
-      console.log('sending patch', patch)
+
+      if (logSysEx) {
+        console.log('Sending patch', patch)
+      }
+
       sendPatchToXFM(patch)
     }
   }, sysexSendThrottleTime)
