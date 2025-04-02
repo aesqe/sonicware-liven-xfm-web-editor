@@ -3,11 +3,13 @@ import { useAtom, useAtomValue } from 'jotai'
 import { MessageEvent } from 'webmidi'
 import {
   ActionIcon,
+  Anchor,
   Box,
   Button,
   Divider,
   Fieldset,
   Flex,
+  Image,
   Modal,
   Paper,
   Stack,
@@ -50,6 +52,8 @@ import {
   SetInternalValueRef,
   Banks
 } from './types'
+
+import githubMark from './assets/github-mark.svg'
 
 export const App = () => {
   useWebMidi()
@@ -233,6 +237,24 @@ export const App = () => {
       <Paper p={0} px={10} mx='auto' w={viewport.width > 970 ? '100%' : '460px'}>
         <Flex w='100%' mx='auto' wrap='wrap' ref={containerRef}>
           <Stack gap={0} mr={10} w={viewport.width > 970 ? 250 : '100%'} pt={5}>
+            <Anchor
+              title='View the repository on GitHub'
+              href='https://github.com/aesqe/sonicware-liven-xfm-web-editor'
+              c='grey'
+              fz={12}
+              py={3}
+            >
+              <Image
+                src={githubMark}
+                alt='View the repository on GitHub'
+                w={12}
+                h={12}
+                mr={5}
+                display='inline'
+                mb={-2}
+              />
+              View the repository on GitHub
+            </Anchor>
             <Flex justify='space-between' align='center' w='100%'>
               <Title order={2} style={{ cursor: 'default' }}>
                 XFM Web Editor
@@ -250,7 +272,7 @@ export const App = () => {
 
             <MidiDevicesSelection />
 
-            <Flex align='end' justify='space-between' gap={10}>
+            <Flex align='end' justify='space-between' gap={5}>
               <PatchNameEditor onChange={updatePatchName} ref={patchNameRef} />
               <DownloadPatchButton />
             </Flex>

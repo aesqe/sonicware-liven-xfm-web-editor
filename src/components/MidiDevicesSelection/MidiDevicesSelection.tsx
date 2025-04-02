@@ -58,7 +58,7 @@ export const MidiDevicesSelection = () => {
   }, [webMidiEnabled, restoreMidiDevices])
 
   return (
-    <Stack w='100%' gap={10}>
+    <Stack w='100%' gap={5}>
       <Select
         label='MIDI Input'
         data={midiInputList.map((input) => ({
@@ -67,6 +67,7 @@ export const MidiDevicesSelection = () => {
         }))}
         value={midiInput?.id}
         onChange={saveMidiInput}
+        size='xs'
       />
       <Select
         label='MIDI Output'
@@ -76,6 +77,7 @@ export const MidiDevicesSelection = () => {
         }))}
         value={midiOutput?.id}
         onChange={(value) => saveMidiOutput(value ?? '')}
+        size='xs'
       />
     </Stack>
   )
