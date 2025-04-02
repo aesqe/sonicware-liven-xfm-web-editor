@@ -222,16 +222,17 @@ export const App = () => {
   return (
     <Stack
       align='center'
+      justify='center'
       w='auto'
       mx='auto'
       gap={0}
-      maw={!ADSRControlsOpen ? 960 : viewport.width > 1900 ? 1900 : 960}
+      maw={viewport.width > 1900 ? 1900 : 970}
     >
       <FileUpload onDrop={handleDrop} />
 
       <Paper p={0} px={10} mx='auto' w={viewport.width > 970 ? '100%' : '460px'}>
         <Flex w='100%' mx='auto' wrap='wrap' ref={containerRef}>
-          <Stack gap={0} mr={10} w={viewport.width > 960 ? 250 : '100%'} pt={5}>
+          <Stack gap={0} mr={10} w={viewport.width > 970 ? 250 : '100%'} pt={5}>
             <Flex justify='space-between' align='center' w='100%'>
               <Title order={2} style={{ cursor: 'default' }}>
                 XFM Web Editor
@@ -255,14 +256,14 @@ export const App = () => {
             </Flex>
           </Stack>
 
-          {viewport.width > 960 && <Divider orientation='vertical' mr={15} ml={10} />}
+          {viewport.width > 970 && <Divider orientation='vertical' mr={15} ml={10} />}
 
           <Stack
             gap={8}
             mb={10}
             mt={8}
-            mr={viewport.width > 960 ? 20 : 0}
-            w={viewport.width > 960 ? 280 : '100%'}
+            mr={viewport.width > 970 ? 20 : 0}
+            w={viewport.width > 970 ? 280 : '100%'}
           >
             <Fieldset legend='Initialize' w='100%' px={5} py={8}>
               <Button.Group w='100%'>
@@ -270,7 +271,7 @@ export const App = () => {
                   color='#e6e3e1'
                   size='xs'
                   c='dark'
-                  mt={viewport.width > 960 ? 2 : 20}
+                  mt={viewport.width > 970 ? 2 : 20}
                   flex={1}
                   style={{ '--button-bd': '1px solid #BABABA' }}
                   onClick={() => {
@@ -283,7 +284,7 @@ export const App = () => {
                   color='#e6e3e1'
                   size='xs'
                   c='dark'
-                  mt={viewport.width > 960 ? 2 : 20}
+                  mt={viewport.width > 970 ? 2 : 20}
                   flex={1}
                   style={{ '--button-bd': '1px solid #BABABA' }}
                   onClick={() => {
@@ -303,7 +304,7 @@ export const App = () => {
                   color='#e6e3e1'
                   size='xs'
                   c='dark'
-                  mt={viewport.width > 960 ? 2 : 20}
+                  mt={viewport.width > 970 ? 2 : 20}
                   flex={1}
                   style={{ '--button-bd': '1px solid #BABABA' }}
                   onClick={() => {
@@ -371,8 +372,8 @@ export const App = () => {
             align='start'
             gap={4}
             mt={8}
-            mr={viewport.width > 960 ? 20 : 0}
-            w={viewport.width > 960 ? 280 : '100%'}
+            mr={viewport.width > 970 ? 20 : 0}
+            w={viewport.width >= 1920 ? 380 : viewport.width >= 970 ? 280 : '100%'}
           >
             <Fieldset legend='Randomize (work in progress)' w='100%' px={5} py={8}>
               <Button.Group w='100%'>
@@ -442,8 +443,8 @@ export const App = () => {
                     }
                   />
                   <Switch
-                    label='Use current values'
-                    description='Smaller changes closer to the original values'
+                    label='Use current values as origin'
+                    description='Smaller changes around original values'
                     checked={randomizationOptions.useStartValues}
                     onChange={(e) =>
                       setRandomizationOptions({
@@ -467,16 +468,17 @@ export const App = () => {
                   valueRawRoundFn={(value) => Math.round(value)}
                   formatterFn={(value) => Math.round(value)}
                   size='3.2rem'
+                  mx='auto'
                 />
               </Flex>
             </Fieldset>
           </Stack>
 
-          {viewport.width > 1880 && <Divider orientation='vertical' mr={20} />}
+          {viewport.width > 1900 && <Divider orientation='vertical' mr={20} />}
 
           <ADSREnvelope
-            width={viewport.width > 960 ? 550 : adsrEnvelopeWidth}
-            height={110}
+            width={viewport.width >= 970 ? 850 : adsrEnvelopeWidth}
+            height={100}
             onChange={updatePitchEnvelope}
             pitchEnv
             initialState={patch.Pitch}
@@ -487,7 +489,13 @@ export const App = () => {
         </Flex>
       </Paper>
       <Divider w='100%' />
-      <Flex w='auto' mx='auto' wrap='wrap' mt={10}>
+      <Flex
+        w='auto'
+        mx='auto'
+        wrap='wrap'
+        mt={10}
+        maw={!ADSRControlsOpen ? 970 : viewport.width > 1900 ? 1900 : 970}
+      >
         <Box mx='auto' mb={10}>
           <Divider />
           <Flex>

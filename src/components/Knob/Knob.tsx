@@ -1,6 +1,6 @@
 import { ComponentProps, CSSProperties, RefObject, useId, useState, useEffect, useRef } from 'react'
 import { KnobHeadless, KnobHeadlessLabel, KnobHeadlessOutput } from 'react-knob-headless'
-import { Stack } from '@mantine/core'
+import { Stack, StackProps } from '@mantine/core'
 
 import { KnobBaseThumb } from './components/KnobBaseThumb/KnobBaseThumb'
 import { NormalisableRange } from '../../services/normalisable-range/normalisable-range'
@@ -30,7 +30,7 @@ type Props = KnobHeadlessProps &
     formatterFn?: (x: number) => number
     size?: CSSProperties['width']
     ref?: RefObject<SetInternalValueRef<number> | null>
-  }
+  } & Partial<Omit<StackProps, 'onChange'>>
 
 export const Knob = ({
   ref,
@@ -49,7 +49,8 @@ export const Knob = ({
   stepFn = (): number => 1,
   stepLargerFn = (): number => 10,
   formatterFn = (x: number): number => x,
-  onChange
+  onChange,
+  ...stackProps
 }: Props) => {
   const knobId = useId()
   const labelId = useId()
@@ -117,6 +118,7 @@ export const Knob = ({
         outline: 'none',
         pointerEvents: disabled ? 'none' : 'auto'
       }}
+      {...stackProps}
     >
       <KnobHeadlessOutput htmlFor={knobId}>{valueRawDisplayFn(valueRaw)}</KnobHeadlessOutput>
       <KnobHeadless
