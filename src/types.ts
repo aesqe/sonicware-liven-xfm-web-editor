@@ -169,6 +169,10 @@ export type OperatorRef = SetInternalValueRef<OperatorProps> & {
   setADSRControlsOpen: (open: boolean) => void
 }
 
+export type RatioRef = SetInternalValueRef<number> & {
+  resetPrevRatioMode: () => void
+}
+
 export type RandomizationOptions = {
   amount: number
   freeRatio: boolean
@@ -179,3 +183,5 @@ export type RandomizationOptions = {
 export type DragPoint = 'attack' | 'decay' | 'sustain' | 'release' | null
 
 export type Banks = Record<string, XFMPatch[]>
+
+export type RatioMode = 'default' | 'free' | 'scale'

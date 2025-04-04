@@ -1,25 +1,12 @@
-import { clamp } from '@dsp-ts/math'
+import { RatioMode } from '../../../../types'
 
-import { NOTES } from '../../../../services/round-to-nearest-note/constants'
-import { roundToNearestNote } from '../../../../services/round-to-nearest-note/round-to-nearest-note'
-
-export const ratioStepFn = (
-  val: number,
-  ratioMode: 'default' | 'free' | 'scale',
-  largerStep: boolean,
-  direction: 'up' | 'down' | undefined
-) => {
+export const ratioStepFn = (val: number, ratioMode: RatioMode, largerStep: boolean) => {
   if (ratioMode === 'default') {
     return largerStep ? 1000 : val < 75 ? 50 : 100
   }
 
   if (ratioMode === 'scale') {
-    const { index } = roundToNearestNote(val)
-    const indexStep = largerStep ? 12 : 1
-    const nextIndex = direction === 'up' ? index + indexStep : index - indexStep
-    const nextNote = NOTES[clamp(nextIndex, 0, NOTES.length - 1)]
-
-    return Math.abs(nextNote.value - val)
+    return largerStep ? 12 : 1
   }
 
   return largerStep ? 10 : 1

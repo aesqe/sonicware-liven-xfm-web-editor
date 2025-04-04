@@ -10,21 +10,22 @@ import {
   OperatorProps,
   SetInternalValueRef,
   UpdatedProperty,
-  OperatorRef
+  OperatorRef,
+  RatioMode,
+  RatioRef
 } from '../../types'
 import { Knob } from '../Knob/Knob'
+import { RatioKnob } from '../Knob/RatioKnob'
 import { backgrounds } from './constants'
 import { isFreeRatio } from './services/is-free-ratio/is-free-ratio'
-import { ratioStepFn } from './services/ratio-step-fn/ratio-step-fn'
 import { ADSREnvelope } from '../ADSREnvelope/ADSREnvelope'
-import { ratioFormatter } from './services/ratio-formatter/ratio-formatter'
 import { getOperatorValues } from './services/get-operator-values/get-operator-values'
-import { ratioMatchesSomeNote } from '../../services/ratio-matches-some-note/ratio-matches-some-note'
 import { OperatorScaleControls } from './components/OperatorScaleControls/OperatorScaleControls'
 import { getInitialOperatorValues } from './services/get-initial-operator-values/get-initial-operator-values'
 import { getUpdatedEnvelopeValues } from './services/get-updated-envelope-values/get-updated-envelope-values'
 import { getRandomizedOperatorValues } from './services/get-randomized-operator-values/get-randomized-operator-values'
 import { operatorClipboardAtom, patchAtom, randomizationOptionsAtom } from '../../store/atoms'
+
 type Props = {
   id: 1 | 2 | 3 | 4
   updateValues: (props: UpdatedProperty[]) => void
@@ -46,7 +47,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   const levelRef = useRef<KnobRefType>(null)
   const outputRef = useRef<KnobRefType>(null)
   const velSensRef = useRef<KnobRefType>(null)
-  const ratioRef = useRef<KnobRefType>(null)
+  const ratioRef = useRef<RatioRef>(null)
   const freqRef = useRef<KnobRefType>(null)
   const detuneRef = useRef<KnobRefType>(null)
   const feedbackRef = useRef<KnobRefType>(null)
@@ -61,7 +62,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   const scaleControlsRef = useRef<SetInternalValueRef<OperatorProps>>(undefined)
   const [operatorClipboard, setOperatorClipboard] = useAtom(operatorClipboardAtom)
   const viewport = useViewportSize()
-  const [ratioMode, setRatioMode] = useState<'default' | 'free' | 'scale'>('default')
+  const [ratioMode, setRatioMode] = useState<RatioMode>('default')
 
   const opInRefs = [
     { id: 1, ref: op1InRef },
@@ -72,6 +73,8 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
 
   const setValues = useCallback(
     (values: OperatorProps) => {
+      ratioRef.current?.resetPrevRatioMode()
+
       levelRef.current?.setInternalValue(values.Level)
       outputRef.current?.setInternalValue(values.Output)
       velSensRef.current?.setInternalValue(values.VelSens)
@@ -94,13 +97,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
 
       setFixed(values.Fixed === 1)
 
-      setRatioMode(
-        ratioMatchesSomeNote(values.Ratio)
-          ? 'scale'
-          : isFreeRatio(values.Ratio)
-            ? 'free'
-            : 'default'
-      )
+      setRatioMode(isFreeRatio(values.Ratio) ? 'free' : 'default')
     },
     [opInRefs]
   )
@@ -285,38 +282,25 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
               valueRawDisplayFn={(val) => `${Math.round(val)}`}
               ref={outputRef}
             />
-            <Flex>
-              <Knob
-                label='Velocity Sensitivity'
-                propertyPath={`${opId}.VelSens`}
-                onChange={updateValues}
-                valueMin={0}
-                valueMax={127}
-                valueDefault={values.VelSens}
-                formatterFn={Math.round}
-                valueRawDisplayFn={(val) => `${Math.round(val)}`}
-                ref={velSensRef}
-              />
-            </Flex>
-            <Stack align='center' gap={5}>
-              <Knob
-                label='Ratio'
-                propertyPath={`${opId}.Ratio`}
-                disabled={fixed}
-                ref={ratioRef}
-                onChange={(val) => {
-                  updateValues(val)
-                }}
-                valueDefault={values.Ratio}
-                valueMin={50}
-                valueMax={3200}
-                center={1600}
-                formatterFn={(val) => ratioFormatter(val, ratioMode).value}
-                valueRawDisplayFn={(val) => ratioFormatter(val, ratioMode).label}
-                stepFn={(val, direction) => ratioStepFn(val, ratioMode, false, direction)}
-                stepLargerFn={(val, direction) => ratioStepFn(val, ratioMode, true, direction)}
-              />
-            </Stack>
+            <Knob
+              label='Velocity Sensitivity'
+              propertyPath={`${opId}.VelSens`}
+              onChange={updateValues}
+              valueMin={0}
+              valueMax={127}
+              valueDefault={values.VelSens}
+              formatterFn={Math.round}
+              valueRawDisplayFn={(val) => `${Math.round(val)}`}
+              ref={velSensRef}
+            />
+            <RatioKnob
+              opId={opId}
+              fixed={fixed}
+              ratioRef={ratioRef}
+              ratioMode={ratioMode}
+              values={values}
+              updateValues={updateValues}
+            />
             <Stack align='center' gap={10}>
               <Knob
                 label='Frequency'
@@ -360,7 +344,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
               defaultValue='default'
               defaultChecked
               onChange={(val) => {
-                setRatioMode(val as 'default' | 'free' | 'scale')
+                setRatioMode(val as RatioMode)
               }}
             >
               <Flex gap={10} align='center'>
