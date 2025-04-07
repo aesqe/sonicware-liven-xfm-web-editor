@@ -1,8 +1,9 @@
-import { OperatorProps, UpdatedProperty } from '../../../../types'
+import { OperatorValues, UpdatedProperty } from '../../../../types'
 import initpatch from '../../../../assets/presets/initpatch.json'
 
-export const getInitialOperatorValues = (opId: 'OP1' | 'OP2' | 'OP3' | 'OP4') => {
-  const values = initpatch[opId] as OperatorProps
+export const getInitialOperatorValues = (numId: 1 | 2 | 3 | 4) => {
+  const opId = `OP${numId}` as const
+  const values = initpatch[opId] as OperatorValues
 
   const updatedValues: UpdatedProperty[] = [
     { value: values.PitchEnv, propertyPath: `${opId}.PitchEnv` },

@@ -2,7 +2,7 @@ import { atom } from 'jotai'
 import { Input, Output } from 'webmidi'
 
 import initPatch from '../assets/presets/initpatch.json'
-import { XFMPatch, ADSRValues, OperatorProps, RandomizationOptions } from '../types'
+import { XFMPatch, ADSRValues, OperatorValues, RandomizationOptions } from '../types'
 
 export const webMidiEnabledAtom = atom<boolean>(false)
 export const midiInputAtom = atom<Input | null>(null)
@@ -25,6 +25,6 @@ export const sysexSendThrottleTimeAtom = atom<number>(200)
 
 export const patchClipboardAtom = atom<XFMPatch | null>(null)
 export const envelopeClipboardAtom = atom<ADSRValues | null>(null)
-export const operatorClipboardAtom = atom<OperatorProps | null>(null)
+export const operatorClipboardAtom = atom<OperatorValues | null>(null)
 
 export const logSysExAtom = atom<boolean>(false)

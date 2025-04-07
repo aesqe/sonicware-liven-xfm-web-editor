@@ -5,7 +5,12 @@ import {
   range_6363,
   range_6364
 } from '../../../ADSREnvelope/constants'
-import { ADSRValues, RandomizationOptions, UpdatedProperty, OperatorProps } from '../../../../types'
+import {
+  ADSRValues,
+  RandomizationOptions,
+  UpdatedProperty,
+  OperatorValues
+} from '../../../../types'
 
 const randBool = () => Math.random() < 0.5
 
@@ -13,7 +18,7 @@ export const getRandomizedOperatorValues = (
   numId: 1 | 2 | 3 | 4,
   adsr: boolean,
   randomizationOptions: RandomizationOptions,
-  startValues: OperatorProps
+  startValues: OperatorValues
 ) => {
   const opId = `OP${numId}`
 

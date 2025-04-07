@@ -7,7 +7,7 @@ import { IconDice5, IconCopy, IconReload, IconClipboardText } from '@tabler/icon
 import {
   ADSRValues,
   KnobRefType,
-  OperatorProps,
+  OperatorValues,
   SetInternalValueRef,
   UpdatedProperty,
   OperatorRef,
@@ -35,9 +35,8 @@ type Props = {
 export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   const patch = useAtomValue(patchAtom)
   const randomizationOptions = useAtomValue(randomizationOptionsAtom)
-
-  const opId = `OP${numId}` as 'OP1' | 'OP2' | 'OP3' | 'OP4'
-  const values = patch[opId]
+  const opId = `OP${numId}` as const
+  const values = patch[opId] as OperatorValues
 
   const [fixed, setFixed] = useState(values.Fixed === 1)
   const [scaleControlsOpen, setScaleControlsOpen] = useState(false)
@@ -59,7 +58,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   const fixedSwitchRef = useRef<HTMLInputElement | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const adsrRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
-  const scaleControlsRef = useRef<SetInternalValueRef<OperatorProps>>(undefined)
+  const scaleControlsRef = useRef<SetInternalValueRef<OperatorValues>>(undefined)
   const [operatorClipboard, setOperatorClipboard] = useAtom(operatorClipboardAtom)
   const viewport = useViewportSize()
   const [ratioMode, setRatioMode] = useState<RatioMode>('default')
@@ -72,9 +71,8 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   ].filter(({ id }) => id !== numId)
 
   const setValues = useCallback(
-    (values: OperatorProps) => {
+    (values: OperatorValues) => {
       ratioRef.current?.resetPrevRatioMode()
-
       levelRef.current?.setInternalValue(values.Level)
       outputRef.current?.setInternalValue(values.Output)
       velSensRef.current?.setInternalValue(values.VelSens)
@@ -82,21 +80,18 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
       freqRef.current?.setInternalValue(values.Freq)
       detuneRef.current?.setInternalValue(values.Detune)
       feedbackRef.current?.setInternalValue(values.Feedback)
-
       scaleControlsRef.current?.setInternalValue(values)
       pitchEnvRef.current!.checked = values.PitchEnv === 1
       fixedSwitchRef.current!.checked = values.Fixed === 1
-
       adsrRef.current?.setInternalValue(values)
 
       opInRefs.forEach(({ id, ref }) => {
-        const prop = `OP${id}In` as keyof OperatorProps
+        const prop = `OP${id}In` as keyof OperatorValues
         const value = values[prop] as number
         ref.current?.setInternalValue(value)
       })
 
       setFixed(values.Fixed === 1)
-
       setRatioMode(isFreeRatio(values.Ratio) ? 'free' : 'default')
     },
     [opInRefs]
@@ -107,7 +102,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
   }
 
   const initializeOperator = () => {
-    const init = getInitialOperatorValues(opId)
+    const init = getInitialOperatorValues(numId)
     setValues(init.values)
 
     const envelopeValues = getUpdatedEnvelopeValues(numId, init.values)
@@ -115,11 +110,11 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
     setRatioMode('default')
   }
 
-  const randomizeOperator = (adsr = false) => {
-    const random = getRandomizedOperatorValues(numId, adsr, randomizationOptions, values)
-    setValues({ ...values, ...random.values, ...(adsr ? random.adsrValues : {}) })
+  const randomizeOperator = (randomAdsr = false) => {
+    const random = getRandomizedOperatorValues(numId, randomAdsr, randomizationOptions, values)
+    setValues({ ...values, ...random.values, ...(randomAdsr ? random.adsrValues : {}) })
 
-    const envelopeValues = adsr ? getUpdatedEnvelopeValues(numId, random.adsrValues) : []
+    const envelopeValues = randomAdsr ? getUpdatedEnvelopeValues(numId, random.adsrValues) : []
     updateValues([...random.updatedValues, ...envelopeValues])
   }
 
@@ -234,9 +229,9 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
             variant='transparent'
             onClick={() => {
               if (operatorClipboard) {
-                const fromClipboard = getOperatorValues(opId, operatorClipboard)
-                setValues(fromClipboard.values)
-                updateValues(fromClipboard.updatedValues)
+                const fromClipboard = getOperatorValues(numId, operatorClipboard)
+                setValues(operatorClipboard)
+                updateValues(fromClipboard)
               }
             }}
           >
@@ -410,7 +405,7 @@ export const Operator = ({ id: numId, updateValues, ref }: Props) => {
           <Divider />
 
           <OperatorScaleControls
-            opId={numId}
+            numId={numId}
             updateValues={updateValues}
             values={values}
             ref={scaleControlsRef}

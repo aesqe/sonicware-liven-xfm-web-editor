@@ -1,7 +1,7 @@
 import { ADSRValues } from '../../../../types'
 
 export const getUpdatedEnvelopeValues = (numId: number, values: ADSRValues) => {
-  const opId = `OP${numId}` as 'OP1' | 'OP2' | 'OP3' | 'OP4'
+  const opId = `OP${numId}`
   const updatedValues = [
     { value: values.ATime, propertyPath: `${opId}.ATime` },
     { value: values.ALevel, propertyPath: `${opId}.ALevel` },

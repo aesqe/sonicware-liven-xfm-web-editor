@@ -2,20 +2,25 @@ import { RefObject, useEffect, useRef } from 'react'
 import { Flex, InputLabel, Stack } from '@mantine/core'
 import { Accordion } from '@mantine/core'
 
+import {
+  KnobRefType,
+  OperatorValues,
+  SetInternalValueRef,
+  UpdatedProperty
+} from '../../../../types'
 import { Knob } from '../../../Knob/Knob'
-import { KnobRefType, OperatorProps, SetInternalValueRef, UpdatedProperty } from '../../../../types'
 
 type Props = {
-  opId: number
+  numId: number
   updateValues: (props: UpdatedProperty[]) => void
-  values: OperatorProps
-  ref?: RefObject<SetInternalValueRef<OperatorProps> | undefined>
+  values: OperatorValues
+  ref?: RefObject<SetInternalValueRef<OperatorValues> | undefined>
   open?: boolean
   toggleScaleControls: () => void
 }
 
 export const OperatorScaleControls = ({
-  opId,
+  numId,
   updateValues,
   values,
   ref,
@@ -32,13 +37,13 @@ export const OperatorScaleControls = ({
   useEffect(() => {
     if (ref) {
       ref.current = {
-        setInternalValue: (values: OperatorProps) => {
-          timeRef.current?.setInternalValue(values.Time)
-          scaleRef.current?.setInternalValue(values.Scale)
-          lGainRef.current?.setInternalValue(values.LGain)
-          lCurveRef.current?.setInternalValue(values.LCurve)
-          rGainRef.current?.setInternalValue(values.RGain)
-          rCurveRef.current?.setInternalValue(values.RCurve)
+        setInternalValue: (data: OperatorValues) => {
+          timeRef.current?.setInternalValue(data.Time)
+          scaleRef.current?.setInternalValue(data.Scale)
+          lGainRef.current?.setInternalValue(data.LGain)
+          rGainRef.current?.setInternalValue(data.RGain)
+          lCurveRef.current?.setInternalValue(data.LCurve)
+          rCurveRef.current?.setInternalValue(data.RCurve)
         }
       }
     }
@@ -59,7 +64,7 @@ export const OperatorScaleControls = ({
               <Flex gap={12} p={4}>
                 <Knob
                   label='Time'
-                  propertyPath={`OP${opId}.Time`}
+                  propertyPath={`OP${numId}.Time`}
                   onChange={updateValues}
                   valueMin={0}
                   valueMax={127}
@@ -70,7 +75,7 @@ export const OperatorScaleControls = ({
                 />
                 <Knob
                   label='Position'
-                  propertyPath={`OP${opId}.Scale`}
+                  propertyPath={`OP${numId}.Scale`}
                   onChange={updateValues}
                   valueMin={0}
                   valueMax={6}
@@ -88,7 +93,7 @@ export const OperatorScaleControls = ({
               <Flex gap={12} p={4}>
                 <Knob
                   label='Gain'
-                  propertyPath={`OP${opId}.LGain`}
+                  propertyPath={`OP${numId}.LGain`}
                   onChange={updateValues}
                   valueMin={0}
                   valueMax={127}
@@ -99,7 +104,7 @@ export const OperatorScaleControls = ({
                 />
                 <Knob
                   label='Curve'
-                  propertyPath={`OP${opId}.LCurve`}
+                  propertyPath={`OP${numId}.LCurve`}
                   onChange={updateValues}
                   valueMin={-18}
                   valueMax={18}
@@ -117,7 +122,7 @@ export const OperatorScaleControls = ({
               <Flex gap={12} p={4}>
                 <Knob
                   label='Gain'
-                  propertyPath={`OP${opId}.RGain`}
+                  propertyPath={`OP${numId}.RGain`}
                   onChange={updateValues}
                   valueMin={0}
                   valueMax={127}
@@ -128,7 +133,7 @@ export const OperatorScaleControls = ({
                 />
                 <Knob
                   label='Curve'
-                  propertyPath={`OP${opId}.RCurve`}
+                  propertyPath={`OP${numId}.RCurve`}
                   onChange={updateValues}
                   valueMin={-18}
                   valueMax={18}

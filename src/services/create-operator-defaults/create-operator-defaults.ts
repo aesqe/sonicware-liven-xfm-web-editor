@@ -1,6 +1,6 @@
-import { OperatorProps } from '../../types'
+import { OperatorValues } from '../../types'
 
-export const createOperatorDefaults = (): OperatorProps => ({
+export const createOperatorDefaults = (): OperatorValues => ({
   Feedback: 0, // -63.0..+64.0 (+1.0)
   OP1In: 0, // 0..127 (+1)
   OP2In: 0, // 0..127 (+1)

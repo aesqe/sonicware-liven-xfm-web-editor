@@ -1,6 +1,8 @@
-import { OperatorProps, UpdatedProperty } from '../../../../types'
+import { OperatorValues, UpdatedProperty } from '../../../../types'
 
-export const getOperatorValues = (opId: 'OP1' | 'OP2' | 'OP3' | 'OP4', values: OperatorProps) => {
+export const getOperatorValues = (numId: 1 | 2 | 3 | 4, values: OperatorValues) => {
+  const opId = `OP${numId}`
+
   const updatedValues: UpdatedProperty[] = [
     { value: values.PitchEnv, propertyPath: `${opId}.PitchEnv` },
     { value: values.Ratio, propertyPath: `${opId}.Ratio` },
@@ -23,5 +25,5 @@ export const getOperatorValues = (opId: 'OP1' | 'OP2' | 'OP3' | 'OP4', values: O
     { value: values.RCurve, propertyPath: `${opId}.RCurve` }
   ]
 
-  return { values, updatedValues }
+  return updatedValues
 }
