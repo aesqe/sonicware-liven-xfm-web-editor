@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, RefObject, CSSProperties } from 'react'
-import { useAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import { Box, Button, Flex, Stack, Title, BoxProps } from '@mantine/core'
 
 import {
@@ -15,8 +15,8 @@ import { compareObjects } from '../../services/compare-objects/compare-objects'
 import { ADSREnvelopeSVG } from './components/ADSREnvelopeSVG/ADSREnvelopeSVG'
 import { ADSREnvelopeKnobs } from './components/ADSREnvelopeKnobs/ADSREnvelopeKnobs'
 import { getRandomValues01 } from './services/get-random-values-01/get-random-values-01'
-import { envelopeClipboardAtom } from '../../store/atoms'
 import { range0127, range_1818, range_4848 } from './constants'
+import { envelopeClipboardAtom, globalRefsAtom } from '../../store/atoms'
 import { ADSRValues, UpdatedProperty, SetInternalValueRef } from '../../types'
 
 type Props = {
@@ -52,6 +52,8 @@ export const ADSREnvelope = ({
   const svgRef = useRef<SVGSVGElement>(null)
   const knobsRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
   const skipOnChange = useRef(false)
+  const pitchAdsrRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
+  const setGlobalRef = useSetAtom(globalRefsAtom)
 
   const setEnvelopeValues = useCallback(
     (updatedValues: ADSRValues) => {
@@ -72,15 +74,28 @@ export const ADSREnvelope = ({
   )
 
   useEffect(() => {
-    if (ref) {
-      ref.current = {
-        setInternalValue: (values: ADSRValues, skipUpdate = false) => {
-          skipOnChange.current = skipUpdate
-          setEnvelopeValues(convertInput(values, range))
-        }
+    const obj = {
+      setInternalValue: (values: ADSRValues, skipUpdate = false) => {
+        skipOnChange.current = skipUpdate
+        setEnvelopeValues(convertInput(values, range))
       }
     }
+
+    pitchAdsrRef.current = obj
+
+    if (ref) {
+      ref.current = obj
+    }
   }, [range, ref, setEnvelopeValues])
+
+  useEffect(() => {
+    if (pitchEnv) {
+      setGlobalRef((prev) => ({
+        ...prev,
+        pitchAdsrRef
+      }))
+    }
+  }, [pitchEnv, setGlobalRef])
 
   const resetEnvelope = () => {
     setEnvelopeValues(pitchEnv ? defaultPitchADSRCurve01 : defaultADSRCurve01)
