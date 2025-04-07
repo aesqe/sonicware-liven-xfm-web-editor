@@ -1,12 +1,13 @@
-import { useThrottledCallback } from '@mantine/hooks'
 import { useCallback, useEffect, useRef } from 'react'
-import { UpdatedProperty, XFMPatch } from '../../types'
-import { updateObjectValueByPath } from '../update-object-value-by-path/update-object-value-by-path'
-import { compareObjects } from '../compare-objects/compare-objects'
-import { logSysExAtom, patchAtom } from '../../store/atoms'
-import { sysexSendThrottleTimeAtom } from '../../store/atoms'
-import { useSendPatchToXFM } from '../use-send-patch-to-xfm/use-send-patch-to-xfm'
 import { useAtom, useAtomValue } from 'jotai'
+import { useThrottledCallback } from '@mantine/hooks'
+
+import { compareObjects } from '../compare-objects/compare-objects'
+import { useSendPatchToXFM } from '../use-send-patch-to-xfm/use-send-patch-to-xfm'
+import { logSysExAtom, patchAtom } from '../../store/atoms'
+import { updateObjectValueByPath } from '../update-object-value-by-path/update-object-value-by-path'
+import { UpdatedProperty, XFMPatch } from '../../types'
+import { sysexSendThrottleTimeAtom } from '../../store/atoms'
 
 export const useUpdateValues = () => {
   const sendPatchToXFM = useSendPatchToXFM()
