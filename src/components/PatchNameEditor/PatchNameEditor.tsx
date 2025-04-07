@@ -1,29 +1,42 @@
-import { RefObject, useEffect, useState } from 'react'
-import { useAtomValue } from 'jotai'
+import { useEffect, useRef, useState } from 'react'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { TextInput, Tooltip } from '@mantine/core'
+import { useThrottledCallback } from '@mantine/hooks'
 import { IconInfoCircle } from '@tabler/icons-react'
 
-import { patchAtom } from '../../store/atoms'
+import { useSendPatchToXFM } from '../../services/use-send-patch-to-xfm/use-send-patch-to-xfm'
 import { SetInternalValueRef } from '../../types'
 import { tooltipText, validationRegex } from './constants'
+import { globalRefsAtom, patchAtom, sysexSendThrottleTimeAtom } from '../../store/atoms'
 
-type Props = {
-  onChange: (patchName: string) => void
-  ref: RefObject<SetInternalValueRef<string> | undefined>
-}
-
-export const PatchNameEditor = ({ onChange, ref }: Props) => {
-  const patch = useAtomValue(patchAtom)
-  const [patchName, setPatchName] = useState(patch.Name)
+export const PatchNameEditor = () => {
   const [valid, setValid] = useState(true)
+  const sendPatchToXFM = useSendPatchToXFM()
+  const [patch, setPatch] = useAtom(patchAtom)
+  const [patchName, setPatchName] = useState(patch.Name)
+  const sysexSendThrottleTime = useAtomValue(sysexSendThrottleTimeAtom)
+  const setGlobalRef = useSetAtom(globalRefsAtom)
+  const patchNameRef = useRef<SetInternalValueRef<string>>(undefined)
 
   useEffect(() => {
-    if (ref) {
-      ref.current = {
-        setInternalValue: setPatchName
-      }
+    patchNameRef.current = {
+      setInternalValue: setPatchName
     }
-  }, [ref])
+  }, [setPatchName])
+
+  useEffect(() => {
+    setGlobalRef((prev) => ({
+      ...prev,
+      patchNameRef
+    }))
+  }, [setGlobalRef])
+
+  const updatePatchName = useThrottledCallback((patchName: string) => {
+    const updatedPatch = { ...patch, Name: patchName.padEnd(4, ' ') }
+
+    setPatch(updatedPatch)
+    sendPatchToXFM(updatedPatch)
+  }, sysexSendThrottleTime * 10)
 
   const validate = (value: string) => {
     const isValid = value.length > 0 && value.length < 8 && validationRegex.test(value)
@@ -40,7 +53,7 @@ export const PatchNameEditor = ({ onChange, ref }: Props) => {
     setPatchName(value)
 
     if (isValid && value !== patch.Name) {
-      onChange(value)
+      updatePatchName(value)
     }
   }
 
