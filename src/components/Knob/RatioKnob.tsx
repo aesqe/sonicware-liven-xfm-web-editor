@@ -3,19 +3,25 @@ import { RefObject, useEffect, useRef } from 'react'
 import { Knob } from './Knob'
 import { ratioStepFn } from '../Operator/services/ratio-step-fn/ratio-step-fn'
 import { ratioFormatter } from '../Operator/services/ratio-formatter/ratio-formatter'
-import { OperatorProps, RatioRef } from '../../types'
-import { UpdatedProperty, RatioMode } from '../../types'
+import { UpdatedProperty, RatioMode, RatioRef } from '../../types'
 
 type Props = {
-  opId: string
-  fixed: boolean
+  propertyPath: string
   ratioRef: RefObject<RatioRef | null>
   ratioMode: RatioMode
+  fixed: boolean
+  value: number
   updateValues: (val: UpdatedProperty[]) => void
-  values: OperatorProps
 }
 
-export const RatioKnob = ({ opId, fixed, ratioRef, ratioMode, updateValues, values }: Props) => {
+export const RatioKnob = ({
+  propertyPath,
+  ratioRef,
+  ratioMode,
+  fixed,
+  value,
+  updateValues
+}: Props) => {
   const prevRatioModeRef = useRef(ratioMode)
 
   const isScaleMode = ratioMode === 'scale'
@@ -34,11 +40,11 @@ export const RatioKnob = ({ opId, fixed, ratioRef, ratioMode, updateValues, valu
   return (
     <Knob
       label='Ratio'
-      propertyPath={`${opId}.Ratio`}
+      propertyPath={propertyPath}
       disabled={fixed}
       ref={ratioRef}
       onChange={updateValues}
-      valueDefault={values.Ratio}
+      valueDefault={value}
       valueMin={isScaleMode ? 0 : 50}
       valueMax={isScaleMode ? 60 : 3200}
       center={isScaleMode ? 30 : 1600}
