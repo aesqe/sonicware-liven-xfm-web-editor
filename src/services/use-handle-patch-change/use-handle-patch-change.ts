@@ -20,7 +20,11 @@ export const useHandlePatchChange = () => {
   }, sysexSendThrottleTime)
 
   const handlePatchChange = useCallback(
-    (data: XFMPatch) => {
+    (data: XFMPatch | null | undefined) => {
+      if (!data) {
+        return
+      }
+
       setPatch(data)
       setTimeout(() => {
         throttledRefUpdates(data)

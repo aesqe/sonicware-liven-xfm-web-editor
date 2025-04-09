@@ -1,4 +1,4 @@
-export const compareObjects = (prev: object, current: object) => {
+export const objectsAreJSONEqual = (prev: object, current: object) => {
   const prevKeys = Object.keys(prev)
   const currentKeys = Object.keys(current)
 

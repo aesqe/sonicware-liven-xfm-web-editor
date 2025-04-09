@@ -11,7 +11,7 @@ import {
 } from './constants'
 import { convertInput } from './services/convert-input/convert-input'
 import { convertOutput } from './services/convert-output/convert-output'
-import { compareObjects } from '../../services/compare-objects/compare-objects'
+import { objectsAreJSONEqual } from '../../services/compare-objects/compare-objects'
 import { ADSREnvelopeSVG } from './components/ADSREnvelopeSVG/ADSREnvelopeSVG'
 import { ADSREnvelopeKnobs } from './components/ADSREnvelopeKnobs/ADSREnvelopeKnobs'
 import { getRandomValues01 } from './services/get-random-values-01/get-random-values-01'
@@ -51,13 +51,13 @@ export const ADSREnvelope = ({
   const [envelopeClipboard, setEnvelopeClipboard] = useAtom(envelopeClipboardAtom)
   const svgRef = useRef<SVGSVGElement>(null)
   const knobsRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
-  const skipOnChange = useRef(false)
+  const skipChangeCallback = useRef(false)
   const pitchAdsrRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
   const setGlobalRef = useSetAtom(globalRefsAtom)
 
   const setEnvelopeValues = useCallback(
     (updatedValues: ADSRValues) => {
-      if (compareObjects(values, updatedValues)) {
+      if (objectsAreJSONEqual(values, updatedValues)) {
         return
       }
 
@@ -66,7 +66,7 @@ export const ADSREnvelope = ({
       setValues(updatedValues)
       knobsRef.current?.setInternalValue(output)
 
-      if (!skipOnChange.current) {
+      if (!skipChangeCallback.current) {
         onChange?.(output)
       }
     },
@@ -76,7 +76,7 @@ export const ADSREnvelope = ({
   useEffect(() => {
     const obj = {
       setInternalValue: (values: ADSRValues, skipUpdate = false) => {
-        skipOnChange.current = skipUpdate
+        skipChangeCallback.current = skipUpdate
         setEnvelopeValues(convertInput(values, range))
       }
     }

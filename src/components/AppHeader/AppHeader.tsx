@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { useAtom, useAtomValue } from 'jotai'
 import { Stack, Flex, Paper, ActionIcon, Anchor, Divider, Image, Title } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
@@ -12,36 +12,25 @@ import { GlobalRandomization } from '../GlobalRandomization/GlobalRandomization'
 import { MidiDevicesSelection } from '../MidiDevicesSelection/MidiDevicesSelection'
 import { logSysExAtom, patchAtom } from '../../store/atoms'
 import { AppHeaderToggleControls } from './components/AppHeaderToggleControls/AppHeaderToggleControls'
+import { getUpdatedEnvelopeValues } from '../Operator/services/get-updated-envelope-values/get-updated-envelope-values'
 import { AppHeaderInitializeControls } from './components/AppHeaderInitializeControls/AppHeaderInitializeControls'
 import { ADSRValues, UpdatedProperty, XFMPatch } from '../../types'
 
 type Props = {
-  updateValues: (props: UpdatedProperty[]) => void
-  handlePatchChange: (patch: XFMPatch) => void
+  onChange: (props: UpdatedProperty[]) => void
+  handlePatchChange: (patch: XFMPatch | null | undefined) => void
 }
 
-export const AppHeader = ({ updateValues, handlePatchChange }: Props) => {
+export const AppHeader = ({ onChange, handlePatchChange }: Props) => {
   const viewport = useViewportSize()
   const patch = useAtomValue(patchAtom)
   const [logSysEx, setLogSysEx] = useAtom(logSysExAtom)
   const [adsrEnvelopeWidth, setADSREnvelopeWidth] = useState(600)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const updatePitchEnvelope = useCallback(
-    (data: ADSRValues) => {
-      updateValues([
-        { propertyPath: 'Pitch.ALevel', value: data.ALevel },
-        { propertyPath: 'Pitch.ATime', value: data.ATime },
-        { propertyPath: 'Pitch.DLevel', value: data.DLevel },
-        { propertyPath: 'Pitch.DTime', value: data.DTime },
-        { propertyPath: 'Pitch.SLevel', value: data.SLevel },
-        { propertyPath: 'Pitch.STime', value: data.STime },
-        { propertyPath: 'Pitch.RLevel', value: data.RLevel },
-        { propertyPath: 'Pitch.RTime', value: data.RTime }
-      ])
-    },
-    [updateValues]
-  )
+  const updatePitchEnvelope = (values: ADSRValues) => {
+    onChange(getUpdatedEnvelopeValues('Pitch', values))
+  }
 
   useEffect(() => {
     const handleResize = () => {

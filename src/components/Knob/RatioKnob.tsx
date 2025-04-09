@@ -11,17 +11,10 @@ type Props = {
   ratioMode: RatioMode
   fixed: boolean
   value: number
-  updateValues: (val: UpdatedProperty[]) => void
+  onChange: (val: UpdatedProperty[]) => void
 }
 
-export const RatioKnob = ({
-  propertyPath,
-  ratioRef,
-  ratioMode,
-  fixed,
-  value,
-  updateValues
-}: Props) => {
+export const RatioKnob = ({ propertyPath, ratioRef, ratioMode, fixed, value, onChange }: Props) => {
   const prevRatioModeRef = useRef(ratioMode)
 
   const isScaleMode = ratioMode === 'scale'
@@ -43,7 +36,7 @@ export const RatioKnob = ({
       propertyPath={propertyPath}
       disabled={fixed}
       ref={ratioRef}
-      onChange={updateValues}
+      onChange={onChange}
       valueDefault={value}
       valueMin={isScaleMode ? 0 : 50}
       valueMax={isScaleMode ? 60 : 3200}

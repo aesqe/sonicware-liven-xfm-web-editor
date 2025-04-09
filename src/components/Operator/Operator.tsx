@@ -33,10 +33,10 @@ import { getRandomizedOperatorValues } from './services/get-randomized-operator-
 
 type Props = {
   id: 1 | 2 | 3 | 4
-  updateValues: (props: UpdatedProperty[]) => void
+  onChange: (props: UpdatedProperty[]) => void
 }
 
-export const Operator = ({ id: numId, updateValues }: Props) => {
+export const Operator = ({ id: numId, onChange }: Props) => {
   const patch = useAtomValue(patchAtom)
   const randomizationOptions = useAtomValue(randomizationOptionsAtom)
   const opId = `OP${numId}` as const
@@ -105,15 +105,15 @@ export const Operator = ({ id: numId, updateValues }: Props) => {
   )
 
   const updateEnvelope = (values: ADSRValues) => {
-    updateValues(getUpdatedEnvelopeValues(numId, values))
+    onChange(getUpdatedEnvelopeValues(opId, values))
   }
 
   const initializeOperator = () => {
     const init = getInitialOperatorValues(numId)
     setValues(init.values)
 
-    const envelopeValues = getUpdatedEnvelopeValues(numId, init.values)
-    updateValues([...init.updatedValues, ...envelopeValues])
+    const envelopeValues = getUpdatedEnvelopeValues(opId, init.values)
+    onChange([...init.updatedValues, ...envelopeValues])
     setRatioMode('default')
   }
 
@@ -121,8 +121,8 @@ export const Operator = ({ id: numId, updateValues }: Props) => {
     const random = getRandomizedOperatorValues(numId, randomAdsr, randomizationOptions, values)
     setValues({ ...values, ...random.values, ...(randomAdsr ? random.adsrValues : {}) })
 
-    const envelopeValues = randomAdsr ? getUpdatedEnvelopeValues(numId, random.adsrValues) : []
-    updateValues([...random.updatedValues, ...envelopeValues])
+    const envelopeValues = randomAdsr ? getUpdatedEnvelopeValues(opId, random.adsrValues) : []
+    onChange([...random.updatedValues, ...envelopeValues])
   }
 
   useEffect(() => {
@@ -208,7 +208,7 @@ export const Operator = ({ id: numId, updateValues }: Props) => {
             >
               <Switch
                 onChange={(e) => {
-                  updateValues([
+                  onChange([
                     {
                       value: e.target.checked ? 1 : 0,
                       propertyPath: `${opId}.PitchEnv`
@@ -244,7 +244,7 @@ export const Operator = ({ id: numId, updateValues }: Props) => {
                 if (operatorClipboard) {
                   const fromClipboard = getOperatorValues(numId, operatorClipboard)
                   setValues(operatorClipboard)
-                  updateValues(fromClipboard)
+                  onChange(fromClipboard)
                 }
               }}
             >
@@ -271,7 +271,7 @@ export const Operator = ({ id: numId, updateValues }: Props) => {
               <Knob
                 label='Level'
                 propertyPath={`${opId}.Level`}
-                onChange={updateValues}
+                onChange={onChange}
                 valueMin={0}
                 valueMax={127}
                 valueDefault={values.Level}
@@ -282,7 +282,7 @@ export const Operator = ({ id: numId, updateValues }: Props) => {
               <Knob
                 label='Output'
                 propertyPath={`${opId}.Output`}
-                onChange={updateValues}
+                onChange={onChange}
                 valueMin={0}
                 valueMax={127}
                 valueDefault={values.Output}
@@ -293,7 +293,7 @@ export const Operator = ({ id: numId, updateValues }: Props) => {
               <Knob
                 label='Velocity Sensitivity'
                 propertyPath={`${opId}.VelSens`}
-                onChange={updateValues}
+                onChange={onChange}
                 valueMin={0}
                 valueMax={127}
                 valueDefault={values.VelSens}
@@ -307,13 +307,13 @@ export const Operator = ({ id: numId, updateValues }: Props) => {
                 ratioRef={ratioRef}
                 ratioMode={ratioMode}
                 value={values.Ratio}
-                updateValues={updateValues}
+                onChange={onChange}
               />
               <Stack align='center' gap={10}>
                 <Knob
                   label='Frequency'
                   propertyPath={`${opId}.Freq`}
-                  onChange={updateValues}
+                  onChange={onChange}
                   valueMin={1}
                   valueMax={97550}
                   valueDefault={values.Freq}
@@ -325,9 +325,7 @@ export const Operator = ({ id: numId, updateValues }: Props) => {
                 <Switch
                   onChange={(e) => {
                     setFixed(e.target.checked)
-                    updateValues([
-                      { value: e.target.checked ? 1 : 0, propertyPath: `${opId}.Fixed` }
-                    ])
+                    onChange([{ value: e.target.checked ? 1 : 0, propertyPath: `${opId}.Fixed` }])
                   }}
                   checked={fixed}
                   ref={fixedSwitchRef}
@@ -339,7 +337,7 @@ export const Operator = ({ id: numId, updateValues }: Props) => {
               <Knob
                 label='Detune'
                 propertyPath={`${opId}.Detune`}
-                onChange={updateValues}
+                onChange={onChange}
                 valueMin={-63}
                 valueMax={63}
                 valueDefault={values.Detune}
@@ -390,7 +388,7 @@ export const Operator = ({ id: numId, updateValues }: Props) => {
               <Knob
                 label='Feedback'
                 propertyPath={`${opId}.Feedback`}
-                onChange={updateValues}
+                onChange={onChange}
                 valueMin={-630}
                 valueMax={640}
                 stepFn={() => 10}
@@ -406,7 +404,7 @@ export const Operator = ({ id: numId, updateValues }: Props) => {
                   key={`${opId}.OP${id}In`}
                   label={`OP${id} In`}
                   propertyPath={`${opId}.OP${id}In`}
-                  onChange={updateValues}
+                  onChange={onChange}
                   valueMin={0}
                   valueMax={127}
                   valueDefault={0}
@@ -421,7 +419,7 @@ export const Operator = ({ id: numId, updateValues }: Props) => {
 
             <OperatorScaleControls
               numId={numId}
-              updateValues={updateValues}
+              onChange={onChange}
               values={values}
               ref={scaleControlsRef}
               open={scaleControlsOpen}

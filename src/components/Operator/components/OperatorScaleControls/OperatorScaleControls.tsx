@@ -12,7 +12,7 @@ import { Knob } from '../../../Knob/Knob'
 
 type Props = {
   numId: number
-  updateValues: (props: UpdatedProperty[]) => void
+  onChange: (props: UpdatedProperty[]) => void
   values: OperatorValues
   ref?: RefObject<SetInternalValueRef<OperatorValues> | undefined>
   open?: boolean
@@ -21,7 +21,7 @@ type Props = {
 
 export const OperatorScaleControls = ({
   numId,
-  updateValues,
+  onChange,
   values,
   ref,
   open = false,
@@ -65,7 +65,7 @@ export const OperatorScaleControls = ({
                 <Knob
                   label='Time'
                   propertyPath={`OP${numId}.Time`}
-                  onChange={updateValues}
+                  onChange={onChange}
                   valueMin={0}
                   valueMax={127}
                   valueDefault={values.Time}
@@ -76,7 +76,7 @@ export const OperatorScaleControls = ({
                 <Knob
                   label='Position'
                   propertyPath={`OP${numId}.Scale`}
-                  onChange={updateValues}
+                  onChange={onChange}
                   valueMin={0}
                   valueMax={6}
                   valueDefault={values.Scale}
@@ -94,7 +94,7 @@ export const OperatorScaleControls = ({
                 <Knob
                   label='Gain'
                   propertyPath={`OP${numId}.LGain`}
-                  onChange={updateValues}
+                  onChange={onChange}
                   valueMin={0}
                   valueMax={127}
                   valueDefault={values.LGain}
@@ -105,7 +105,7 @@ export const OperatorScaleControls = ({
                 <Knob
                   label='Curve'
                   propertyPath={`OP${numId}.LCurve`}
-                  onChange={updateValues}
+                  onChange={onChange}
                   valueMin={-18}
                   valueMax={18}
                   valueDefault={values.LCurve}
@@ -123,7 +123,7 @@ export const OperatorScaleControls = ({
                 <Knob
                   label='Gain'
                   propertyPath={`OP${numId}.RGain`}
-                  onChange={updateValues}
+                  onChange={onChange}
                   valueMin={0}
                   valueMax={127}
                   valueDefault={values.RGain}
@@ -134,7 +134,7 @@ export const OperatorScaleControls = ({
                 <Knob
                   label='Curve'
                   propertyPath={`OP${numId}.RCurve`}
-                  onChange={updateValues}
+                  onChange={onChange}
                   valueMin={-18}
                   valueMax={18}
                   valueDefault={values.RCurve}
