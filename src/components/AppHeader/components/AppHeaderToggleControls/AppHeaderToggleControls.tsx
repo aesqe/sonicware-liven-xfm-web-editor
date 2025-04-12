@@ -30,7 +30,7 @@ export const AppHeaderToggleControls = () => {
   }, [scaleControlsOpen, refs])
 
   return (
-    <Fieldset legend='Toggle' w='100%' px={5} py={8}>
+    <Fieldset legend='Toggle' w='100%' px={5} py={6}>
       <Button.Group w='100%'>
         <Button
           color='#e6e3e1'

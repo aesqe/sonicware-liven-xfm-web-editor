@@ -3,7 +3,7 @@ import { Input, Output } from 'webmidi'
 
 import initPatch from '../assets/presets/initpatch.json'
 import { XFMPatch, ADSRValues, OperatorValues, RandomizationOptions, GlobalRefs } from '../types'
-
+import { atomWithListeners } from '../services/atom-with-listeners/atom-with-listeners'
 export const webMidiEnabledAtom = atom<boolean>(false)
 export const midiInputAtom = atom<Input | null>(null)
 export const midiOutputAtom = atom<Output | null>(null)
@@ -11,7 +11,7 @@ export const midiOutputAtom = atom<Output | null>(null)
 export const midiInputListAtom = atom<Input[]>([])
 export const midiOutputListAtom = atom<Output[]>([])
 
-export const patchAtom = atom<XFMPatch>(initPatch)
+export const [patchAtom, usePatchAtomListener] = atomWithListeners<XFMPatch>(initPatch)
 
 export const randomizationOptionsAtom = atom<RandomizationOptions>({
   amount: 50,

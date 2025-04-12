@@ -1,16 +1,17 @@
 import { useRef, useEffect, useState } from 'react'
-import { useAtom, useAtomValue } from 'jotai'
+import { useAtom } from 'jotai'
 import { Stack, Flex, Paper, ActionIcon, Anchor, Divider, Image, Title } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
 import { IconTerminal2 } from '@tabler/icons-react'
 
+import initPatch from '../../assets/presets/initpatch.json'
 import githubMark from '../../assets/github-mark.svg'
+import { logSysExAtom } from '../../store/atoms'
 import { ADSREnvelope } from '../ADSREnvelope/ADSREnvelope'
 import { PatchNameEditor } from '../PatchNameEditor/PatchNameEditor'
 import { DownloadPatchButton } from '../DownloadPatchButton/DownloadPatchButton'
 import { GlobalRandomization } from '../GlobalRandomization/GlobalRandomization'
 import { MidiDevicesSelection } from '../MidiDevicesSelection/MidiDevicesSelection'
-import { logSysExAtom, patchAtom } from '../../store/atoms'
 import { AppHeaderToggleControls } from './components/AppHeaderToggleControls/AppHeaderToggleControls'
 import { getUpdatedEnvelopeValues } from '../Operator/services/get-updated-envelope-values/get-updated-envelope-values'
 import { AppHeaderInitializeControls } from './components/AppHeaderInitializeControls/AppHeaderInitializeControls'
@@ -23,7 +24,6 @@ type Props = {
 
 export const AppHeader = ({ onChange, handlePatchChange }: Props) => {
   const viewport = useViewportSize()
-  const patch = useAtomValue(patchAtom)
   const [logSysEx, setLogSysEx] = useAtom(logSysExAtom)
   const [adsrEnvelopeWidth, setADSREnvelopeWidth] = useState(600)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -132,7 +132,7 @@ export const AppHeader = ({ onChange, handlePatchChange }: Props) => {
           height={100}
           onChange={updatePitchEnvelope}
           pitchEnv
-          initialState={patch.Pitch}
+          initialState={initPatch.Pitch}
           mb={-8}
           mx={-8}
         />

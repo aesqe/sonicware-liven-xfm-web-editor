@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useSetAtom } from 'jotai'
+import { useAtomCallback } from 'jotai/utils'
 import { ActionIcon, Divider, Flex, InputLabel, Stack, Switch, Text, Radio } from '@mantine/core'
-import { clamp, useViewportSize } from '@mantine/hooks'
+import { clamp, useDebouncedCallback, useViewportSize } from '@mantine/hooks'
 import { IconDice5, IconCopy, IconReload, IconClipboardText } from '@tabler/icons-react'
 
 import {
@@ -37,16 +38,19 @@ type Props = {
 }
 
 export const Operator = ({ id: numId, onChange }: Props) => {
-  const patch = useAtomValue(patchAtom)
-  const randomizationOptions = useAtomValue(randomizationOptionsAtom)
-  const opId = `OP${numId}` as const
-  const values = patch[opId] as OperatorValues
+  const viewport = useViewportSize()
 
-  const [fixed, setFixed] = useState(values.Fixed === 1)
+  const setGlobalRefs = useSetAtom(globalRefsAtom)
+
   const [scaleControlsOpen, setScaleControlsOpen] = useState(false)
   const [ADSRControlsOpen, setADSRControlsOpen] = useState(true)
   const [adsrEnvelopeWidth, setADSREnvelopeWidth] = useState(600)
   const [containerWidth, setContainerWidth] = useState(0)
+  const [ratioMode, setRatioMode] = useState<RatioMode>('default')
+  const [pitchEnvChecked, setPitchEnvChecked] = useState(false)
+  const [fixed, setFixed] = useState(false)
+
+  const containerRef = useRef<HTMLDivElement>(null)
   const levelRef = useRef<KnobRefType>(null)
   const outputRef = useRef<KnobRefType>(null)
   const velSensRef = useRef<KnobRefType>(null)
@@ -60,15 +64,14 @@ export const Operator = ({ id: numId, onChange }: Props) => {
   const op4InRef = useRef<KnobRefType>(null)
   const pitchEnvRef = useRef<HTMLInputElement | null>(null)
   const fixedSwitchRef = useRef<HTMLInputElement | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const adsrRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
   const scaleControlsRef = useRef<SetInternalValueRef<OperatorValues>>(undefined)
-  const [operatorClipboard, setOperatorClipboard] = useAtom(operatorClipboardAtom)
-  const viewport = useViewportSize()
-  const [ratioMode, setRatioMode] = useState<RatioMode>('default')
+  const adsrRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
+
   const opRef = useRef<OperatorRef>(undefined)
-  const setGlobalRefs = useSetAtom(globalRefsAtom)
+  const initialOperatorValues = useMemo(() => getInitialOperatorValues(numId), [numId])
+
   const refName = `op${numId}Ref`
+  const opId = `OP${numId}` as const
 
   const opInRefs = [
     { id: 1, ref: op1InRef },
@@ -78,52 +81,117 @@ export const Operator = ({ id: numId, onChange }: Props) => {
   ].filter(({ id }) => id !== numId)
 
   const setValues = useCallback(
-    (values: OperatorValues) => {
+    (data: OperatorValues) => {
       ratioRef.current?.resetPrevRatioMode()
-      levelRef.current?.setInternalValue(values.Level)
-      outputRef.current?.setInternalValue(values.Output)
-      velSensRef.current?.setInternalValue(values.VelSens)
-      ratioRef.current?.setInternalValue(values.Ratio)
-      freqRef.current?.setInternalValue(values.Freq)
-      detuneRef.current?.setInternalValue(values.Detune)
-      feedbackRef.current?.setInternalValue(values.Feedback)
-      scaleControlsRef.current?.setInternalValue(values)
-      pitchEnvRef.current!.checked = values.PitchEnv === 1
-      fixedSwitchRef.current!.checked = values.Fixed === 1
-      adsrRef.current?.setInternalValue(values)
+      levelRef.current?.setInternalValue(data.Level)
+      outputRef.current?.setInternalValue(data.Output)
+      velSensRef.current?.setInternalValue(data.VelSens)
+      ratioRef.current?.setInternalValue(data.Ratio)
+      freqRef.current?.setInternalValue(data.Freq)
+      detuneRef.current?.setInternalValue(data.Detune)
+      feedbackRef.current?.setInternalValue(data.Feedback)
+      scaleControlsRef.current?.setInternalValue(data)
+      fixedSwitchRef.current!.checked = data.Fixed === 1
+      adsrRef.current?.setInternalValue(data, true)
+
+      if (pitchEnvRef.current) {
+        pitchEnvRef.current.checked = data.PitchEnv === 1
+      }
 
       opInRefs.forEach(({ id, ref }) => {
         const prop = `OP${id}In` as keyof OperatorValues
-        const value = values[prop] as number
+        const value = data[prop] as number
         ref.current?.setInternalValue(value)
       })
 
-      setFixed(values.Fixed === 1)
-      setRatioMode(isFreeRatio(values.Ratio) ? 'free' : 'default')
+      setFixed(data.Fixed === 1)
+      setRatioMode(isFreeRatio(data.Ratio) ? 'free' : 'default')
     },
     [opInRefs]
   )
 
-  const updateEnvelope = (values: ADSRValues) => {
-    onChange(getUpdatedEnvelopeValues(opId, values))
+  const updateEnvelope = (data: ADSRValues) => {
+    onChange(getUpdatedEnvelopeValues(opId, data))
   }
 
   const initializeOperator = () => {
-    const init = getInitialOperatorValues(numId)
-    setValues(init.values)
+    const { values, updatedValues } = initialOperatorValues
+    const envelopeValues = getUpdatedEnvelopeValues(opId, values)
 
-    const envelopeValues = getUpdatedEnvelopeValues(opId, init.values)
-    onChange([...init.updatedValues, ...envelopeValues])
+    setValues(values)
     setRatioMode('default')
+    onChange([...updatedValues, ...envelopeValues])
   }
 
-  const randomizeOperator = (randomAdsr = false) => {
-    const random = getRandomizedOperatorValues(numId, randomAdsr, randomizationOptions, values)
-    setValues({ ...values, ...random.values, ...(randomAdsr ? random.adsrValues : {}) })
+  const randomizeOperator = useAtomCallback(
+    useCallback(
+      (get, _set, randomAdsr = false) => {
+        const patch = get(patchAtom)
+        const randomizationOptions = get(randomizationOptionsAtom)
 
-    const envelopeValues = randomAdsr ? getUpdatedEnvelopeValues(opId, random.adsrValues) : []
-    onChange([...random.updatedValues, ...envelopeValues])
-  }
+        const operatorValues = patch[opId]
+        const { values, adsrValues, updatedValues } = getRandomizedOperatorValues(
+          numId,
+          randomAdsr,
+          randomizationOptions,
+          operatorValues
+        )
+        const envelopeValues = randomAdsr ? getUpdatedEnvelopeValues(opId, adsrValues) : []
+
+        setValues({
+          ...operatorValues,
+          ...values,
+          ...(randomAdsr ? adsrValues : {})
+        })
+
+        onChange([...updatedValues, ...envelopeValues])
+      },
+      [numId, onChange, opId, setValues]
+    )
+  )
+
+  const handleCopy = useAtomCallback(
+    useCallback(
+      (get, set) => {
+        const patch = get(patchAtom)
+        const operatorValues = patch[opId]
+
+        set(operatorClipboardAtom, {
+          ...operatorValues,
+          [`${opId}In`]: 0
+        })
+      },
+      [opId]
+    )
+  )
+
+  const handlePaste = useAtomCallback(
+    useCallback(
+      (get) => {
+        const operatorClipboard = get(operatorClipboardAtom)
+
+        if (operatorClipboard) {
+          const fromClipboard = getOperatorValues(numId, operatorClipboard)
+          setValues(operatorClipboard)
+          onChange(fromClipboard)
+        }
+      },
+      [numId, onChange, setValues]
+    )
+  )
+
+  const handlePitchEnvChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      onChange([
+        {
+          value: e.target.checked ? 1 : 0,
+          propertyPath: `${opId}.PitchEnv`
+        }
+      ])
+      setPitchEnvChecked(e.target.checked)
+    },
+    [onChange, opId]
+  )
 
   useEffect(() => {
     opRef.current = {
@@ -140,19 +208,19 @@ export const Operator = ({ id: numId, onChange }: Props) => {
     }))
   }, [setGlobalRefs, refName])
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (containerRef.current) {
-        const clientWidth = containerRef.current.clientWidth
-        const minWidth = 385
-        const maxWidth = clientWidth > 800 ? 450 : 385
-        const width = clamp(clientWidth, minWidth, maxWidth)
+  const handleResize = useDebouncedCallback(() => {
+    if (containerRef.current) {
+      const clientWidth = containerRef.current.clientWidth
+      const minWidth = 385
+      const maxWidth = clientWidth > 800 ? 450 : 385
+      const width = clamp(clientWidth, minWidth, maxWidth)
 
-        setContainerWidth(clientWidth)
-        setADSREnvelopeWidth(width)
-      }
+      setContainerWidth(clientWidth)
+      setADSREnvelopeWidth(width)
     }
+  }, 1000)
 
+  useEffect(() => {
     window.addEventListener('resize', handleResize)
 
     handleResize()
@@ -160,7 +228,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
     return () => {
       window.removeEventListener('resize', handleResize)
     }
-  }, [])
+  }, [handleResize])
 
   return (
     <Flex>
@@ -206,48 +274,15 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                 borderBottom: '1px solid #DADADA'
               }}
             >
-              <Switch
-                onChange={(e) => {
-                  onChange([
-                    {
-                      value: e.target.checked ? 1 : 0,
-                      propertyPath: `${opId}.PitchEnv`
-                    }
-                  ])
-                }}
-                checked={values.PitchEnv === 1}
-                ref={pitchEnvRef}
-              />
+              <Switch onChange={handlePitchEnvChange} checked={pitchEnvChecked} ref={pitchEnvRef} />
               <InputLabel fw='normal' mt={-10} fz='xs'>
                 Pitch EG
               </InputLabel>
             </Stack>
-            <ActionIcon
-              mt={24}
-              title='Copy'
-              size={32}
-              variant='transparent'
-              onClick={() => {
-                setOperatorClipboard({
-                  ...values,
-                  [`${opId}In`]: 0
-                })
-              }}
-            >
+            <ActionIcon mt={24} title='Copy' size={32} variant='transparent' onClick={handleCopy}>
               <IconCopy size={48} color='#00000044' />
             </ActionIcon>
-            <ActionIcon
-              title='Paste'
-              size={32}
-              variant='transparent'
-              onClick={() => {
-                if (operatorClipboard) {
-                  const fromClipboard = getOperatorValues(numId, operatorClipboard)
-                  setValues(operatorClipboard)
-                  onChange(fromClipboard)
-                }
-              }}
-            >
+            <ActionIcon title='Paste' size={32} variant='transparent' onClick={handlePaste}>
               <IconClipboardText size={48} color='#00000044' />
             </ActionIcon>
             <ActionIcon
@@ -274,7 +309,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                 onChange={onChange}
                 valueMin={0}
                 valueMax={127}
-                valueDefault={values.Level}
+                valueDefault={initialOperatorValues.values.Level}
                 formatterFn={Math.round}
                 valueRawDisplayFn={(val) => `${Math.round(val)}`}
                 ref={levelRef}
@@ -285,7 +320,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                 onChange={onChange}
                 valueMin={0}
                 valueMax={127}
-                valueDefault={values.Output}
+                valueDefault={initialOperatorValues.values.Output}
                 formatterFn={Math.round}
                 valueRawDisplayFn={(val) => `${Math.round(val)}`}
                 ref={outputRef}
@@ -296,7 +331,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                 onChange={onChange}
                 valueMin={0}
                 valueMax={127}
-                valueDefault={values.VelSens}
+                valueDefault={initialOperatorValues.values.VelSens}
                 formatterFn={Math.round}
                 valueRawDisplayFn={(val) => `${Math.round(val)}`}
                 ref={velSensRef}
@@ -306,7 +341,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                 fixed={fixed}
                 ratioRef={ratioRef}
                 ratioMode={ratioMode}
-                value={values.Ratio}
+                value={initialOperatorValues.values.Ratio}
                 onChange={onChange}
               />
               <Stack align='center' gap={10}>
@@ -316,7 +351,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                   onChange={onChange}
                   valueMin={1}
                   valueMax={97550}
-                  valueDefault={values.Freq}
+                  valueDefault={initialOperatorValues.values.Freq}
                   formatterFn={Math.round}
                   valueRawDisplayFn={(val) => `${Math.round(val / 10)}`}
                   disabled={!fixed}
@@ -340,7 +375,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                 onChange={onChange}
                 valueMin={-63}
                 valueMax={63}
-                valueDefault={values.Detune}
+                valueDefault={initialOperatorValues.values.Detune}
                 formatterFn={Math.round}
                 valueRawDisplayFn={(val) => `${Math.round(val)}`}
                 ref={detuneRef}
@@ -393,7 +428,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                 valueMax={640}
                 stepFn={() => 10}
                 stepLargerFn={() => 100}
-                valueDefault={values.Feedback}
+                valueDefault={initialOperatorValues.values.Feedback}
                 center={0}
                 formatterFn={Math.round}
                 valueRawDisplayFn={(val) => `${Math.round(val / 10)}`}
@@ -420,7 +455,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
             <OperatorScaleControls
               numId={numId}
               onChange={onChange}
-              values={values}
+              values={initialOperatorValues.values}
               ref={scaleControlsRef}
               open={scaleControlsOpen}
               toggleScaleControls={() => setScaleControlsOpen(!scaleControlsOpen)}
@@ -431,7 +466,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
 
           {ADSRControlsOpen && (
             <ADSREnvelope
-              initialState={values}
+              initialState={initialOperatorValues.values}
               width={adsrEnvelopeWidth}
               containerWidth={containerWidth}
               height={165}

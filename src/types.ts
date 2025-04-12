@@ -162,7 +162,7 @@ export type KnobRefType = SetInternalValueRef<number> | null
 export type OperatorValues = OP1Props | OP2Props | OP3Props | OP4Props
 
 export type SetInternalValueRef<T> = {
-  setInternalValue: (value: T) => void
+  setInternalValue: (value: T, skipUpdate?: boolean) => void
 }
 
 export type OperatorRef = SetInternalValueRef<OperatorValues> & {

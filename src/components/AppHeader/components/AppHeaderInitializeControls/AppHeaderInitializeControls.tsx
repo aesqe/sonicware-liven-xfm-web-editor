@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useAtomValue } from 'jotai'
+import { useAtomCallback } from 'jotai/utils'
 import { Button } from '@mantine/core'
 import { Fieldset } from '@mantine/core'
 
@@ -18,42 +18,52 @@ const buttonStyle = {
 }
 
 export const AppHeaderInitializeControls = ({ handlePatchChange, viewportWidth }: Props) => {
-  const patch = useAtomValue(patchAtom)
-
   const buttonMarginTop = viewportWidth > 970 ? 2 : 20
 
   const handleInitializePatch = useCallback(() => {
     handlePatchChange(initPatch)
   }, [handlePatchChange])
 
-  const handleInitializeADSR = useCallback(() => {
-    const OP1 = { ...patch.OP1, ...defaultADSR }
-    const OP2 = { ...patch.OP2, ...defaultADSR }
-    const OP3 = { ...patch.OP3, ...defaultADSR }
-    const OP4 = { ...patch.OP4, ...defaultADSR }
+  const handleInitializeADSR = useAtomCallback(
+    useCallback(
+      (get) => {
+        const patch = get(patchAtom)
+        const OP1 = { ...patch.OP1, ...defaultADSR }
+        const OP2 = { ...patch.OP2, ...defaultADSR }
+        const OP3 = { ...patch.OP3, ...defaultADSR }
+        const OP4 = { ...patch.OP4, ...defaultADSR }
 
-    handlePatchChange({
-      ...patch,
-      OP1,
-      OP2,
-      OP3,
-      OP4
-    })
-  }, [patch, handlePatchChange])
+        handlePatchChange({
+          ...patch,
+          OP1,
+          OP2,
+          OP3,
+          OP4
+        })
+      },
+      [handlePatchChange]
+    )
+  )
 
-  const handleInitializeOperators = useCallback(() => {
-    const { Mixer, Pitch, Name } = patch
+  const handleInitializeOperators = useAtomCallback(
+    useCallback(
+      (get) => {
+        const patch = get(patchAtom)
+        const { Mixer, Pitch, Name } = patch
 
-    handlePatchChange({
-      ...initPatch,
-      Mixer,
-      Pitch,
-      Name
-    })
-  }, [patch, handlePatchChange])
+        handlePatchChange({
+          ...initPatch,
+          Mixer,
+          Pitch,
+          Name
+        })
+      },
+      [handlePatchChange]
+    )
+  )
 
   return (
-    <Fieldset legend='Initialize' w='100%' px={5} py={8}>
+    <Fieldset legend='Initialize' w='100%' px={5} py={6}>
       <Button.Group w='100%'>
         <Button
           color='#e6e3e1'

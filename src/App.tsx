@@ -5,14 +5,16 @@ import { Operator } from './components/Operator/Operator'
 import { AppHeader } from './components/AppHeader/AppHeader'
 import { FileUpload } from './components/FileUpload/FileUpload'
 import { useWebMidi } from './services/use-web-midi/use-web-midi'
-import { useUpdatePatch } from './services/use-update-values/use-update-values'
+import { useUpdatePatch } from './services/use-update-patch/use-update-patch'
 import { useHandlePatchChange } from './services/use-handle-patch-change/use-handle-patch-change'
+import { useMonitorPatchAtom } from './services/use-monitor-patch-atom/use-monitor-patch-atom'
 
 export const App = () => {
   const viewport = useViewportSize()
   const updatePatch = useUpdatePatch()
   const handlePatchChange = useHandlePatchChange()
 
+  useMonitorPatchAtom()
   useWebMidi(handlePatchChange)
 
   return (

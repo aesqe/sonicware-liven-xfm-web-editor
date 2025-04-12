@@ -1,12 +1,12 @@
-import { useAtom, useAtomValue } from 'jotai'
+import { useCallback } from 'react'
+import { useAtom } from 'jotai'
+import { useAtomCallback } from 'jotai/utils'
 import { Button, Divider, Fieldset, Flex, Stack, Switch } from '@mantine/core'
-import { useThrottledCallback } from '@mantine/hooks'
 
 import { Knob } from '../Knob/Knob'
-import { XFMPatch } from '../../types'
 import { getRandomPatch } from '../../services/get-random-patch/get-random-patch'
-import { patchAtom, randomizationOptionsAtom, sysexSendThrottleTimeAtom } from '../../store/atoms'
-import { useCallback } from 'react'
+import { UpdatedProperty, XFMPatch } from '../../types'
+import { patchAtom, randomizationOptionsAtom } from '../../store/atoms'
 
 const buttonStyle = {
   '--button-bd': '1px solid #BABABA'
@@ -17,39 +17,49 @@ type Props = {
 }
 
 export const GlobalRandomization = ({ handlePatchChange }: Props) => {
-  const patch = useAtomValue(patchAtom)
-  const sysexSendThrottleTime = useAtomValue(sysexSendThrottleTimeAtom)
   const [randomizationOptions, setRandOptions] = useAtom(randomizationOptionsAtom)
 
-  const setRandomizationOptions = useThrottledCallback(setRandOptions, sysexSendThrottleTime)
+  const handleBasicRandom = useAtomCallback(
+    useCallback(
+      (get) => {
+        const randomizationOptions = get(randomizationOptionsAtom)
+        const randomPatch = getRandomPatch({
+          basic: true,
+          sourcePatch: get(patchAtom),
+          randomizationOptions
+        })
 
-  const handleBasicRandom = useCallback(() => {
-    const randomPatch = getRandomPatch({
-      basic: true,
-      sourcePatch: patch,
-      randomizationOptions
-    })
+        handlePatchChange(randomPatch)
+      },
+      [handlePatchChange]
+    )
+  )
 
-    handlePatchChange({
-      ...patch,
-      ...randomPatch
-    })
-  }, [patch, handlePatchChange, randomizationOptions])
+  const handleBasicADSRRandom = useAtomCallback(
+    useCallback(
+      (get) => {
+        const randomizationOptions = get(randomizationOptionsAtom)
+        const randomPatch = getRandomPatch({
+          basic: false,
+          randomizationOptions
+        })
 
-  const handleBasicADSRRandom = useCallback(() => {
-    const randomPatch = getRandomPatch({
-      basic: false,
-      randomizationOptions
-    })
+        handlePatchChange(randomPatch)
+      },
+      [handlePatchChange]
+    )
+  )
 
-    handlePatchChange({
-      ...patch,
-      ...randomPatch
-    })
-  }, [patch, handlePatchChange, randomizationOptions])
+  const handleAmountChange = useAtomCallback(
+    useCallback(
+      (get, set, [{ value }]: UpdatedProperty[]) =>
+        set(randomizationOptionsAtom, { ...get(randomizationOptionsAtom), amount: value }),
+      []
+    )
+  )
 
   return (
-    <Fieldset legend='Randomize (work in progress)' w='100%' px={5} py={8}>
+    <Fieldset legend='Randomize (work in progress)' w='100%' px={5} py={6}>
       <Button.Group w='100%'>
         <Button
           color='#e6e3e1'
@@ -78,7 +88,7 @@ export const GlobalRandomization = ({ handlePatchChange }: Props) => {
             label='Free ratio'
             checked={randomizationOptions.freeRatio}
             onChange={(e) =>
-              setRandomizationOptions({
+              setRandOptions({
                 ...randomizationOptions,
                 freeRatio: e.target.checked
               })
@@ -89,7 +99,7 @@ export const GlobalRandomization = ({ handlePatchChange }: Props) => {
             description='Less noise and distortion'
             checked={randomizationOptions.lowOP1In}
             onChange={(e) =>
-              setRandomizationOptions({
+              setRandOptions({
                 ...randomizationOptions,
                 lowOP1In: e.target.checked
               })
@@ -100,7 +110,7 @@ export const GlobalRandomization = ({ handlePatchChange }: Props) => {
             description='Smaller changes around original values'
             checked={randomizationOptions.useStartValues}
             onChange={(e) =>
-              setRandomizationOptions({
+              setRandOptions({
                 ...randomizationOptions,
                 useStartValues: e.target.checked
               })
@@ -117,11 +127,8 @@ export const GlobalRandomization = ({ handlePatchChange }: Props) => {
           valueMax={100}
           valueDefault={randomizationOptions.amount}
           valueRawDisplayFn={(value) => Math.round(value).toString()}
-          valueRawRoundFn={(value) => Math.round(value)}
           formatterFn={(value) => Math.round(value)}
-          onChange={([{ value }]) =>
-            setRandomizationOptions({ ...randomizationOptions, amount: value })
-          }
+          onChange={handleAmountChange}
         />
       </Flex>
     </Fieldset>

@@ -1,6 +1,15 @@
-import { ComponentProps, CSSProperties, RefObject, useId, useState, useEffect, useRef } from 'react'
+import {
+  ComponentProps,
+  CSSProperties,
+  RefObject,
+  useId,
+  useState,
+  useEffect,
+  useRef,
+  useCallback
+} from 'react'
 import { KnobHeadless, KnobHeadlessLabel, KnobHeadlessOutput } from 'react-knob-headless'
-import { Stack, StackProps } from '@mantine/core'
+import { Box, Stack, StackProps } from '@mantine/core'
 
 import { KnobBaseThumb } from './components/KnobBaseThumb/KnobBaseThumb'
 import { NormalisableRange } from '../../services/normalisable-range/normalisable-range'
@@ -9,7 +18,7 @@ import { UpdatedProperty, SetInternalValueRef } from '../../types'
 
 type KnobHeadlessProps = Pick<
   ComponentProps<typeof KnobHeadless>,
-  'valueMin' | 'valueMax' | 'orientation' | 'mapTo01' | 'mapFrom01' | 'includeIntoTabOrder'
+  'valueMin' | 'valueMax' | 'mapTo01' | 'mapFrom01'
 >
 
 type KnobBaseProps = Pick<
@@ -41,14 +50,12 @@ export const Knob = ({
   valueDefault,
   center = (valueMin + valueMax) / 2,
   disabled = false,
-  orientation = 'vertical',
-  includeIntoTabOrder = true,
   size = '3.25rem',
-  valueRawDisplayFn = (val: number): string => `${val}`,
-  valueRawRoundFn = (x: number): number => x,
-  stepFn = (): number => 1,
-  stepLargerFn = (): number => 10,
-  formatterFn = (x: number): number => x,
+  formatterFn = (x: number) => x,
+  valueRawDisplayFn = (val: number) => `${val}`,
+  valueRawRoundFn = (x: number) => x,
+  stepFn = () => 1,
+  stepLargerFn = () => 10,
   onChange,
   ...stackProps
 }: Props) => {
@@ -66,15 +73,18 @@ export const Knob = ({
   const step = stepFn(valueRaw)
   const stepLarger = stepLargerFn(valueRaw)
 
-  const handleOnChange = (value: number) => {
-    if (valueSetFromOutside.current) {
-      valueSetFromOutside.current = false
-      return
-    }
+  const handleOnChange = useCallback(
+    (value: number) => {
+      if (valueSetFromOutside.current) {
+        valueSetFromOutside.current = false
+        return
+      }
 
-    setValueRaw(value)
-    onChange([{ value, propertyPath, formatterFn }])
-  }
+      setValueRaw(value)
+      onChange([{ value, propertyPath, formatterFn }])
+    },
+    [onChange, propertyPath, formatterFn]
+  )
 
   const keyboardControlHandlers = useKnobKeyboardControls({
     valueRaw,
@@ -94,16 +104,18 @@ export const Knob = ({
             return
           }
 
+          // prevent patch update when value is set from the outside
           valueSetFromOutside.current = true
+          // this will trigger onChange on the KnobHeadless component
           setValueRaw(value)
         }
       }
     }
   }, [ref, setValueRaw, valueRaw])
 
-  const handleOnDoubleClick = () => {
+  const handleOnDoubleClick = useCallback(() => {
     handleOnChange(center)
-  }
+  }, [center, handleOnChange])
 
   return (
     <Stack
@@ -123,32 +135,26 @@ export const Knob = ({
       {...stackProps}
     >
       <KnobHeadlessOutput htmlFor={knobId}>{valueRawDisplayFn(valueRaw)}</KnobHeadlessOutput>
-      <KnobHeadless
-        id={knobId}
-        aria-labelledby={labelId}
-        valueMin={valueMin}
-        valueMax={valueMax}
-        valueRaw={valueRaw}
-        includeIntoTabOrder={includeIntoTabOrder}
-        valueRawRoundFn={valueRawRoundFn}
-        valueRawDisplayFn={valueRawDisplayFn}
-        dragSensitivity={dragSensitivity}
-        orientation={orientation}
-        mapTo01={mapTo01}
-        mapFrom01={mapFrom01}
-        onValueRawChange={handleOnChange}
-        onDoubleClick={handleOnDoubleClick}
-        {...keyboardControlHandlers}
-        style={{
-          position: 'relative',
-          marginTop: 2,
-          marginBottom: 2,
-          width: size,
-          height: size
-        }}
-      >
-        <KnobBaseThumb value01={value01} />
-      </KnobHeadless>
+      <Box pos='relative' w={size} h={size} mt={2} mb={2}>
+        <KnobHeadless
+          id={knobId}
+          aria-labelledby={labelId}
+          includeIntoTabOrder
+          dragSensitivity={dragSensitivity}
+          valueMin={valueMin}
+          valueMax={valueMax}
+          valueRaw={valueRaw}
+          valueRawRoundFn={valueRawRoundFn}
+          valueRawDisplayFn={valueRawDisplayFn}
+          mapTo01={mapTo01}
+          mapFrom01={mapFrom01}
+          onValueRawChange={handleOnChange}
+          onDoubleClick={handleOnDoubleClick}
+          {...keyboardControlHandlers}
+        >
+          <KnobBaseThumb value01={value01} />
+        </KnobHeadless>
+      </Box>
       <KnobHeadlessLabel id={labelId}>{label}</KnobHeadlessLabel>
     </Stack>
   )

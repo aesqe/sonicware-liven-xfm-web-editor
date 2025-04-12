@@ -11,10 +11,10 @@ import {
 } from './constants'
 import { convertInput } from './services/convert-input/convert-input'
 import { convertOutput } from './services/convert-output/convert-output'
-import { objectsAreJSONEqual } from '../../services/compare-objects/compare-objects'
 import { ADSREnvelopeSVG } from './components/ADSREnvelopeSVG/ADSREnvelopeSVG'
 import { ADSREnvelopeKnobs } from './components/ADSREnvelopeKnobs/ADSREnvelopeKnobs'
 import { getRandomValues01 } from './services/get-random-values-01/get-random-values-01'
+import { objectsAreJSONEqual } from '../../services/compare-objects/compare-objects'
 import { range0127, range_1818, range_4848 } from './constants'
 import { envelopeClipboardAtom, globalRefsAtom } from '../../store/atoms'
 import { ADSRValues, UpdatedProperty, SetInternalValueRef } from '../../types'
@@ -51,12 +51,11 @@ export const ADSREnvelope = ({
   const [envelopeClipboard, setEnvelopeClipboard] = useAtom(envelopeClipboardAtom)
   const svgRef = useRef<SVGSVGElement>(null)
   const knobsRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
-  const skipChangeCallback = useRef(false)
   const pitchAdsrRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
   const setGlobalRef = useSetAtom(globalRefsAtom)
 
   const setEnvelopeValues = useCallback(
-    (updatedValues: ADSRValues) => {
+    (updatedValues: ADSRValues, skipChange = false) => {
       if (objectsAreJSONEqual(values, updatedValues)) {
         return
       }
@@ -66,7 +65,7 @@ export const ADSREnvelope = ({
       setValues(updatedValues)
       knobsRef.current?.setInternalValue(output)
 
-      if (!skipChangeCallback.current) {
+      if (!skipChange) {
         onChange?.(output)
       }
     },
@@ -76,8 +75,7 @@ export const ADSREnvelope = ({
   useEffect(() => {
     const obj = {
       setInternalValue: (values: ADSRValues, skipUpdate = false) => {
-        skipChangeCallback.current = skipUpdate
-        setEnvelopeValues(convertInput(values, range))
+        setEnvelopeValues(convertInput(values, range), skipUpdate)
       }
     }
 

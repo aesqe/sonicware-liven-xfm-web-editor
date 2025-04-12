@@ -1,21 +1,18 @@
-import { useEffect, useRef, useState } from 'react'
-import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { useEffect, useRef, useState, useCallback } from 'react'
+import { useSetAtom, Setter } from 'jotai'
+import { useAtomCallback } from 'jotai/utils'
 import { TextInput, Tooltip } from '@mantine/core'
-import { useThrottledCallback } from '@mantine/hooks'
+import { useDebouncedCallback } from '@mantine/hooks'
 import { IconInfoCircle } from '@tabler/icons-react'
 
-import { useSendPatchToXFM } from '../../services/use-send-patch-to-xfm/use-send-patch-to-xfm'
 import { SetInternalValueRef } from '../../types'
+import { globalRefsAtom, patchAtom } from '../../store/atoms'
 import { tooltipText, validationRegex } from './constants'
-import { globalRefsAtom, patchAtom, sysexSendThrottleTimeAtom } from '../../store/atoms'
 
 export const PatchNameEditor = () => {
-  const [valid, setValid] = useState(true)
-  const sendPatchToXFM = useSendPatchToXFM()
-  const [patch, setPatch] = useAtom(patchAtom)
-  const [patchName, setPatchName] = useState(patch.Name)
-  const sysexSendThrottleTime = useAtomValue(sysexSendThrottleTimeAtom)
   const setGlobalRef = useSetAtom(globalRefsAtom)
+  const [valid, setValid] = useState(true)
+  const [patchName, setPatchName] = useState('INIT')
   const patchNameRef = useRef<SetInternalValueRef<string>>(undefined)
 
   useEffect(() => {
@@ -31,31 +28,34 @@ export const PatchNameEditor = () => {
     }))
   }, [setGlobalRef])
 
-  const updatePatchName = useThrottledCallback((patchName: string) => {
-    const updatedPatch = { ...patch, Name: patchName.padEnd(4, ' ') }
+  const handleDebouncedChange = useAtomCallback(
+    useDebouncedCallback(
+      useCallback(
+        (_get, set: Setter, value: string) => {
+          if (valid) {
+            set(patchAtom, (prev) => ({
+              ...prev,
+              Name: value.padEnd(4, ' ')
+            }))
+          }
+        },
+        [valid]
+      ),
+      1000
+    )
+  )
 
-    setPatch(updatedPatch)
-    sendPatchToXFM(updatedPatch)
-  }, sysexSendThrottleTime * 10)
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value.toUpperCase()
+      const isValid = value.length > 0 && value.length < 8 && validationRegex.test(value)
 
-  const validate = (value: string) => {
-    const isValid = value.length > 0 && value.length < 8 && validationRegex.test(value)
-
-    setValid(isValid)
-
-    return isValid
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toUpperCase()
-    const isValid = validate(value)
-
-    setPatchName(value)
-
-    if (isValid && value !== patch.Name) {
-      updatePatchName(value)
-    }
-  }
+      setValid(isValid)
+      setPatchName(value)
+      handleDebouncedChange(value)
+    },
+    [handleDebouncedChange]
+  )
 
   return (
     <TextInput
