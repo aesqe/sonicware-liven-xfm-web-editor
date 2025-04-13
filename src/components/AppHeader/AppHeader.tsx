@@ -9,6 +9,7 @@ import githubMark from '../../assets/github-mark.svg'
 import { logSysExAtom } from '../../store/atoms'
 import { ADSREnvelope } from '../ADSREnvelope/ADSREnvelope'
 import { PatchNameEditor } from '../PatchNameEditor/PatchNameEditor'
+import { UndoRedoControls } from '../UndoRedoControls/UndoRedoControls'
 import { DownloadPatchButton } from '../DownloadPatchButton/DownloadPatchButton'
 import { GlobalRandomization } from '../GlobalRandomization/GlobalRandomization'
 import { MidiDevicesSelection } from '../MidiDevicesSelection/MidiDevicesSelection'
@@ -111,6 +112,8 @@ export const AppHeader = ({ onChange, handlePatchChange }: Props) => {
           <Stack align='start' gap={4} w='100%'>
             <AppHeaderToggleControls />
           </Stack>
+
+          <UndoRedoControls handlePatchChange={handlePatchChange} />
         </Stack>
 
         {viewport.width > 1880 && <Divider orientation='vertical' mr={15} />}

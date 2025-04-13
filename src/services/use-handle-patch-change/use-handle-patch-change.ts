@@ -4,9 +4,11 @@ import { useAtomCallback } from 'jotai/utils'
 
 import { XFMPatch } from '../../types'
 import { globalRefsAtom, patchAtom } from '../../store/atoms'
+import { useHistory } from '../../store/undo-redo'
 
 export const useHandlePatchChange = () => {
   const refs = useAtomValue(globalRefsAtom)
+  const { pushToUndoStack } = useHistory()
 
   const throttledRefUpdates = useCallback(
     (data: XFMPatch) => {
@@ -22,15 +24,21 @@ export const useHandlePatchChange = () => {
 
   const handlePatchChange = useAtomCallback(
     useCallback(
-      (_get, set, data: XFMPatch | null | undefined) => {
+      (_get, set, data: XFMPatch | null | undefined, pushToUndo = true) => {
         if (!data) {
           return
+        }
+
+        // console.log('handlePatchChange', data, pushToUndo)
+
+        if (pushToUndo) {
+          pushToUndoStack(data)
         }
 
         set(patchAtom, data)
         throttledRefUpdates(data)
       },
-      [throttledRefUpdates]
+      [throttledRefUpdates, pushToUndoStack]
     )
   )
 
