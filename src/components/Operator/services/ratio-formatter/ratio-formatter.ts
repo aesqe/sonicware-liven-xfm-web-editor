@@ -20,7 +20,7 @@ export const ratioFormatter = (
     const note =
       prevMode === 'scale' && val >= 0 && val <= 60
         ? NOTES[Math.round(val)]
-        : roundToNearestNote(Math.round(val / 100) * 100)
+        : roundToNearestNote(val)
 
     value = 'index' in note ? (note.index as number) : note.value
 

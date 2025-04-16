@@ -1,6 +1,6 @@
-import { Banks } from '../types'
-import { convert78 } from '../services/convert78/convert78'
-import { decode8bit } from '../services/decode8bit/decode8bit'
+import { Banks } from '../../types'
+import { convert78 } from '../convert78/convert78'
+import { decode8bit } from '../decode8bit/decode8bit'
 import { getBankPatches } from '../get-bank-patches/get-bank-patches'
 import { findSequenceIndexes } from '../find-sequence-indexes/find-sequence-indexes'
 

@@ -4,7 +4,7 @@ import { DropzoneFullScreenProps, Dropzone } from '@mantine/dropzone'
 import { IconUpload, IconX, IconFile } from '@tabler/icons-react'
 
 import { Banks, XFMPatch } from '../../types'
-import { extractPatchesFromSyxBank } from '../../extract-patches-from-syx-bank/extract-patches-from-syx-bank'
+import { extractPatchesFromSyxBank } from '../../services/extract-patches-from-syx-bank/extract-patches-from-syx-bank'
 
 type Props = Partial<DropzoneFullScreenProps> & {
   handlePatchChange: (data: XFMPatch) => void

@@ -1,5 +1,5 @@
-import { XFMPatch } from '../types'
-import { decode8bit } from '../services/decode8bit/decode8bit'
+import { XFMPatch } from '../../types'
+import { decode8bit } from '../decode8bit/decode8bit'
 import { findSequenceIndexes } from '../find-sequence-indexes/find-sequence-indexes'
 
 export const getBankPatches = (data: number[]) => {
