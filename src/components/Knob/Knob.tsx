@@ -39,6 +39,7 @@ type Props = KnobHeadlessProps &
     formatterFn?: (x: number) => number
     size?: CSSProperties['width']
     ref?: RefObject<SetInternalValueRef<number> | null>
+    refName: string
   } & Partial<Omit<StackProps, 'onChange'>>
 
 export const Knob = ({
@@ -57,6 +58,7 @@ export const Knob = ({
   stepFn = () => 1,
   stepLargerFn = () => 10,
   onChange,
+  refName,
   ...stackProps
 }: Props) => {
   const knobId = useId()

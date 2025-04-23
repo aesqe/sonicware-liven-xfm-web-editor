@@ -36,6 +36,7 @@ export const RatioKnob = ({ propertyPath, ratioRef, ratioMode, fixed, value, onC
       propertyPath={propertyPath}
       disabled={fixed}
       ref={ratioRef}
+      refName='ratioRef'
       onChange={onChange}
       valueDefault={value}
       valueMin={isScaleMode ? 0 : 50}

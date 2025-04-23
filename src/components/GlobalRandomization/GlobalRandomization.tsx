@@ -129,6 +129,7 @@ export const GlobalRandomization = ({ handlePatchChange }: Props) => {
           valueRawDisplayFn={(value) => Math.round(value).toString()}
           formatterFn={(value) => Math.round(value)}
           onChange={handleAmountChange}
+          refName='globalRandomization.amountRef'
         />
       </Flex>
     </Fieldset>

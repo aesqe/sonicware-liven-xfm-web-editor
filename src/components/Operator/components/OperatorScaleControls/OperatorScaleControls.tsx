@@ -4,8 +4,8 @@ import { Accordion } from '@mantine/core'
 
 import {
   KnobRefType,
-  OperatorValues,
-  SetInternalValueRef,
+  ScaleControlsValues,
+  ScaleControlsRef,
   UpdatedProperty
 } from '../../../../types'
 import { Knob } from '../../../Knob/Knob'
@@ -13,8 +13,8 @@ import { Knob } from '../../../Knob/Knob'
 type Props = {
   numId: number
   onChange: (props: UpdatedProperty[]) => void
-  values: OperatorValues
-  ref?: RefObject<SetInternalValueRef<OperatorValues> | undefined>
+  values: ScaleControlsValues
+  ref?: RefObject<ScaleControlsRef | undefined>
   open?: boolean
   toggleScaleControls: () => void
 }
@@ -37,13 +37,21 @@ export const OperatorScaleControls = ({
   useEffect(() => {
     if (ref) {
       ref.current = {
-        setInternalValue: (data: OperatorValues) => {
+        setInternalValue: (data: ScaleControlsValues) => {
           timeRef.current?.setInternalValue(data.Time)
           scaleRef.current?.setInternalValue(data.Scale)
           lGainRef.current?.setInternalValue(data.LGain)
           rGainRef.current?.setInternalValue(data.RGain)
           lCurveRef.current?.setInternalValue(data.LCurve)
           rCurveRef.current?.setInternalValue(data.RCurve)
+        },
+        refs: {
+          timeRef,
+          scaleRef,
+          lGainRef,
+          rGainRef,
+          lCurveRef,
+          rCurveRef
         }
       }
     }
@@ -79,6 +87,7 @@ export const OperatorScaleControls = ({
                   formatterFn={Math.round}
                   valueRawDisplayFn={(val) => `${Math.round(val)}`}
                   ref={timeRef}
+                  refName='timeRef'
                 />
                 <Knob
                   label='Position'
@@ -90,6 +99,7 @@ export const OperatorScaleControls = ({
                   formatterFn={Math.round}
                   valueRawDisplayFn={(val) => `C${Math.round(val + 1)}`}
                   ref={scaleRef}
+                  refName='scaleRef'
                 />
               </Flex>
             </Stack>
@@ -108,6 +118,7 @@ export const OperatorScaleControls = ({
                   formatterFn={Math.round}
                   valueRawDisplayFn={(val) => `${Math.round(val)}`}
                   ref={lGainRef}
+                  refName='lGainRef'
                 />
                 <Knob
                   label='Curve'
@@ -119,6 +130,7 @@ export const OperatorScaleControls = ({
                   formatterFn={Math.round}
                   valueRawDisplayFn={(val) => `${Math.round(val)}`}
                   ref={lCurveRef}
+                  refName='lCurveRef'
                 />
               </Flex>
             </Stack>
@@ -137,6 +149,7 @@ export const OperatorScaleControls = ({
                   formatterFn={Math.round}
                   valueRawDisplayFn={(val) => `${Math.round(val)}`}
                   ref={rGainRef}
+                  refName='rGainRef'
                 />
                 <Knob
                   label='Curve'
@@ -148,6 +161,7 @@ export const OperatorScaleControls = ({
                   formatterFn={Math.round}
                   valueRawDisplayFn={(val) => `${Math.round(val)}`}
                   ref={rCurveRef}
+                  refName='rCurveRef'
                 />
               </Flex>
             </Stack>

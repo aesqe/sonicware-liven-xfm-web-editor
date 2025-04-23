@@ -9,11 +9,12 @@ import {
   ADSRValues,
   KnobRefType,
   OperatorValues,
-  SetInternalValueRef,
   UpdatedProperty,
   RatioMode,
   RatioRef,
-  OperatorRef
+  OperatorRef,
+  ADSREnvelopeRef,
+  ScaleControlsRef
 } from '../../types'
 import {
   globalRefsAtom,
@@ -64,8 +65,8 @@ export const Operator = ({ id: numId, onChange }: Props) => {
   const op4InRef = useRef<KnobRefType>(null)
   const pitchEnvRef = useRef<HTMLInputElement | null>(null)
   const fixedSwitchRef = useRef<HTMLInputElement | null>(null)
-  const scaleControlsRef = useRef<SetInternalValueRef<OperatorValues>>(undefined)
-  const adsrRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
+  const scaleControlsRef = useRef<ScaleControlsRef>(undefined)
+  const adsrRef = useRef<ADSREnvelopeRef>(undefined)
 
   const opRef = useRef<OperatorRef>(undefined)
   const initialOperatorValues = useMemo(() => getInitialOperatorValues(numId), [numId])
@@ -197,7 +198,24 @@ export const Operator = ({ id: numId, onChange }: Props) => {
     opRef.current = {
       setScaleControlsOpen,
       setADSRControlsOpen,
-      setInternalValue: setValues
+      setInternalValue: setValues,
+      refs: {
+        levelRef,
+        outputRef,
+        velSensRef,
+        ratioRef,
+        freqRef,
+        detuneRef,
+        feedbackRef,
+        op1InRef,
+        op2InRef,
+        op3InRef,
+        op4InRef,
+        pitchEnvRef,
+        fixedSwitchRef,
+        ...adsrRef.current!.refs,
+        ...scaleControlsRef.current!.refs
+      }
     }
   }, [setValues])
 
@@ -313,6 +331,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                 formatterFn={Math.round}
                 valueRawDisplayFn={(val) => `${Math.round(val)}`}
                 ref={levelRef}
+                refName='levelRef'
               />
               <Knob
                 label='Output'
@@ -324,6 +343,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                 formatterFn={Math.round}
                 valueRawDisplayFn={(val) => `${Math.round(val)}`}
                 ref={outputRef}
+                refName='outputRef'
               />
               <Knob
                 label='Velocity Sensitivity'
@@ -335,6 +355,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                 formatterFn={Math.round}
                 valueRawDisplayFn={(val) => `${Math.round(val)}`}
                 ref={velSensRef}
+                refName='velSensRef'
               />
               <RatioKnob
                 propertyPath={`${opId}.Ratio`}
@@ -356,6 +377,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                   valueRawDisplayFn={(val) => `${Math.round(val / 10)}`}
                   disabled={!fixed}
                   ref={freqRef}
+                  refName='freqRef'
                 />
                 <Switch
                   onChange={(e) => {
@@ -379,6 +401,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                 formatterFn={Math.round}
                 valueRawDisplayFn={(val) => `${Math.round(val)}`}
                 ref={detuneRef}
+                refName='detuneRef'
               />
             </Flex>
             <Flex mt={-10}>
@@ -433,6 +456,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                 formatterFn={Math.round}
                 valueRawDisplayFn={(val) => `${Math.round(val / 10)}`}
                 ref={feedbackRef}
+                refName='feedbackRef'
               />
               {opInRefs.map(({ id, ref }) => (
                 <Knob
@@ -446,6 +470,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                   formatterFn={Math.round}
                   valueRawDisplayFn={(val) => `${Math.round(val)}`}
                   ref={ref}
+                  refName={`op${id}InRef`}
                 />
               ))}
             </Flex>
@@ -473,6 +498,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
               onChange={updateEnvelope}
               ref={adsrRef}
               knobSize='2rem'
+              pathBase={`${opId}.`}
             />
           )}
         </Flex>

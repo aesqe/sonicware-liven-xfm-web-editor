@@ -17,7 +17,7 @@ import { getRandomValues01 } from './services/get-random-values-01/get-random-va
 import { objectsAreJSONEqual } from '../../services/compare-objects/compare-objects'
 import { range0127, range_1818, range_4848 } from './constants'
 import { envelopeClipboardAtom, globalRefsAtom } from '../../store/atoms'
-import { ADSRValues, UpdatedProperty, SetInternalValueRef } from '../../types'
+import { ADSRValues, UpdatedProperty, ADSREnvelopeRef } from '../../types'
 
 type Props = {
   initialState?: ADSRValues
@@ -25,10 +25,11 @@ type Props = {
   width?: number
   height?: number
   pitchEnv?: boolean
-  ref?: RefObject<SetInternalValueRef<ADSRValues> | undefined>
+  ref?: RefObject<ADSREnvelopeRef | undefined>
   knobSize?: CSSProperties['width']
   containerWidth?: number
   padding?: number
+  pathBase: string
 } & Partial<BoxProps>
 
 export const ADSREnvelope = ({
@@ -41,6 +42,7 @@ export const ADSREnvelope = ({
   pitchEnv = false,
   initialState = pitchEnv ? defaultPitchADSRCurve : defaultADSRCurve,
   onChange,
+  pathBase,
   ...boxProps
 }: Props) => {
   // pitch env has a different range for levels
@@ -50,8 +52,8 @@ export const ADSREnvelope = ({
   const [values, setValues] = useState<ADSRValues>(convertInput(initialState, range))
   const [envelopeClipboard, setEnvelopeClipboard] = useAtom(envelopeClipboardAtom)
   const svgRef = useRef<SVGSVGElement>(null)
-  const knobsRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
-  const pitchAdsrRef = useRef<SetInternalValueRef<ADSRValues>>(undefined)
+  const knobsRef = useRef<ADSREnvelopeRef>(undefined)
+  const pitchAdsrRef = useRef<ADSREnvelopeRef>(undefined)
   const setGlobalRef = useSetAtom(globalRefsAtom)
 
   const setEnvelopeValues = useCallback(
@@ -72,11 +74,20 @@ export const ADSREnvelope = ({
     [onChange, range, knobsRef, values]
   )
 
+  const setInternalValue = useCallback(
+    (data: ADSRValues, skipChange = false) => {
+      const currentValues = convertOutput(values, range)
+      const vals = convertInput({ ...currentValues, ...data }, range)
+
+      setEnvelopeValues(vals, skipChange)
+    },
+    [range, setEnvelopeValues, values]
+  )
+
   useEffect(() => {
     const obj = {
-      setInternalValue: (values: ADSRValues, skipUpdate = false) => {
-        setEnvelopeValues(convertInput(values, range), skipUpdate)
-      }
+      setInternalValue,
+      refs: knobsRef.current!.refs
     }
 
     pitchAdsrRef.current = obj
@@ -84,7 +95,7 @@ export const ADSREnvelope = ({
     if (ref) {
       ref.current = obj
     }
-  }, [range, ref, setEnvelopeValues])
+  }, [ref, setInternalValue])
 
   useEffect(() => {
     if (pitchEnv) {
@@ -128,13 +139,13 @@ export const ADSREnvelope = ({
       updatedValue = range_1818.mapTo01(data.value)
     }
 
-    const updatedValues = {
-      ...values,
-      [data.propertyPath]: updatedValue
-    }
+    const propKey = data.propertyPath.replace(/OP\d\./, '')
 
-    setValues(updatedValues)
-    onChange?.(convertOutput(updatedValues, range))
+    setValues((prev) => {
+      const updatedValues = { ...prev, [propKey]: updatedValue }
+      onChange?.(convertOutput(updatedValues, range))
+      return updatedValues
+    })
   }
 
   const handleAdsrChange = (updatedValues: ADSRValues) => {
@@ -233,6 +244,7 @@ export const ADSREnvelope = ({
           knobSize={containerWidth < 800 ? '1.6rem' : knobSize}
           pitchEnv={pitchEnv}
           ref={knobsRef}
+          pathBase={pathBase}
         />
       </Stack>
     </Box>

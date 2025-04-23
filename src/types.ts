@@ -157,17 +157,69 @@ export type UpdatedProperty = {
   formatterFn?: (val: number) => number
 }
 
-export type KnobRefType = SetInternalValueRef<number> | null
+export type KnobRefType = {
+  setInternalValue: (value: number, fromMidi?: boolean) => void
+} | null
 
 export type OperatorValues = OP1Props | OP2Props | OP3Props | OP4Props
 
 export type SetInternalValueRef<T> = {
-  setInternalValue: (value: T, skipUpdate?: boolean) => void
+  setInternalValue: (value: T, skipChange?: boolean) => void
 }
 
 export type OperatorRef = SetInternalValueRef<OperatorValues> & {
   setScaleControlsOpen: (open: boolean) => void
   setADSRControlsOpen: (open: boolean) => void
+  refs: {
+    levelRef: RefObject<KnobRefType>
+    outputRef: RefObject<KnobRefType>
+    velSensRef: RefObject<KnobRefType>
+    ratioRef: RefObject<KnobRefType>
+    freqRef: RefObject<KnobRefType>
+    detuneRef: RefObject<KnobRefType>
+    feedbackRef: RefObject<KnobRefType>
+    op1InRef: RefObject<KnobRefType>
+    op2InRef: RefObject<KnobRefType>
+    op3InRef: RefObject<KnobRefType>
+    op4InRef: RefObject<KnobRefType>
+    pitchEnvRef: RefObject<HTMLInputElement | null>
+    fixedSwitchRef: RefObject<HTMLInputElement | null>
+  }
+}
+
+export type ADSREnvelopeRef = SetInternalValueRef<ADSRValues> & {
+  refs: {
+    aTimeRef: RefObject<KnobRefType>
+    aLevelRef: RefObject<KnobRefType>
+    dTimeRef: RefObject<KnobRefType>
+    dLevelRef: RefObject<KnobRefType>
+    sTimeRef: RefObject<KnobRefType>
+    sLevelRef: RefObject<KnobRefType>
+    rTimeRef: RefObject<KnobRefType>
+    rLevelRef: RefObject<KnobRefType>
+    upCurveRef: RefObject<KnobRefType>
+    dnCurveRef: RefObject<KnobRefType>
+  }
+}
+
+export type ScaleControlsValues = {
+  Time: number
+  Scale: number
+  LGain: number
+  LCurve: number
+  RGain: number
+  RCurve: number
+}
+
+export type ScaleControlsRef = SetInternalValueRef<ScaleControlsValues> & {
+  refs: {
+    timeRef: RefObject<KnobRefType>
+    scaleRef: RefObject<KnobRefType>
+    lGainRef: RefObject<KnobRefType>
+    lCurveRef: RefObject<KnobRefType>
+    rGainRef: RefObject<KnobRefType>
+    rCurveRef: RefObject<KnobRefType>
+  }
 }
 
 export type RatioRef = SetInternalValueRef<number> & {
