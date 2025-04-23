@@ -2,19 +2,16 @@ import { useCallback } from 'react'
 import { useAtomValue } from 'jotai'
 import { useAtomCallback } from 'jotai/utils'
 
-import { Button, Fieldset, Flex } from '@mantine/core'
+import { Fieldset, Flex } from '@mantine/core'
 import { IconArrowBackUp, IconArrowForwardUp } from '@tabler/icons-react'
 
 import { XFMPatch } from '../../types'
 import { patchAtom } from '../../store/atoms'
+import { MainButton } from '../MainButton/MainButton'
 import { redoStackAtom, undoStackAtom, useHistory } from '../../store/undo-redo'
 
 type Props = {
   handlePatchChange: (patch: XFMPatch | null | undefined, pushToUndo?: boolean) => void
-}
-
-const buttonStyle = {
-  '--button-bd': '1px solid #BABABA'
 }
 
 export const UndoRedoControls = ({ handlePatchChange }: Props) => {
@@ -49,30 +46,20 @@ export const UndoRedoControls = ({ handlePatchChange }: Props) => {
   return (
     <Fieldset legend='Undo/Redo (work in progress)' w='100%' px={5} py={6}>
       <Flex gap='5'>
-        <Button
-          color='#e6e3e1'
-          size='xs'
-          c='dark'
-          flex={1}
+        <MainButton
           leftSection={<IconArrowBackUp size={12} />}
           onClick={handleUndo}
           disabled={undoStack.length === 0}
-          style={buttonStyle}
         >
           Undo
-        </Button>
-        <Button
-          color='#e6e3e1'
-          size='xs'
-          c='dark'
-          flex={1}
+        </MainButton>
+        <MainButton
           leftSection={<IconArrowForwardUp size={12} />}
           onClick={handleRedo}
           disabled={redoStack.length === 0}
-          style={buttonStyle}
         >
           Redo
-        </Button>
+        </MainButton>
       </Flex>
     </Fieldset>
   )

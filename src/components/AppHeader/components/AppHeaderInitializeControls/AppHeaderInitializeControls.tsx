@@ -6,15 +6,12 @@ import { Fieldset } from '@mantine/core'
 import initPatch from '../../../../assets/presets/initpatch.json'
 import { XFMPatch } from '../../../../types'
 import { patchAtom } from '../../../../store/atoms'
+import { MainButton } from '../../../MainButton/MainButton'
 import { defaultADSR } from '../../../../constants'
 
 type Props = {
   handlePatchChange: (patch: XFMPatch) => void
   viewportWidth: number
-}
-
-const buttonStyle = {
-  '--button-bd': '1px solid #BABABA'
 }
 
 export const AppHeaderInitializeControls = ({ handlePatchChange, viewportWidth }: Props) => {
@@ -65,39 +62,15 @@ export const AppHeaderInitializeControls = ({ handlePatchChange, viewportWidth }
   return (
     <Fieldset legend='Initialize' w='100%' px={5} py={6}>
       <Button.Group w='100%'>
-        <Button
-          color='#e6e3e1'
-          size='xs'
-          c='dark'
-          mt={buttonMarginTop}
-          flex={1}
-          style={buttonStyle}
-          onClick={handleInitializePatch}
-        >
+        <MainButton mt={buttonMarginTop} onClick={handleInitializePatch}>
           Patch
-        </Button>
-        <Button
-          color='#e6e3e1'
-          size='xs'
-          c='dark'
-          flex={1}
-          mt={buttonMarginTop}
-          style={buttonStyle}
-          onClick={handleInitializeOperators}
-        >
+        </MainButton>
+        <MainButton mt={buttonMarginTop} onClick={handleInitializeOperators}>
           Operators
-        </Button>
-        <Button
-          color='#e6e3e1'
-          size='xs'
-          c='dark'
-          flex={1}
-          mt={buttonMarginTop}
-          style={buttonStyle}
-          onClick={handleInitializeADSR}
-        >
+        </MainButton>
+        <MainButton mt={buttonMarginTop} onClick={handleInitializeADSR}>
           ADSR
-        </Button>
+        </MainButton>
       </Button.Group>
     </Fieldset>
   )

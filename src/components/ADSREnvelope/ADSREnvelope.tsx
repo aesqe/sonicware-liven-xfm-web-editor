@@ -9,6 +9,7 @@ import {
   defaultPitchADSRCurve,
   defaultPitchADSRCurve01
 } from './constants'
+import { MainButton } from '../MainButton/MainButton'
 import { convertInput } from './services/convert-input/convert-input'
 import { convertOutput } from './services/convert-output/convert-output'
 import { ADSREnvelopeSVG } from './components/ADSREnvelopeSVG/ADSREnvelopeSVG'
@@ -167,60 +168,15 @@ export const ADSREnvelope = ({
           )}
 
           <Button.Group w={pitchEnv ? 190 : width}>
-            <Button
-              flex={1}
-              size='xs'
-              color='#e6e3e1'
-              c='dark'
-              onClick={resetEnvelope}
-              style={{ '--button-bd': '1px solid #BABABA' }}
-            >
-              Init
-            </Button>
+            <MainButton onClick={resetEnvelope}>Init</MainButton>
             {!pitchEnv && (
               <>
-                <Button
-                  flex={1}
-                  size='xs'
-                  color='#e6e3e1'
-                  c='dark'
-                  onClick={copyEnvelope}
-                  style={{ '--button-bd': '1px solid #BABABA' }}
-                >
-                  Copy
-                </Button>
-                <Button
-                  flex={1}
-                  size='xs'
-                  color='#e6e3e1'
-                  c='dark'
-                  onClick={pasteEnvelope}
-                  style={{ '--button-bd': '1px solid #BABABA' }}
-                >
-                  Paste
-                </Button>
-                <Button
-                  flex={1}
-                  size='xs'
-                  color='#e6e3e1'
-                  c='dark'
-                  onClick={spreadEnvelope}
-                  style={{ '--button-bd': '1px solid #BABABA' }}
-                >
-                  Spread
-                </Button>
+                <MainButton onClick={copyEnvelope}>Copy</MainButton>
+                <MainButton onClick={pasteEnvelope}>Paste</MainButton>
+                <MainButton onClick={spreadEnvelope}>Spread</MainButton>
               </>
             )}
-            <Button
-              flex={1}
-              size='xs'
-              color='#e6e3e1'
-              c='dark'
-              onClick={randomizeEnvelope}
-              style={{ '--button-bd': '1px solid #BABABA' }}
-            >
-              Random
-            </Button>
+            <MainButton onClick={randomizeEnvelope}>Random</MainButton>
           </Button.Group>
         </Flex>
         <Flex my={10}>

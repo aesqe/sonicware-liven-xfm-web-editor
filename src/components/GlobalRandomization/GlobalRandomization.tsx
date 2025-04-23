@@ -4,13 +4,10 @@ import { useAtomCallback } from 'jotai/utils'
 import { Button, Divider, Fieldset, Flex, Stack, Switch } from '@mantine/core'
 
 import { Knob } from '../Knob/Knob'
+import { MainButton } from '../MainButton/MainButton'
 import { getRandomPatch } from '../../services/get-random-patch/get-random-patch'
 import { UpdatedProperty, XFMPatch } from '../../types'
 import { patchAtom, randomizationOptionsAtom } from '../../store/atoms'
-
-const buttonStyle = {
-  '--button-bd': '1px solid #BABABA'
-}
 
 type Props = {
   handlePatchChange: (patch: XFMPatch) => void
@@ -61,26 +58,8 @@ export const GlobalRandomization = ({ handlePatchChange }: Props) => {
   return (
     <Fieldset legend='Randomize (work in progress)' w='100%' px={5} py={6} mb={10}>
       <Button.Group w='100%'>
-        <Button
-          color='#e6e3e1'
-          size='xs'
-          c='dark'
-          flex={1}
-          style={buttonStyle}
-          onClick={handleBasicRandom}
-        >
-          Basic values
-        </Button>
-        <Button
-          color='#e6e3e1'
-          size='xs'
-          c='dark'
-          flex={1}
-          style={buttonStyle}
-          onClick={handleBasicADSRRandom}
-        >
-          Basic + ADSR
-        </Button>
+        <MainButton onClick={handleBasicRandom}>Basic values</MainButton>
+        <MainButton onClick={handleBasicADSRRandom}>Basic + ADSR</MainButton>
       </Button.Group>
       <Flex align='center' gap={10} mt={8} px={10}>
         <Stack gap={10} align='start'>

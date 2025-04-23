@@ -1,12 +1,9 @@
 import { ReactNode, useCallback, useState } from 'react'
 import { useAtomValue } from 'jotai'
-import { Button, Fieldset, Flex } from '@mantine/core'
+import { Fieldset, Flex } from '@mantine/core'
 
+import { MainButton } from '../../../MainButton/MainButton'
 import { globalRefsAtom } from '../../../../store/atoms'
-
-const buttonStyle = {
-  '--button-bd': '1px solid #BABABA'
-}
 
 type Props = {
   children?: ReactNode
@@ -36,26 +33,22 @@ export const AppHeaderToggleControls = ({ children }: Props) => {
   return (
     <Fieldset legend='Toggle' w='100%' px={5} py={6}>
       <Flex gap={5} wrap='wrap'>
-        <Button
+        <MainButton
+          flex=''
           color={scaleControlsOpen ? '#ffeb3b' : '#e6e3e1'}
-          size='xs'
-          c='dark'
-          style={buttonStyle}
           onClick={toggleScaleControls}
           w='calc(50% - 2.5px)'
         >
           Scale controls
-        </Button>
-        <Button
+        </MainButton>
+        <MainButton
+          flex=''
           color={ADSRControlsOpen ? '#ffeb3b' : '#e6e3e1'}
-          size='xs'
-          c='dark'
-          style={buttonStyle}
           onClick={toggleADSRControls}
           w='calc(50% - 2.5px)'
         >
           ADSR controls
-        </Button>
+        </MainButton>
         {children}
       </Flex>
     </Fieldset>
