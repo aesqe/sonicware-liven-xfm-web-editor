@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react'
+import { ReactNode, useCallback, useState } from 'react'
 import { useAtomValue } from 'jotai'
-import { Button, Fieldset } from '@mantine/core'
+import { Button, Fieldset, Flex } from '@mantine/core'
 
 import { globalRefsAtom } from '../../../../store/atoms'
 
@@ -8,9 +8,13 @@ const buttonStyle = {
   '--button-bd': '1px solid #BABABA'
 }
 
-export const AppHeaderToggleControls = () => {
+type Props = {
+  children?: ReactNode
+}
+
+export const AppHeaderToggleControls = ({ children }: Props) => {
   const refs = useAtomValue(globalRefsAtom)
-  const [ADSRControlsOpen, setADSRControlsOpen] = useState(false)
+  const [ADSRControlsOpen, setADSRControlsOpen] = useState(true)
   const [scaleControlsOpen, setScaleControlsOpen] = useState(false)
 
   const toggleADSRControls = useCallback(() => {
@@ -31,28 +35,29 @@ export const AppHeaderToggleControls = () => {
 
   return (
     <Fieldset legend='Toggle' w='100%' px={5} py={6}>
-      <Button.Group w='100%'>
+      <Flex gap={5} wrap='wrap'>
         <Button
-          color='#e6e3e1'
+          color={scaleControlsOpen ? '#ffeb3b' : '#e6e3e1'}
           size='xs'
           c='dark'
-          flex={1}
           style={buttonStyle}
           onClick={toggleScaleControls}
+          w='calc(50% - 2.5px)'
         >
           Scale controls
         </Button>
         <Button
-          color='#e6e3e1'
+          color={ADSRControlsOpen ? '#ffeb3b' : '#e6e3e1'}
           size='xs'
           c='dark'
-          flex={1}
           style={buttonStyle}
           onClick={toggleADSRControls}
+          w='calc(50% - 2.5px)'
         >
           ADSR controls
         </Button>
-      </Button.Group>
+        {children}
+      </Flex>
     </Fieldset>
   )
 }

@@ -51,9 +51,17 @@ export const AppHeader = ({ onChange, handlePatchChange }: Props) => {
     }
   }, [])
 
+  const adsrWidth = viewport.width >= 970 ? (viewport.width < 1900 ? 870 : 850) : adsrEnvelopeWidth
+
   return (
-    <Paper p={0} px={10} mx='auto' w={viewport.width > 970 ? '100%' : '460px'}>
-      <Flex w='100%' mx='auto' wrap='wrap' ref={containerRef}>
+    <>
+      <Flex
+        w={viewport.width > 970 ? '100%' : '460px'}
+        mx='auto'
+        wrap='wrap'
+        justify='center'
+        ref={containerRef}
+      >
         <Stack gap={0} mr={10} w={viewport.width > 970 ? 250 : '100%'} pt={5}>
           <Anchor
             title='View the repository on GitHub'
@@ -131,7 +139,7 @@ export const AppHeader = ({ onChange, handlePatchChange }: Props) => {
         {viewport.width > 1900 && <Divider orientation='vertical' mr={20} />}
 
         <ADSREnvelope
-          width={viewport.width >= 970 ? 850 : adsrEnvelopeWidth}
+          width={adsrWidth}
           height={100}
           onChange={updatePitchEnvelope}
           pitchEnv

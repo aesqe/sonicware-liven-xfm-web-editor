@@ -48,7 +48,7 @@ export const UndoRedoControls = ({ handlePatchChange }: Props) => {
 
   return (
     <Fieldset legend='Undo/Redo (work in progress)' w='100%' px={5} py={6}>
-      <Flex gap='xs'>
+      <Flex gap='5'>
         <Button
           color='#e6e3e1'
           size='xs'

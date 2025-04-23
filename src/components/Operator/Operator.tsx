@@ -233,7 +233,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
   return (
     <Flex>
       <Flex gap={0} align='start' w='100%'>
-        <Flex h='100%' w={62}>
+        <Flex h='100%' w={60}>
           <Stack
             align='center'
             justify='start'
@@ -241,7 +241,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
             gap={10}
             pb={10}
             bg={backgrounds[numId - 1]}
-            w={60}
+            w={58}
           >
             <Text
               size='xl'

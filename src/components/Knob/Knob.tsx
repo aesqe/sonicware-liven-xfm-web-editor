@@ -126,15 +126,16 @@ export const Knob = ({
       fz={14}
       lh={1.2}
       ta='center'
-      opacity={disabled ? 0.5 : 1}
+      pos='relative'
       style={{
         userSelect: 'none',
-        outline: 'none',
-        pointerEvents: disabled ? 'none' : 'auto'
+        outline: 'none'
       }}
       {...stackProps}
     >
-      <KnobHeadlessOutput htmlFor={knobId}>{valueRawDisplayFn(valueRaw)}</KnobHeadlessOutput>
+      <KnobHeadlessOutput htmlFor={knobId} style={{ opacity: disabled ? 0.5 : 1 }}>
+        {valueRawDisplayFn(valueRaw)}
+      </KnobHeadlessOutput>
       <Box pos='relative' w={size} h={size} mt={2} mb={2}>
         <KnobHeadless
           id={knobId}
@@ -155,7 +156,9 @@ export const Knob = ({
           <KnobBaseThumb value01={value01} />
         </KnobHeadless>
       </Box>
-      <KnobHeadlessLabel id={labelId}>{label}</KnobHeadlessLabel>
+      <KnobHeadlessLabel id={labelId} style={{ opacity: disabled ? 0.5 : 1 }}>
+        {label}
+      </KnobHeadlessLabel>
     </Stack>
   )
 }

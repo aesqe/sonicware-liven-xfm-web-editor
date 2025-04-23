@@ -30,19 +30,19 @@ export const App = () => {
 
       <AppHeader onChange={updatePatch} handlePatchChange={handlePatchChange} />
 
-      <Divider w='100%' />
+      <Divider w='100%' mt={10} />
 
-      <Flex w='auto' mx='auto' wrap='wrap' mt={10} maw={viewport.width > 1900 ? 1900 : 970}>
-        <Box mx='auto' mb={10} bd='1px solid #e6e3e1'>
+      <Flex w='auto' mx='auto' wrap='wrap' mt={10} maw={viewport.width > 1900 ? 1868 : 970} gap={5}>
+        <Box mx='auto' bd='1px solid #e6e3e1'>
           <Operator id={1} onChange={updatePatch} />
         </Box>
-        <Box mx='auto' mb={10} bd='1px solid #e6e3e1'>
+        <Box mx='auto' bd='1px solid #e6e3e1'>
           <Operator id={2} onChange={updatePatch} />
         </Box>
-        <Box mx='auto' mb={10} bd='1px solid #e6e3e1'>
+        <Box mx='auto' bd='1px solid #e6e3e1'>
           <Operator id={3} onChange={updatePatch} />
         </Box>
-        <Box mx='auto' mb={10} bd='1px solid #e6e3e1'>
+        <Box mx='auto' bd='1px solid #e6e3e1'>
           <Operator id={4} onChange={updatePatch} />
         </Box>
       </Flex>

@@ -52,7 +52,14 @@ export const OperatorScaleControls = ({
   return (
     <Accordion p={0} m={-10} mt={-10} value={open ? 'scale' : ''}>
       <Accordion.Item value='scale' p={0} bd='none'>
-        <Accordion.Control p={0} px={10} fz='sm' bg='#eaeaea' onClick={toggleScaleControls}>
+        <Accordion.Control
+          p={0}
+          px={10}
+          fz='sm'
+          bg='#eaeaea'
+          onClick={toggleScaleControls}
+          styles={{ label: { padding: '5px' } }}
+        >
           Scale Controls
         </Accordion.Control>
         <Accordion.Panel p={0} pl={6} pb={10} styles={{ content: { padding: 0 } }}>

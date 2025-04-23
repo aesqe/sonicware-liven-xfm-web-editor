@@ -146,7 +146,7 @@ export const ADSREnvelope = ({
   }
 
   return (
-    <Box px={8} py={10} style={{ overflow: 'hidden' }} {...boxProps}>
+    <Box px={5} py={5} style={{ overflow: 'hidden' }} {...boxProps}>
       <Stack gap={0} w={pitchEnv ? 'auto' : width}>
         <Flex>
           {pitchEnv && (
@@ -230,7 +230,7 @@ export const ADSREnvelope = ({
           values={convertOutput(values, range)}
           range={range}
           onChange={handleKnobChange}
-          knobSize={containerWidth < 800 ? '1.5rem' : knobSize}
+          knobSize={containerWidth < 800 ? '1.6rem' : knobSize}
           pitchEnv={pitchEnv}
           ref={knobsRef}
         />

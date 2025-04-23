@@ -59,7 +59,7 @@ export const GlobalRandomization = ({ handlePatchChange }: Props) => {
   )
 
   return (
-    <Fieldset legend='Randomize (work in progress)' w='100%' px={5} py={6}>
+    <Fieldset legend='Randomize (work in progress)' w='100%' px={5} py={6} mb={10}>
       <Button.Group w='100%'>
         <Button
           color='#e6e3e1'

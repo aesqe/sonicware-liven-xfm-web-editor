@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useSetAtom, useAtomValue } from 'jotai'
 import { WebMidi, MessageEvent } from 'webmidi'
+import { useCallbackOne } from 'use-memo-one'
 
 import {
   logSysExAtom,
@@ -9,26 +10,31 @@ import {
   midiOutputListAtom,
   webMidiEnabledAtom
 } from '../../store/atoms'
+import { XFMPatch } from '../../types'
 import { convert78 } from '../convert78/convert78'
 import { decode8bit } from '../decode8bit/decode8bit'
-import { XFMPatch } from '../../types'
+import { useAtomEffect } from '../use-atom-effect/use-atom-effect'
 
 export const useWebMidi = (handlePatchChange: (patch: XFMPatch) => void) => {
-  const setMidiInputList = useSetAtom(midiInputListAtom)
-  const setMidiOutputList = useSetAtom(midiOutputListAtom)
   const setWebMidiEnabled = useSetAtom(webMidiEnabledAtom)
   const midiInput = useAtomValue(midiInputAtom)
   const logSysEx = useAtomValue(logSysExAtom)
-  const listenersAdded = useRef(false)
+
+  const [midiPortsChanged, setMidiPortsChanged] = useState(1)
+
+  useAtomEffect(
+    useCallbackOne(
+      (_get, set) => {
+        set(midiInputListAtom, WebMidi.inputs)
+        set(midiOutputListAtom, WebMidi.outputs)
+      },
+      [midiPortsChanged]
+    )
+  )
 
   useEffect(() => {
-    if (listenersAdded.current) {
-      return
-    }
-
     const updateMidiPorts = () => {
-      setMidiInputList(WebMidi.inputs)
-      setMidiOutputList(WebMidi.outputs)
+      setMidiPortsChanged((prev) => prev + 1)
     }
 
     WebMidi.enable({ sysex: true })
@@ -36,21 +42,17 @@ export const useWebMidi = (handlePatchChange: (patch: XFMPatch) => void) => {
         console.log('Failed to enable Web MIDI', error)
       })
       .then(() => {
-        updateMidiPorts()
-
         WebMidi.addListener('connected', updateMidiPorts)
         WebMidi.addListener('disconnected', updateMidiPorts)
 
         setWebMidiEnabled(true)
-
-        listenersAdded.current = true
       })
 
     return () => {
       WebMidi.removeListener('connected', updateMidiPorts)
       WebMidi.removeListener('disconnected', updateMidiPorts)
     }
-  }, [setMidiInputList, setMidiOutputList, setWebMidiEnabled])
+  }, [setWebMidiEnabled])
 
   useEffect(() => {
     midiInput?.addListener('sysex', (e: MessageEvent) => {
