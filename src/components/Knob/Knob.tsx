@@ -11,8 +11,8 @@ import {
 import { KnobHeadless, KnobHeadlessLabel, KnobHeadlessOutput } from 'react-knob-headless'
 import { Box, Stack, StackProps } from '@mantine/core'
 
-import { KnobBaseThumb } from './components/KnobBaseThumb/KnobBaseThumb'
 import { NormalisableRange } from '../../services/normalisable-range/normalisable-range'
+import { ParameterMappingButton } from '../MIDIMapping/ParameterMappingButton'
 import { useKnobKeyboardControls } from './services/use-knob-keyboard-controls/use-knob-keyboard-controls'
 import { UpdatedProperty, SetInternalValueRef } from '../../types'
 
@@ -101,19 +101,22 @@ export const Knob = ({
     if (ref) {
       ref.current = {
         ...ref.current,
-        setInternalValue: (value: number) => {
+        setInternalValue: (value: number, fromMidi = false) => {
           if (value === valueRaw) {
             return
           }
 
+          if (fromMidi) {
+            return handleOnChange(value)
+          }
+
           // prevent patch update when value is set from the outside
           valueSetFromOutside.current = true
-          // this will trigger onChange on the KnobHeadless component
           setValueRaw(value)
         }
       }
     }
-  }, [ref, setValueRaw, valueRaw])
+  }, [ref, setValueRaw, handleOnChange, valueRaw])
 
   const handleOnDoubleClick = useCallback(() => {
     handleOnChange(center)
@@ -155,7 +158,16 @@ export const Knob = ({
           onDoubleClick={handleOnDoubleClick}
           {...keyboardControlHandlers}
         >
-          <KnobBaseThumb value01={value01} />
+          <ParameterMappingButton
+            propertyPath={propertyPath}
+            label={label}
+            min={valueMin}
+            max={valueMax}
+            center={center}
+            refName={refName}
+            value01={value01}
+            disabled={disabled}
+          />
         </KnobHeadless>
       </Box>
       <KnobHeadlessLabel id={labelId} style={{ opacity: disabled ? 0.5 : 1 }}>

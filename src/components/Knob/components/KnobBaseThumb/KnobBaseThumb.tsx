@@ -1,11 +1,19 @@
 import { mapFrom01Linear } from '@dsp-ts/math'
-import { Box } from '@mantine/core'
+import { Box, CSSProperties } from '@mantine/core'
 
 type KnobBaseThumbProps = {
   value01: number
+  style?: CSSProperties
+  midiControlled?: boolean
+  isMultipleMapped?: boolean
 }
 
-export const KnobBaseThumb = ({ value01 }: KnobBaseThumbProps) => {
+export const KnobBaseThumb = ({
+  value01,
+  midiControlled = false,
+  isMultipleMapped = false,
+  style = {}
+}: KnobBaseThumbProps) => {
   const angleMin = -145
   const angleMax = 145
   const angle = mapFrom01Linear(value01, angleMin, angleMax)
@@ -15,9 +23,10 @@ export const KnobBaseThumb = ({ value01 }: KnobBaseThumbProps) => {
       pos='absolute'
       h='100%'
       w='100%'
-      bg='#d6d3d1'
+      bg={midiControlled ? (isMultipleMapped ? 'green' : '#bceb42') : '#d6d3d1'}
       style={{
-        borderRadius: '9999px'
+        borderRadius: '9999px',
+        ...style
       }}
     >
       <Box

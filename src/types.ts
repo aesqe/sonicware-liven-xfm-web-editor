@@ -246,4 +246,13 @@ export type GlobalRefs = {
   op4Ref: RefObject<OperatorRef | undefined> | undefined
   pitchAdsrRef: RefObject<SetInternalValueRef<ADSRValues> | undefined> | undefined
   patchNameRef: RefObject<SetInternalValueRef<string> | undefined> | undefined
+
+export type MIDIMapping = {
+  controllerId: number
+  propertyPath: string
+  min: number
+  max: number
+  center: number
+  label?: string
+  refName: string
 }
