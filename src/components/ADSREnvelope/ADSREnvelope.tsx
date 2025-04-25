@@ -180,17 +180,15 @@ export const ADSREnvelope = ({
           </Button.Group>
         </Flex>
         <Flex my={10}>
-          <Box w={width} h={height} bd='1px solid #DEDEDE'>
-            <ADSREnvelopeSVG
-              ref={svgRef}
-              width={width}
-              height={height}
-              padding={padding}
-              pitchEnv={pitchEnv}
-              values={values}
-              onChange={handleAdsrChange}
-            />
-          </Box>
+          <ADSREnvelopeSVG
+            ref={svgRef}
+            width={width}
+            height={height}
+            padding={padding}
+            pitchEnv={pitchEnv}
+            values={values}
+            onChange={handleAdsrChange}
+          />
         </Flex>
 
         <ADSREnvelopeKnobs

@@ -1,5 +1,7 @@
 import { mapFrom01Linear } from '@dsp-ts/math'
-import { Box, CSSProperties } from '@mantine/core'
+import { Box, CSSProperties, useMantineColorScheme } from '@mantine/core'
+
+import { knobLight, knobDark, knobMidiMultipleLight, knobMidiMultipleDark } from '../../../../theme'
 
 type KnobBaseThumbProps = {
   value01: number
@@ -14,16 +16,25 @@ export const KnobBaseThumb = ({
   isMultipleMapped = false,
   style = {}
 }: KnobBaseThumbProps) => {
+  const { colorScheme } = useMantineColorScheme()
+
   const angleMin = -145
   const angleMax = 145
   const angle = mapFrom01Linear(value01, angleMin, angleMax)
+
+  const colorLight = midiControlled
+    ? isMultipleMapped
+      ? knobMidiMultipleLight
+      : knobLight
+    : knobLight
+  const colorDark = midiControlled ? (isMultipleMapped ? knobMidiMultipleDark : knobDark) : knobDark
 
   return (
     <Box
       pos='absolute'
       h='100%'
       w='100%'
-      bg={midiControlled ? (isMultipleMapped ? 'green' : '#bceb42') : '#d6d3d1'}
+      bg={colorScheme === 'light' ? colorLight : colorDark}
       style={{
         borderRadius: '9999px',
         ...style
@@ -43,7 +54,7 @@ export const KnobBaseThumb = ({
           top={0}
           h='50%'
           w='2px'
-          bg='#0c0a09'
+          bg={colorScheme === 'light' ? 'dark' : 'white'}
           style={{
             transform: 'translateX(-50%)',
             borderRadius: '0.125rem'

@@ -1,6 +1,6 @@
 import { ReactNode, useCallback, useState } from 'react'
 import { useAtomValue } from 'jotai'
-import { Fieldset, Flex } from '@mantine/core'
+import { Fieldset, Flex, useMantineColorScheme } from '@mantine/core'
 
 import { MainButton } from '../../../MainButton/MainButton'
 import { globalRefsAtom } from '../../../../store/atoms'
@@ -13,6 +13,7 @@ export const AppHeaderToggleControls = ({ children }: Props) => {
   const refs = useAtomValue(globalRefsAtom)
   const [ADSRControlsOpen, setADSRControlsOpen] = useState(true)
   const [scaleControlsOpen, setScaleControlsOpen] = useState(false)
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme()
 
   const toggleADSRControls = useCallback(() => {
     refs.op1Ref?.current?.setADSRControlsOpen(!ADSRControlsOpen)
@@ -35,7 +36,7 @@ export const AppHeaderToggleControls = ({ children }: Props) => {
       <Flex gap={5} wrap='wrap'>
         <MainButton
           flex=''
-          color={scaleControlsOpen ? '#ffeb3b' : '#e6e3e1'}
+          active={scaleControlsOpen}
           onClick={toggleScaleControls}
           w='calc(50% - 2.5px)'
         >
@@ -43,11 +44,14 @@ export const AppHeaderToggleControls = ({ children }: Props) => {
         </MainButton>
         <MainButton
           flex=''
-          color={ADSRControlsOpen ? '#ffeb3b' : '#e6e3e1'}
+          active={ADSRControlsOpen}
           onClick={toggleADSRControls}
           w='calc(50% - 2.5px)'
         >
           ADSR controls
+        </MainButton>
+        <MainButton flex='' onClick={toggleColorScheme} w='calc(50% - 2.5px)'>
+          {colorScheme === 'light' ? 'Go Dark' : 'Go Light'}
         </MainButton>
         {children}
       </Flex>

@@ -1,8 +1,25 @@
 import { RefObject, useCallback, useEffect, useState } from 'react'
+import { Box, useMantineColorScheme } from '@mantine/core'
 
+import {
+  lineColorLight,
+  lineColorDark,
+  strokeColorLight,
+  strokeColorDark,
+  attackPointColorLight,
+  attackPointColorDark,
+  decayPointColorLight,
+  decayPointColorDark,
+  sustainPointColorLight,
+  sustainPointColorDark,
+  releasePointColorLight,
+  releasePointColorDark,
+  keyOffPointColor
+} from '../../../../theme'
 import { getTimePosition } from '../../services/get-time-position/get-time-position'
 import { createCurvedPath } from '../../services/create-curved-path/create-curved-path'
 import { ADSRValues, DragPoint } from '../../../../types'
+
 type Props = {
   ref: RefObject<SVGSVGElement | null>
   width: number
@@ -22,6 +39,7 @@ export const ADSREnvelopeSVG = ({
   pitchEnv = false,
   onChange
 }: Props) => {
+  const { colorScheme } = useMantineColorScheme()
   const [dragging, setDragging] = useState<DragPoint>(null)
   // Calculate the effective drawing dimensions with padding
   const drawingWidth = width - padding * 2
@@ -153,94 +171,103 @@ export const ADSREnvelopeSVG = ({
     }
   }, [handleMouseMove])
 
+  const lineColor = colorScheme === 'light' ? lineColorLight : lineColorDark
+  const strokeColor = colorScheme === 'light' ? strokeColorLight : strokeColorDark
+  const attackPointColor = colorScheme === 'light' ? attackPointColorLight : attackPointColorDark
+  const decayPointColor = colorScheme === 'light' ? decayPointColorLight : decayPointColorDark
+  const sustainPointColor = colorScheme === 'light' ? sustainPointColorLight : sustainPointColorDark
+  const releasePointColor = colorScheme === 'light' ? releasePointColorLight : releasePointColorDark
+
   return (
-    <svg
-      ref={ref}
-      width={width}
-      height={height}
-      viewBox={`0 0 ${width} ${height}`}
-      style={{ userSelect: 'none' }}
-    >
-      <g>
-        {/* Solid line segments */}
-        <path d={attackSegment} stroke='#000000' strokeWidth={2} fill='none' />
-        <path d={decaySegment} stroke='#000000' strokeWidth={2} fill='none' />
-        <path d={sustainSegment} stroke='#000000' strokeWidth={2} fill='none' />
+    <Box w={width} h={height} bd={`1px solid ${colorScheme === 'light' ? '#DEDEDE' : '#777777'}`}>
+      <svg
+        ref={ref}
+        width={width}
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+        style={{ userSelect: 'none' }}
+      >
+        <g>
+          {/* Solid line segments */}
+          <path d={attackSegment} stroke={lineColor} strokeWidth={2} fill='none' />
+          <path d={decaySegment} stroke={lineColor} strokeWidth={2} fill='none' />
+          <path d={sustainSegment} stroke={lineColor} strokeWidth={2} fill='none' />
 
-        {/* Dashed segment from sustain to key off point */}
-        <path
-          d={dashLineSegment}
-          stroke='#000000'
-          strokeWidth={2}
-          strokeDasharray='5,5'
-          fill='none'
-        />
+          {/* Dashed segment from sustain to key off point */}
+          <path
+            d={dashLineSegment}
+            stroke={lineColor}
+            strokeWidth={2}
+            strokeDasharray='5,5'
+            fill='none'
+          />
 
-        <path d={releaseSegment} stroke='#000000' strokeWidth={2} fill='none' />
+          <path d={releaseSegment} stroke={lineColor} strokeWidth={2} fill='none' />
 
-        {/* Attack control point */}
-        <circle
-          cx={attackPoint.x}
-          cy={attackPoint.y}
-          r={8}
-          fill='#48a5f4'
-          stroke='#FFFFFF'
-          strokeWidth={1.5}
-          style={{ cursor: 'move' }}
-          onMouseDown={handleMouseDown('attack')}
-          onTouchStart={handleMouseDown('attack')}
-        />
+          {/* Attack control point */}
+          <circle
+            cx={attackPoint.x}
+            cy={attackPoint.y}
+            r={8}
+            fill={attackPointColor}
+            stroke={strokeColor}
+            strokeWidth={1.5}
+            style={{ cursor: 'move' }}
+            onMouseDown={handleMouseDown('attack')}
+            onTouchStart={handleMouseDown('attack')}
+          />
 
-        {/* Decay control point */}
-        <circle
-          cx={decayPoint.x}
-          cy={decayPoint.y}
-          r={8}
-          fill='#25c370'
-          stroke='#FFFFFF'
-          strokeWidth={1.5}
-          style={{ cursor: 'move' }}
-          onMouseDown={handleMouseDown('decay')}
-          onTouchStart={handleMouseDown('decay')}
-        />
+          {/* Decay control point */}
+          <circle
+            cx={decayPoint.x}
+            cy={decayPoint.y}
+            r={8}
+            fill={decayPointColor}
+            stroke={strokeColor}
+            strokeWidth={1.5}
+            style={{ cursor: 'move' }}
+            onMouseDown={handleMouseDown('decay')}
+            onTouchStart={handleMouseDown('decay')}
+          />
 
-        {/* Sustain control point */}
-        <circle
-          cx={sustainPoint.x}
-          cy={sustainPoint.y}
-          r={8}
-          fill='#ffa381'
-          stroke='#FFFFFF'
-          strokeWidth={1.5}
-          style={{ cursor: 'move' }}
-          onMouseDown={handleMouseDown('sustain')}
-          onTouchStart={handleMouseDown('sustain')}
-        />
+          {/* Sustain control point */}
+          <circle
+            cx={sustainPoint.x}
+            cy={sustainPoint.y}
+            r={8}
+            fill={sustainPointColor}
+            stroke={strokeColor}
+            strokeWidth={1.5}
+            style={{ cursor: 'move' }}
+            onMouseDown={handleMouseDown('sustain')}
+            onTouchStart={handleMouseDown('sustain')}
+          />
 
-        {/* Key Off point */}
-        <rect
-          x={keyOffPoint.x - 8}
-          y={keyOffPoint.y - 8}
-          width={16}
-          height={16}
-          fill='#888888'
-          stroke='#FFFFFF'
-          strokeWidth={2}
-        />
+          {/* Key Off point */}
+          <rect
+            x={keyOffPoint.x - 8}
+            y={keyOffPoint.y - 8}
+            width={16}
+            height={16}
+            fill={keyOffPointColor}
+            stroke={strokeColor}
+            strokeWidth={2}
+          />
 
-        {/* Release control point */}
-        <circle
-          cx={releasePoint.x}
-          cy={releasePoint.y}
-          r={8}
-          fill='#edd314'
-          stroke='#FFFFFF'
-          strokeWidth={1.5}
-          style={{ cursor: 'move' }}
-          onMouseDown={handleMouseDown('release')}
-          onTouchStart={handleMouseDown('release')}
-        />
-      </g>
-    </svg>
+          {/* Release control point */}
+          <circle
+            cx={releasePoint.x}
+            cy={releasePoint.y}
+            r={8}
+            fill={releasePointColor}
+            stroke={strokeColor}
+            strokeWidth={1.5}
+            style={{ cursor: 'move' }}
+            onMouseDown={handleMouseDown('release')}
+            onTouchStart={handleMouseDown('release')}
+          />
+        </g>
+      </svg>
+    </Box>
   )
 }

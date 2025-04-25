@@ -1,7 +1,18 @@
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSetAtom } from 'jotai'
 import { useAtomCallback } from 'jotai/utils'
-import { ActionIcon, Divider, Flex, InputLabel, Stack, Switch, Text, Radio } from '@mantine/core'
+import {
+  ActionIcon,
+  Divider,
+  Flex,
+  InputLabel,
+  Stack,
+  Switch,
+  Text,
+  Radio,
+  useMantineColorScheme,
+  Box
+} from '@mantine/core'
 import { clamp, useDebouncedCallback, useViewportSize } from '@mantine/hooks'
 import { IconDice5, IconCopy, IconReload, IconClipboardText } from '@tabler/icons-react'
 
@@ -24,7 +35,7 @@ import {
 } from '../../store/atoms'
 import { Knob } from '../Knob/Knob'
 import { RatioKnob } from '../Knob/RatioKnob'
-import { backgrounds } from './constants'
+import { backgroundsLight, backgroundsDark, iconsLight, iconsDark } from './constants'
 import { isFreeRatio } from './services/is-free-ratio/is-free-ratio'
 import { ADSREnvelope } from '../ADSREnvelope/ADSREnvelope'
 import { getOperatorValues } from './services/get-operator-values/get-operator-values'
@@ -71,8 +82,15 @@ export const Operator = ({ id: numId, onChange }: Props) => {
   const opRef = useRef<OperatorRef>(undefined)
   const initialOperatorValues = useMemo(() => getInitialOperatorValues(numId), [numId])
 
+  const { colorScheme } = useMantineColorScheme()
+
   const refName = `op${numId}Ref`
   const opId = `OP${numId}` as const
+
+  const backgrounds = useMemo(
+    () => (colorScheme === 'light' ? backgroundsLight : backgroundsDark),
+    [colorScheme]
+  )
 
   const opInRefs = [
     { id: 1, ref: op1InRef },
@@ -248,261 +266,288 @@ export const Operator = ({ id: numId, onChange }: Props) => {
     }
   }, [handleResize])
 
+  const iconsColor = colorScheme === 'light' ? iconsLight : iconsDark
+  const operatorBorderColor = colorScheme === 'light' ? '#e6e3e1' : '#6f6a68'
+
   return (
-    <Flex>
-      <Flex gap={0} align='start' w='100%'>
-        <Flex h='100%' w={60}>
-          <Stack
-            align='center'
-            justify='start'
-            h='100%'
-            gap={10}
-            pb={10}
-            bg={backgrounds[numId - 1]}
-            w={58}
-          >
-            <Text
-              size='xl'
-              fw='bold'
-              p={10}
-              mb={-10}
-              ta='center'
-              component='div'
-              style={{ cursor: 'default' }}
-            >
-              OP{numId}
-            </Text>
-            <ActionIcon
-              title='Initialize'
-              size={32}
-              variant='transparent'
-              onClick={initializeOperator}
-            >
-              <IconReload size={48} color='#00000044' />
-            </ActionIcon>
+    <Box mx='auto' bd={`1px solid ${operatorBorderColor}`} style={{ borderRadius: 2 }}>
+      <Flex>
+        <Flex gap={0} align='start' w='100%'>
+          <Flex h='100%' w={60}>
             <Stack
               align='center'
-              gap={15}
-              bg='#F5F5F5'
-              w='100%'
-              pt={10}
-              pb={5}
-              style={{
-                borderTop: '1px solid #DADADA',
-                borderBottom: '1px solid #DADADA'
-              }}
+              justify='start'
+              h='100%'
+              gap={10}
+              pb={10}
+              bg={backgrounds[numId - 1]}
+              w={58}
             >
-              <Switch onChange={handlePitchEnvChange} checked={pitchEnvChecked} ref={pitchEnvRef} />
-              <InputLabel fw='normal' mt={-10} fz='xs'>
-                Pitch EG
-              </InputLabel>
-            </Stack>
-            <ActionIcon mt={24} title='Copy' size={32} variant='transparent' onClick={handleCopy}>
-              <IconCopy size={48} color='#00000044' />
-            </ActionIcon>
-            <ActionIcon title='Paste' size={32} variant='transparent' onClick={handlePaste}>
-              <IconClipboardText size={48} color='#00000044' />
-            </ActionIcon>
-            <ActionIcon
-              title='Randomize'
-              size={32}
-              variant='transparent'
-              onClick={() => randomizeOperator(false)}
-            >
-              <IconDice5 size={48} color='#00000044' />
-            </ActionIcon>
-          </Stack>
-          <Divider orientation='vertical' />
-        </Flex>
-        <Flex
-          w='auto'
-          ref={containerRef}
-          style={{ flexFlow: viewport.width > 960 ? 'row wrap' : 'column wrap' }}
-        >
-          <Stack gap={10} p={10} bg='#F5F5F5' w={400} h='100%'>
-            <Flex align='start' justify='start' gap={12}>
-              <Knob
-                label='Level'
-                propertyPath={`${opId}.Level`}
-                onChange={onChange}
-                valueMin={0}
-                valueMax={127}
-                valueDefault={initialOperatorValues.values.Level}
-                formatterFn={Math.round}
-                valueRawDisplayFn={(val) => `${Math.round(val)}`}
-                ref={levelRef}
-                refName='levelRef'
-              />
-              <Knob
-                label='Output'
-                propertyPath={`${opId}.Output`}
-                onChange={onChange}
-                valueMin={0}
-                valueMax={127}
-                valueDefault={initialOperatorValues.values.Output}
-                formatterFn={Math.round}
-                valueRawDisplayFn={(val) => `${Math.round(val)}`}
-                ref={outputRef}
-                refName='outputRef'
-              />
-              <Knob
-                label='Velocity Sensitivity'
-                propertyPath={`${opId}.VelSens`}
-                onChange={onChange}
-                valueMin={0}
-                valueMax={127}
-                valueDefault={initialOperatorValues.values.VelSens}
-                formatterFn={Math.round}
-                valueRawDisplayFn={(val) => `${Math.round(val)}`}
-                ref={velSensRef}
-                refName='velSensRef'
-              />
-              <RatioKnob
-                propertyPath={`${opId}.Ratio`}
-                fixed={fixed}
-                ratioRef={ratioRef}
-                ratioMode={ratioMode}
-                value={initialOperatorValues.values.Ratio}
-                onChange={onChange}
-              />
-              <Stack align='center' gap={10}>
-                <Knob
-                  label='Frequency'
-                  propertyPath={`${opId}.Freq`}
-                  onChange={onChange}
-                  valueMin={1}
-                  valueMax={97550}
-                  valueDefault={initialOperatorValues.values.Freq}
-                  formatterFn={Math.round}
-                  valueRawDisplayFn={(val) => `${Math.round(val / 10)}`}
-                  disabled={!fixed}
-                  ref={freqRef}
-                  refName='freqRef'
-                />
-                <Switch
-                  onChange={(e) => {
-                    setFixed(e.target.checked)
-                    onChange([{ value: e.target.checked ? 1 : 0, propertyPath: `${opId}.Fixed` }])
-                  }}
-                  checked={fixed}
-                  ref={fixedSwitchRef}
-                />
-                <InputLabel fw='normal' mt={-10} fz='xs'>
-                  Fixed
-                </InputLabel>
-              </Stack>
-              <Knob
-                label='Detune'
-                propertyPath={`${opId}.Detune`}
-                onChange={onChange}
-                valueMin={-63}
-                valueMax={63}
-                valueDefault={initialOperatorValues.values.Detune}
-                formatterFn={Math.round}
-                valueRawDisplayFn={(val) => `${Math.round(val)}`}
-                ref={detuneRef}
-                refName='detuneRef'
-              />
-            </Flex>
-            <Flex mt={-10}>
-              <Radio.Group
-                value={ratioMode}
-                defaultValue='default'
-                defaultChecked
-                onChange={(val) => {
-                  setRatioMode(val as RatioMode)
+              <Text
+                size='xl'
+                fw='bold'
+                p={10}
+                mb={-10}
+                ta='center'
+                component='div'
+                style={{ cursor: 'default' }}
+              >
+                OP{numId}
+              </Text>
+              <ActionIcon
+                title='Initialize'
+                size={32}
+                variant='transparent'
+                onClick={initializeOperator}
+              >
+                <IconReload size={48} color={iconsColor} opacity={0.4} />
+              </ActionIcon>
+              <Stack
+                align='center'
+                gap={15}
+                bg={colorScheme === 'light' ? '#F5F5F5' : '#696969'}
+                w='100%'
+                pt={10}
+                pb={5}
+                style={{
+                  borderTop: `1px solid ${colorScheme === 'light' ? '#DADADA' : '#2f2a28'}`,
+                  borderBottom: `1px solid ${colorScheme === 'light' ? '#DADADA' : '#2f2a28'}`
                 }}
               >
-                <Flex gap={10} align='center'>
-                  <InputLabel fw='bold' fz='xs'>
-                    Ratio mode:
-                  </InputLabel>
-                  <Radio
-                    styles={{ label: { paddingInlineStart: 5 } }}
-                    size='xs'
-                    value='default'
-                    label='Default'
-                    checked={ratioMode === 'default'}
-                  />
-                  <Radio
-                    size='xs'
-                    styles={{ label: { paddingInlineStart: 5 } }}
-                    value='free'
-                    label='Free '
-                    checked={ratioMode === 'free'}
-                  />
-                  <Radio
-                    size='xs'
-                    styles={{ label: { paddingInlineStart: 5 } }}
-                    value='scale'
-                    label='Scale '
-                    checked={ratioMode === 'scale'}
-                  />
-                </Flex>
-              </Radio.Group>
-            </Flex>
-            <Divider />
-            <Flex align='start' justify='start' gap={12}>
-              <Knob
-                label='Feedback'
-                propertyPath={`${opId}.Feedback`}
-                onChange={onChange}
-                valueMin={-630}
-                valueMax={640}
-                stepFn={() => 10}
-                stepLargerFn={() => 100}
-                valueDefault={initialOperatorValues.values.Feedback}
-                center={0}
-                formatterFn={Math.round}
-                valueRawDisplayFn={(val) => `${Math.round(val / 10)}`}
-                ref={feedbackRef}
-                refName='feedbackRef'
-              />
-              {opInRefs.map(({ id, ref }) => (
+                <Switch
+                  onChange={handlePitchEnvChange}
+                  checked={pitchEnvChecked}
+                  ref={pitchEnvRef}
+                  color={colorScheme === 'light' ? 'blue' : '#868e96'}
+                  styles={{
+                    thumb: {
+                      backgroundColor: colorScheme === 'light' ? '#FFFFFF' : '#d9d9d9',
+                      borderColor: colorScheme === 'light' ? '#EEEEEE' : '#d9d9d9'
+                    }
+                  }}
+                />
+                <InputLabel fw='normal' mt={-10} fz='xs'>
+                  Pitch EG
+                </InputLabel>
+              </Stack>
+              <ActionIcon mt={24} title='Copy' size={32} variant='transparent' onClick={handleCopy}>
+                <IconCopy size={48} color={iconsColor} opacity={0.4} />
+              </ActionIcon>
+              <ActionIcon title='Paste' size={32} variant='transparent' onClick={handlePaste}>
+                <IconClipboardText size={48} color={iconsColor} opacity={0.4} />
+              </ActionIcon>
+              <ActionIcon
+                title='Randomize'
+                size={32}
+                variant='transparent'
+                onClick={() => randomizeOperator(false)}
+              >
+                <IconDice5 size={48} color={iconsColor} opacity={0.4} />
+              </ActionIcon>
+            </Stack>
+            <Divider orientation='vertical' />
+          </Flex>
+          <Flex
+            w='auto'
+            ref={containerRef}
+            style={{ flexFlow: viewport.width > 960 ? 'row wrap' : 'column wrap' }}
+          >
+            <Stack
+              gap={10}
+              p={10}
+              w={400}
+              h='100%'
+              bg={colorScheme === 'light' ? '#F5F5F5' : '#474540'}
+            >
+              <Flex align='start' justify='start' gap={12}>
                 <Knob
-                  key={`${opId}.OP${id}In`}
-                  label={`OP${id} In`}
-                  propertyPath={`${opId}.OP${id}In`}
+                  label='Level'
+                  propertyPath={`${opId}.Level`}
                   onChange={onChange}
                   valueMin={0}
                   valueMax={127}
-                  valueDefault={0}
+                  valueDefault={initialOperatorValues.values.Level}
                   formatterFn={Math.round}
                   valueRawDisplayFn={(val) => `${Math.round(val)}`}
-                  ref={ref}
-                  refName={`op${id}InRef`}
+                  ref={levelRef}
+                  refName='levelRef'
                 />
-              ))}
-            </Flex>
+                <Knob
+                  label='Output'
+                  propertyPath={`${opId}.Output`}
+                  onChange={onChange}
+                  valueMin={0}
+                  valueMax={127}
+                  valueDefault={initialOperatorValues.values.Output}
+                  formatterFn={Math.round}
+                  valueRawDisplayFn={(val) => `${Math.round(val)}`}
+                  ref={outputRef}
+                  refName='outputRef'
+                />
+                <Knob
+                  label='Velocity Sensitivity'
+                  propertyPath={`${opId}.VelSens`}
+                  onChange={onChange}
+                  valueMin={0}
+                  valueMax={127}
+                  valueDefault={initialOperatorValues.values.VelSens}
+                  formatterFn={Math.round}
+                  valueRawDisplayFn={(val) => `${Math.round(val)}`}
+                  ref={velSensRef}
+                  refName='velSensRef'
+                />
+                <RatioKnob
+                  propertyPath={`${opId}.Ratio`}
+                  fixed={fixed}
+                  ratioRef={ratioRef}
+                  ratioMode={ratioMode}
+                  value={initialOperatorValues.values.Ratio}
+                  onChange={onChange}
+                />
+                <Stack align='center' gap={10}>
+                  <Knob
+                    label='Frequency'
+                    propertyPath={`${opId}.Freq`}
+                    onChange={onChange}
+                    valueMin={1}
+                    valueMax={97550}
+                    valueDefault={initialOperatorValues.values.Freq}
+                    formatterFn={Math.round}
+                    valueRawDisplayFn={(val) => `${Math.round(val / 10)}`}
+                    disabled={!fixed}
+                    ref={freqRef}
+                    refName='freqRef'
+                  />
+                  <Switch
+                    onChange={(e) => {
+                      setFixed(e.target.checked)
+                      onChange([{ value: e.target.checked ? 1 : 0, propertyPath: `${opId}.Fixed` }])
+                    }}
+                    checked={fixed}
+                    ref={fixedSwitchRef}
+                    color={colorScheme === 'light' ? 'blue' : '#868e96'}
+                    styles={{
+                      thumb: {
+                        backgroundColor: colorScheme === 'light' ? '#FFFFFF' : '#d9d9d9',
+                        borderColor: colorScheme === 'light' ? '#EEEEEE' : '#d9d9d9'
+                      }
+                    }}
+                  />
+                  <InputLabel fw='normal' mt={-10} fz='xs'>
+                    Fixed
+                  </InputLabel>
+                </Stack>
+                <Knob
+                  label='Detune'
+                  propertyPath={`${opId}.Detune`}
+                  onChange={onChange}
+                  valueMin={-63}
+                  valueMax={63}
+                  valueDefault={initialOperatorValues.values.Detune}
+                  formatterFn={Math.round}
+                  valueRawDisplayFn={(val) => `${Math.round(val)}`}
+                  ref={detuneRef}
+                  refName='detuneRef'
+                />
+              </Flex>
+              <Flex mt={-10}>
+                <Radio.Group
+                  value={ratioMode}
+                  defaultValue='default'
+                  defaultChecked
+                  onChange={(val) => {
+                    setRatioMode(val as RatioMode)
+                  }}
+                >
+                  <Flex gap={10} align='center'>
+                    <InputLabel fw='bold' fz='xs'>
+                      Ratio mode:
+                    </InputLabel>
+                    <Radio
+                      styles={{ label: { paddingInlineStart: 5 } }}
+                      size='xs'
+                      value='default'
+                      label='Default'
+                      checked={ratioMode === 'default'}
+                    />
+                    <Radio
+                      size='xs'
+                      styles={{ label: { paddingInlineStart: 5 } }}
+                      value='free'
+                      label='Free '
+                      checked={ratioMode === 'free'}
+                    />
+                    <Radio
+                      size='xs'
+                      styles={{ label: { paddingInlineStart: 5 } }}
+                      value='scale'
+                      label='Scale '
+                      checked={ratioMode === 'scale'}
+                    />
+                  </Flex>
+                </Radio.Group>
+              </Flex>
+              <Divider />
+              <Flex align='start' justify='start' gap={12}>
+                <Knob
+                  label='Feedback'
+                  propertyPath={`${opId}.Feedback`}
+                  onChange={onChange}
+                  valueMin={-630}
+                  valueMax={640}
+                  stepFn={() => 10}
+                  stepLargerFn={() => 100}
+                  valueDefault={initialOperatorValues.values.Feedback}
+                  center={0}
+                  formatterFn={Math.round}
+                  valueRawDisplayFn={(val) => `${Math.round(val / 10)}`}
+                  ref={feedbackRef}
+                  refName='feedbackRef'
+                />
+                {opInRefs.map(({ id, ref }) => (
+                  <Knob
+                    key={`${opId}.OP${id}In`}
+                    label={`OP${id} In`}
+                    propertyPath={`${opId}.OP${id}In`}
+                    onChange={onChange}
+                    valueMin={0}
+                    valueMax={127}
+                    valueDefault={0}
+                    formatterFn={Math.round}
+                    valueRawDisplayFn={(val) => `${Math.round(val)}`}
+                    ref={ref}
+                    refName={`op${id}InRef`}
+                  />
+                ))}
+              </Flex>
 
-            <Divider />
+              <OperatorScaleControls
+                numId={numId}
+                onChange={onChange}
+                values={initialOperatorValues.values}
+                ref={scaleControlsRef}
+                open={scaleControlsOpen}
+                toggleScaleControls={() => setScaleControlsOpen(!scaleControlsOpen)}
+              />
+            </Stack>
 
-            <OperatorScaleControls
-              numId={numId}
-              onChange={onChange}
-              values={initialOperatorValues.values}
-              ref={scaleControlsRef}
-              open={scaleControlsOpen}
-              toggleScaleControls={() => setScaleControlsOpen(!scaleControlsOpen)}
-            />
-          </Stack>
+            <Divider orientation='vertical' />
 
-          <Divider orientation='vertical' />
-
-          {ADSRControlsOpen && (
-            <ADSREnvelope
-              initialState={initialOperatorValues.values}
-              width={adsrEnvelopeWidth}
-              containerWidth={containerWidth}
-              height={165}
-              onChange={updateEnvelope}
-              ref={adsrRef}
-              knobSize='2rem'
-              pathBase={`${opId}.`}
-            />
-          )}
+            {ADSRControlsOpen && (
+              <ADSREnvelope
+                initialState={initialOperatorValues.values}
+                width={adsrEnvelopeWidth}
+                containerWidth={containerWidth}
+                height={165}
+                onChange={updateEnvelope}
+                ref={adsrRef}
+                knobSize='2rem'
+                pathBase={`${opId}.`}
+              />
+            )}
+          </Flex>
         </Flex>
       </Flex>
-    </Flex>
+    </Box>
   )
 }

@@ -1,8 +1,18 @@
 import { useAtom } from 'jotai'
-import { ActionIcon, Text } from '@mantine/core'
+import { ActionIcon, Text, useMantineColorScheme, useMantineTheme } from '@mantine/core'
 
 import { midiMappingModeAtom, midiMapAtom } from '../../store/atoms'
 import { KnobBaseThumb } from '../Knob/components/KnobBaseThumb/KnobBaseThumb'
+import {
+  knobDark,
+  knobLight,
+  knobMidiDark,
+  knobMidiLight,
+  knobMidiMultipleDark,
+  knobMidiMultipleLight,
+  knobMidiUnmappedDark,
+  knobMidiUnmappedLight
+} from '../../theme'
 
 interface Props {
   propertyPath: string
@@ -26,10 +36,13 @@ export const ParameterMappingButton = ({
 }: Props) => {
   const [midiMap] = useAtom(midiMapAtom)
   const [midiMappingMode, setMidiMappingMode] = useAtom(midiMappingModeAtom)
+  const theme = useMantineTheme()
+  const { colorScheme } = useMantineColorScheme()
 
   const CCs = midiMap
     .filter((mapping) => mapping.propertyPath === propertyPath)
-    .map((mapping) => mapping.controllerId)
+    .map((mapping) => mapping.controllerIds)
+    .flat()
   const isMapped = CCs.length > 0
   const isMultipleMapped = CCs.length > 1
   const isSelected = midiMappingMode.active && midiMappingMode.propertyPath === propertyPath
@@ -59,27 +72,36 @@ export const ParameterMappingButton = ({
     )
   }
 
+  const colorLight = isSelected
+    ? theme.colors.blue[5]
+    : isMapped
+      ? isMultipleMapped
+        ? knobMidiMultipleLight
+        : knobMidiLight
+      : knobMidiUnmappedLight
+
+  const colorDark = isSelected
+    ? theme.colors.blue[5]
+    : isMapped
+      ? isMultipleMapped
+        ? knobMidiMultipleDark
+        : knobMidiDark
+      : knobMidiUnmappedDark
+
   return (
     <ActionIcon
       variant='filled'
-      color={isSelected ? 'red' : isMapped ? (isMultipleMapped ? 'green' : '#bceb42') : 'yellow'}
-      c={isSelected ? 'white' : isMultipleMapped ? 'white' : 'dark'}
+      color={colorScheme === 'light' ? colorLight : colorDark}
+      c={isSelected ? 'white' : 'auto'}
       onClick={handleClick}
       radius='xl'
-      size={midiMappingMode.active ? '100%' : '16px'}
-      style={{
-        position: 'absolute',
-        top: midiMappingMode.active ? 0 : 'calc(50% - 8px)',
-        right: midiMappingMode.active ? 0 : 'calc(50% - 8px)',
-        pointerEvents: midiMappingMode.active ? 'auto' : 'none'
-      }}
+      size='100%'
+      pos='absolute'
+      top={0}
+      right={0}
+      autoContrast
     >
-      <Text
-        lh={0}
-        fw={isMultipleMapped ? 700 : 400}
-        size={isMapped ? '12px' : '12px'}
-        style={{ whiteSpace: 'nowrap' }}
-      >
+      <Text lh={0} fw={500} fz={14} style={{ whiteSpace: 'nowrap' }}>
         {isMapped ? (isMultipleMapped ? `x${CCs.length}` : CCs) : '+'}
       </Text>
     </ActionIcon>

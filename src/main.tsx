@@ -13,7 +13,7 @@ if (!rootEl) {
 
 createRoot(rootEl).render(
   <StrictMode>
-    <MantineProvider>
+    <MantineProvider defaultColorScheme='auto'>
       <App />
     </MantineProvider>
   </StrictMode>

@@ -1,7 +1,15 @@
 import { useCallback } from 'react'
 import { useAtom } from 'jotai'
 import { useAtomCallback } from 'jotai/utils'
-import { Button, Divider, Fieldset, Flex, Stack, Switch } from '@mantine/core'
+import {
+  Button,
+  Divider,
+  Fieldset,
+  Flex,
+  Stack,
+  Switch,
+  useMantineColorScheme
+} from '@mantine/core'
 
 import { Knob } from '../Knob/Knob'
 import { MainButton } from '../MainButton/MainButton'
@@ -14,6 +22,7 @@ type Props = {
 }
 
 export const GlobalRandomization = ({ handlePatchChange }: Props) => {
+  const { colorScheme } = useMantineColorScheme()
   const [randomizationOptions, setRandOptions] = useAtom(randomizationOptionsAtom)
 
   const handleBasicRandom = useAtomCallback(
@@ -72,6 +81,13 @@ export const GlobalRandomization = ({ handlePatchChange }: Props) => {
                 freeRatio: e.target.checked
               })
             }
+            color={colorScheme === 'light' ? 'blue' : '#868e96'}
+            styles={{
+              thumb: {
+                backgroundColor: colorScheme === 'light' ? '#FFFFFF' : '#d9d9d9',
+                borderColor: colorScheme === 'light' ? '#EEEEEE' : '#d9d9d9'
+              }
+            }}
           />
           <Switch
             label='Low OP1 In levels'
@@ -83,6 +99,13 @@ export const GlobalRandomization = ({ handlePatchChange }: Props) => {
                 lowOP1In: e.target.checked
               })
             }
+            color={colorScheme === 'light' ? 'blue' : '#868e96'}
+            styles={{
+              thumb: {
+                backgroundColor: colorScheme === 'light' ? '#FFFFFF' : '#d9d9d9',
+                borderColor: colorScheme === 'light' ? '#EEEEEE' : '#d9d9d9'
+              }
+            }}
           />
           <Switch
             label='Use current values as origin'
@@ -94,6 +117,13 @@ export const GlobalRandomization = ({ handlePatchChange }: Props) => {
                 useStartValues: e.target.checked
               })
             }
+            color={colorScheme === 'light' ? 'blue' : '#868e96'}
+            styles={{
+              thumb: {
+                backgroundColor: colorScheme === 'light' ? '#FFFFFF' : '#d9d9d9',
+                borderColor: colorScheme === 'light' ? '#EEEEEE' : '#d9d9d9'
+              }
+            }}
           />
         </Stack>
         <Divider orientation='vertical' ml={4} />

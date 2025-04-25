@@ -1,26 +1,28 @@
 import { useAtomCallback } from 'jotai/utils'
 import { IconDownload } from '@tabler/icons-react'
-import { ActionIcon, Tooltip } from '@mantine/core'
+import { ActionIcon, Tooltip, useMantineColorScheme } from '@mantine/core'
 
 import { patchAtom } from '../../store/atoms'
+import { downloadJSON } from '../../services/download-json/download-json'
 
 export const DownloadPatchButton = () => {
+  const { colorScheme } = useMantineColorScheme()
+
   const handleDownload = useAtomCallback((get) => {
     const patch = get(patchAtom)
-    const blob = new Blob([JSON.stringify(patch, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-
-    a.href = url
-    a.download = `${patch.Name}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-    a.remove()
+    downloadJSON(patch, patch.Name)
   })
 
   return (
     <Tooltip label='Download Patch' withArrow color='#F0F0F0' c='#000000'>
-      <ActionIcon h={40} w={40} color='#e6e3e1' c='dark' onClick={handleDownload}>
+      <ActionIcon
+        h={40}
+        w={40}
+        color={colorScheme === 'light' ? '#e6e3e1' : '#6f6a68'}
+        c={colorScheme === 'light' ? 'dark' : '#c9c9c9'}
+        onClick={handleDownload}
+        autoContrast
+      >
         <IconDownload />
       </ActionIcon>
     </Tooltip>

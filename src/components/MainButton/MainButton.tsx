@@ -1,23 +1,33 @@
-import { Button, ButtonProps } from '@mantine/core'
+import { Button, ButtonProps, useMantineColorScheme } from '@mantine/core'
+
+import { activeLight, darkBorder, activeDark, lightGrey, darkGrey, lightBorder } from '../../theme'
 
 type Props = ButtonProps & {
   onClick: () => void
+  active?: boolean
 }
 
-const buttonStyle = {
-  '--button-bd': '1px solid #BABABA'
-}
+export const MainButton = ({ onClick, active = false, children, ...props }: Props) => {
+  const { colorScheme } = useMantineColorScheme()
 
-export const MainButton = ({ onClick, children, ...props }: Props) => (
-  <Button
-    flex={1}
-    size='xs'
-    onClick={onClick}
-    color='#e6e3e1'
-    c='dark'
-    style={buttonStyle}
-    {...props}
-  >
-    {children}
-  </Button>
-)
+  const color = colorScheme === 'light' ? lightGrey : darkGrey
+  const c = colorScheme === 'dark' ? lightGrey : darkGrey
+  const borderColor = colorScheme === 'light' ? lightBorder : darkBorder
+  const activeColor = active ? (colorScheme === 'light' ? activeLight : activeDark) : color
+
+  return (
+    <Button
+      flex={1}
+      size='xs'
+      onClick={onClick}
+      color={activeColor}
+      c={c}
+      style={{
+        '--button-bd': `1px solid ${borderColor}`
+      }}
+      {...props}
+    >
+      {children}
+    </Button>
+  )
+}

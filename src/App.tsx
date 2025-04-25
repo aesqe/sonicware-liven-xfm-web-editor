@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Box, Divider, Flex, Stack } from '@mantine/core'
+import { Divider, Flex, Stack, useMantineColorScheme } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks'
 
 import { Operator } from './components/Operator/Operator'
@@ -16,6 +16,7 @@ export const App = () => {
   const updatePatch = useUpdatePatch()
   const handlePatchChange = useHandlePatchChange()
   const loadMidiMappings = useLoadMidiMappingsFromLocalStorage()
+  const { setColorScheme } = useMantineColorScheme()
 
   useMonitorPatchAtom()
   useWebMidi(handlePatchChange)
@@ -23,6 +24,18 @@ export const App = () => {
   useEffect(() => {
     loadMidiMappings()
   }, [loadMidiMappings])
+
+  useEffect(() => {
+    const colorScheme = window?.matchMedia?.('(prefers-color-scheme:dark)')?.matches
+      ? 'dark'
+      : 'light'
+
+    setColorScheme(colorScheme)
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+      setColorScheme(event.matches ? 'dark' : 'light')
+    })
+  }, [])
 
   return (
     <Stack
@@ -37,21 +50,13 @@ export const App = () => {
 
       <AppHeader onChange={updatePatch} handlePatchChange={handlePatchChange} />
 
-      <Divider w='100%' mt={10} />
+      <Divider w='100%' />
 
       <Flex w='auto' mx='auto' wrap='wrap' mt={10} maw={viewport.width > 1900 ? 1868 : 970} gap={5}>
-        <Box mx='auto' bd='1px solid #e6e3e1'>
-          <Operator id={1} onChange={updatePatch} />
-        </Box>
-        <Box mx='auto' bd='1px solid #e6e3e1'>
-          <Operator id={2} onChange={updatePatch} />
-        </Box>
-        <Box mx='auto' bd='1px solid #e6e3e1'>
-          <Operator id={3} onChange={updatePatch} />
-        </Box>
-        <Box mx='auto' bd='1px solid #e6e3e1'>
-          <Operator id={4} onChange={updatePatch} />
-        </Box>
+        <Operator id={1} onChange={updatePatch} />
+        <Operator id={2} onChange={updatePatch} />
+        <Operator id={3} onChange={updatePatch} />
+        <Operator id={4} onChange={updatePatch} />
       </Flex>
     </Stack>
   )

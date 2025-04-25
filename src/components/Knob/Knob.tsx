@@ -8,10 +8,12 @@ import {
   useRef,
   useCallback
 } from 'react'
+import { useAtomValue } from 'jotai'
 import { KnobHeadless, KnobHeadlessLabel, KnobHeadlessOutput } from 'react-knob-headless'
 import { Box, Stack, StackProps } from '@mantine/core'
 
 import { NormalisableRange } from '../../services/normalisable-range/normalisable-range'
+import { midiMappingModeAtom } from '../../store/atoms'
 import { ParameterMappingButton } from '../MIDIMapping/ParameterMappingButton'
 import { useKnobKeyboardControls } from './services/use-knob-keyboard-controls/use-knob-keyboard-controls'
 import { UpdatedProperty, SetInternalValueRef } from '../../types'
@@ -65,12 +67,13 @@ export const Knob = ({
   const labelId = useId()
   const [valueRaw, setValueRaw] = useState<number>(valueDefault)
   const valueSetFromOutside = useRef(false)
+  const midiMappingMode = useAtomValue(midiMappingModeAtom)
 
   const range = new NormalisableRange(valueMin, valueMax, center)
   const mapTo01 = (x: number) => range.mapTo01(x)
   const mapFrom01 = (x: number) => range.mapFrom01(x)
 
-  const dragSensitivity = 0.006
+  const dragSensitivity = midiMappingMode.active ? 0 : 0.006
   const value01 = mapTo01(valueRaw)
   const step = stepFn(valueRaw)
   const stepLarger = stepLargerFn(valueRaw)

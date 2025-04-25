@@ -1,11 +1,22 @@
 import { useRef, useEffect, useState } from 'react'
 import { useAtom } from 'jotai'
-import { Stack, Flex, Paper, ActionIcon, Anchor, Divider, Image, Title } from '@mantine/core'
-import { useViewportSize } from '@mantine/hooks'
-import { IconTerminal2 } from '@tabler/icons-react'
+import {
+  Stack,
+  Flex,
+  ActionIcon,
+  Anchor,
+  Divider,
+  Image,
+  Title,
+  Text,
+  useMantineColorScheme
+} from '@mantine/core'
+import { useDisclosure, useViewportSize } from '@mantine/hooks'
+import { IconExternalLink, IconTerminal2 } from '@tabler/icons-react'
 
 import initPatch from '../../assets/presets/initpatch.json'
 import githubMark from '../../assets/github-mark.svg'
+import { MainButton } from '../MainButton/MainButton'
 import { logSysExAtom } from '../../store/atoms'
 import { ADSREnvelope } from '../ADSREnvelope/ADSREnvelope'
 import { PatchNameEditor } from '../PatchNameEditor/PatchNameEditor'
@@ -28,6 +39,7 @@ export const AppHeader = ({ onChange, handlePatchChange }: Props) => {
   const [logSysEx, setLogSysEx] = useAtom(logSysExAtom)
   const [adsrEnvelopeWidth, setADSREnvelopeWidth] = useState(600)
   const containerRef = useRef<HTMLDivElement>(null)
+  const { colorScheme } = useMantineColorScheme()
 
   const updatePitchEnvelope = (values: ADSRValues) => {
     onChange(getUpdatedEnvelopeValues('Pitch', values))
@@ -61,25 +73,31 @@ export const AppHeader = ({ onChange, handlePatchChange }: Props) => {
         wrap='wrap'
         justify='center'
         ref={containerRef}
+        pb={viewport.width > 1900 ? 0 : 10}
       >
         <Stack gap={0} mr={10} w={viewport.width > 970 ? 250 : '100%'} pt={5}>
           <Anchor
             title='View the repository on GitHub'
             href='https://github.com/aesqe/sonicware-liven-xfm-web-editor'
+            target='_blank'
             c='grey'
             fz={12}
             py={3}
           >
-            <Image
-              src={githubMark}
-              alt='View the repository on GitHub'
-              w={12}
-              h={12}
-              mr={5}
-              display='inline'
-              mb={-2}
-            />
-            View the repository on GitHub
+            <Flex align='center' gap={5}>
+              <Image
+                src={githubMark}
+                alt='View the repository on GitHub'
+                w={12}
+                h={12}
+                display='inline'
+                style={{ filter: colorScheme === 'dark' ? 'invert(1)' : 'invert(0)' }}
+              />
+              <Text fz={12} mb={1} inline>
+                View the repository on GitHub
+              </Text>
+              <IconExternalLink size={12} />
+            </Flex>
           </Anchor>
           <Flex justify='space-between' align='center' w='100%'>
             <Title order={2} style={{ cursor: 'default' }}>
@@ -87,10 +105,10 @@ export const AppHeader = ({ onChange, handlePatchChange }: Props) => {
             </Title>
             <ActionIcon
               mt={4}
-              color={logSysEx ? 'green' : '#e6e3e1'}
-              c={logSysEx ? 'white' : 'dark'}
+              color={logSysEx ? 'green' : colorScheme === 'light' ? '#e6e3e1' : '#6f6a68'}
               onClick={() => setLogSysEx(!logSysEx)}
               title='Toggle logging of SysEx messages to the browser console'
+              c={colorScheme === 'light' ? 'dark' : '#c9c9c9'}
             >
               <IconTerminal2 />
             </ActionIcon>
@@ -146,8 +164,9 @@ export const AppHeader = ({ onChange, handlePatchChange }: Props) => {
           initialState={initPatch.Pitch}
           mb={-8}
           mx={-8}
+          pathBase='Pitch.'
         />
       </Flex>
-    </Paper>
+    </>
   )
 }

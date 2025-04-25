@@ -1,5 +1,5 @@
 import { RefObject, useEffect, useRef } from 'react'
-import { Flex, InputLabel, Stack } from '@mantine/core'
+import { Flex, InputLabel, Stack, useMantineColorScheme } from '@mantine/core'
 import { Accordion } from '@mantine/core'
 
 import {
@@ -33,6 +33,7 @@ export const OperatorScaleControls = ({
   const lCurveRef = useRef<KnobRefType>(null)
   const rGainRef = useRef<KnobRefType>(null)
   const rCurveRef = useRef<KnobRefType>(null)
+  const { colorScheme } = useMantineColorScheme()
 
   useEffect(() => {
     if (ref) {
@@ -58,13 +59,13 @@ export const OperatorScaleControls = ({
   }, [ref])
 
   return (
-    <Accordion p={0} m={-10} mt={-10} value={open ? 'scale' : ''}>
+    <Accordion p={0} m={-10} mt={0} value={open ? 'scale' : ''}>
       <Accordion.Item value='scale' p={0} bd='none'>
         <Accordion.Control
           p={0}
           px={10}
           fz='sm'
-          bg='#eaeaea'
+          bg={colorScheme === 'light' ? '#eaeaea' : '#696969'}
           onClick={toggleScaleControls}
           styles={{ label: { padding: '5px' } }}
         >

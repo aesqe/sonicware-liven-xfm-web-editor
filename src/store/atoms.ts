@@ -57,5 +57,6 @@ export const midiMappingModeAtom = atom({
     min: 0,
     max: 127,
     center: 64
-  }
+  },
+  lastCC: 0
 })
