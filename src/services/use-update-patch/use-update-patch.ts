@@ -30,13 +30,6 @@ export const useUpdatePatch = () => {
 
         throttledPushToUndoStack(patch)
 
-        const lines = [
-          '\x1B[93;41;4m useUpdatePatch ',
-          ...props.map((p) => `\x1B[47;97;4m${p.propertyPath}:\x1B[m ${p.value}`)
-        ]
-
-        console.log(lines.join('\n'))
-
         set(patchAtom, updatedPatch)
       },
       [throttledPushToUndoStack]

@@ -35,6 +35,7 @@ export const App = () => {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
       setColorScheme(event.matches ? 'dark' : 'light')
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
