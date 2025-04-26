@@ -43,8 +43,7 @@ export const globalRefsAtom = atom<GlobalRefs>({
   op3Ref: undefined,
   op4Ref: undefined,
   pitchAdsrRef: undefined,
-  patchNameRef: undefined,
-  machineRefs: {}
+  patchNameRef: undefined
 })
 
 export const midiControllerInputAtom = atom<Input | null>(null)
