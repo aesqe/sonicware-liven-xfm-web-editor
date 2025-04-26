@@ -248,11 +248,10 @@ export type GlobalRefs = {
   patchNameRef: RefObject<SetInternalValueRef<string> | undefined> | undefined
 
 export type MIDIMapping = {
-  controllerId: number
+  controllerIds: number[]
   propertyPath: string
   min: number
   max: number
   center: number
-  label?: string
   refName: string
 }

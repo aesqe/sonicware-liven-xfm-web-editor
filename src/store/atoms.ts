@@ -48,6 +48,7 @@ export const globalRefsAtom = atom<GlobalRefs>({
 })
 
 export const midiControllerInputAtom = atom<Input | null>(null)
+export const lastCCUsedAtom = atom<number>(-1)
 export const midiMapAtom = atom<MIDIMapping[]>([])
 export const midiMappingModeAtom = atom({
   active: false,
@@ -57,6 +58,5 @@ export const midiMappingModeAtom = atom({
     min: 0,
     max: 127,
     center: 64
-  },
-  lastCC: 0
+  }
 })

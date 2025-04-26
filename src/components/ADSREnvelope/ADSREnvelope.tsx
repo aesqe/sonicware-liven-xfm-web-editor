@@ -28,22 +28,20 @@ type Props = {
   pitchEnv?: boolean
   ref?: RefObject<ADSREnvelopeRef | undefined>
   knobSize?: CSSProperties['width']
-  containerWidth?: number
   padding?: number
   pathBase: string
 } & Partial<BoxProps>
 
 export const ADSREnvelope = ({
   ref,
+  onChange,
+  pathBase,
   width = 320,
-  containerWidth = width,
   height = 160,
   padding = 10,
   knobSize = '2rem',
   pitchEnv = false,
   initialState = pitchEnv ? defaultPitchADSRCurve : defaultADSRCurve,
-  onChange,
-  pathBase,
   ...boxProps
 }: Props) => {
   // pitch env has a different range for levels
@@ -131,6 +129,7 @@ export const ADSREnvelope = ({
 
   const handleKnobChange = ([data]: UpdatedProperty[]) => {
     let updatedValue = 0
+    const propKey = data.propertyPath.replace(/OP\d\./, '').replace(/Pitch\./, '')
 
     if (data.propertyPath.endsWith('Level')) {
       updatedValue = range.mapTo01(data.value)
@@ -139,8 +138,6 @@ export const ADSREnvelope = ({
     } else {
       updatedValue = range_1818.mapTo01(data.value)
     }
-
-    const propKey = data.propertyPath.replace(/OP\d\./, '')
 
     setValues((prev) => {
       const updatedValues = { ...prev, [propKey]: updatedValue }
@@ -195,7 +192,7 @@ export const ADSREnvelope = ({
           values={convertOutput(values, range)}
           range={range}
           onChange={handleKnobChange}
-          knobSize={containerWidth < 800 ? '1.6rem' : knobSize}
+          knobSize={knobSize}
           pitchEnv={pitchEnv}
           ref={knobsRef}
           pathBase={pathBase}

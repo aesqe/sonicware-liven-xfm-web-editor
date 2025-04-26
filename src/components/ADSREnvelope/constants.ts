@@ -17,7 +17,7 @@ export const defaultADSRCurve: ADSRValues = {
   SLevel: 127,
   STime: 0,
   RLevel: 0,
-  RTime: 0,
+  RTime: 63,
   UpCurve: 0,
   DnCurve: 0
 }
@@ -30,7 +30,7 @@ export const defaultADSRCurve01: ADSRValues = {
   SLevel: 1,
   STime: 0,
   RLevel: 0,
-  RTime: 0,
+  RTime: 0.5,
   UpCurve: 0.5,
   DnCurve: 0.5
 }

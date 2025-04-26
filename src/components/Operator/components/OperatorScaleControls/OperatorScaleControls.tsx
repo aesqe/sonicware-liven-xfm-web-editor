@@ -66,8 +66,8 @@ export const OperatorScaleControls = ({
           px={10}
           fz='sm'
           bg={colorScheme === 'light' ? '#eaeaea' : '#696969'}
+          styles={{ label: { padding: '7px' } }}
           onClick={toggleScaleControls}
-          styles={{ label: { padding: '5px' } }}
         >
           Scale Controls
         </Accordion.Control>

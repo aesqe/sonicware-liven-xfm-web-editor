@@ -4,6 +4,8 @@ import { Fieldset, Flex, useMantineColorScheme } from '@mantine/core'
 
 import { MainButton } from '../../../MainButton/MainButton'
 import { globalRefsAtom } from '../../../../store/atoms'
+import { IconSun } from '@tabler/icons-react'
+import { IconMoon } from '@tabler/icons-react'
 
 type Props = {
   children?: ReactNode
@@ -51,7 +53,17 @@ export const AppHeaderToggleControls = ({ children }: Props) => {
           ADSR controls
         </MainButton>
         <MainButton flex='' onClick={toggleColorScheme} w='calc(50% - 2.5px)'>
-          {colorScheme === 'light' ? 'Go Dark' : 'Go Light'}
+          {colorScheme === 'dark' ? (
+            <>
+              <IconSun size={16} />
+              &nbsp; Light Mode
+            </>
+          ) : (
+            <>
+              <IconMoon size={16} />
+              &nbsp; Dark Mode
+            </>
+          )}
         </MainButton>
         {children}
       </Flex>

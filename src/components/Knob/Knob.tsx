@@ -14,7 +14,7 @@ import { Box, Stack, StackProps } from '@mantine/core'
 
 import { NormalisableRange } from '../../services/normalisable-range/normalisable-range'
 import { midiMappingModeAtom } from '../../store/atoms'
-import { ParameterMappingButton } from '../MIDIMapping/ParameterMappingButton'
+import { ParameterMappingButton } from '../MIDIMappingManager/components/ParameterMappingButton/ParameterMappingButton'
 import { useKnobKeyboardControls } from './services/use-knob-keyboard-controls/use-knob-keyboard-controls'
 import { UpdatedProperty, SetInternalValueRef } from '../../types'
 

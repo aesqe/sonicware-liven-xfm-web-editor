@@ -17,25 +17,24 @@ import { clamp, useDebouncedCallback, useViewportSize } from '@mantine/hooks'
 import { IconDice5, IconCopy, IconReload, IconClipboardText } from '@tabler/icons-react'
 
 import {
+  RatioRef,
+  RatioMode,
   ADSRValues,
+  OperatorRef,
   KnobRefType,
   OperatorValues,
-  UpdatedProperty,
-  RatioMode,
-  RatioRef,
-  OperatorRef,
   ADSREnvelopeRef,
+  UpdatedProperty,
   ScaleControlsRef
 } from '../../types'
 import {
+  patchAtom,
   globalRefsAtom,
   operatorClipboardAtom,
-  patchAtom,
   randomizationOptionsAtom
 } from '../../store/atoms'
 import { Knob } from '../Knob/Knob'
 import { RatioKnob } from '../Knob/RatioKnob'
-import { backgroundsLight, backgroundsDark, iconsLight, iconsDark } from './constants'
 import { isFreeRatio } from './services/is-free-ratio/is-free-ratio'
 import { ADSREnvelope } from '../ADSREnvelope/ADSREnvelope'
 import { getOperatorValues } from './services/get-operator-values/get-operator-values'
@@ -43,6 +42,7 @@ import { OperatorScaleControls } from './components/OperatorScaleControls/Operat
 import { getInitialOperatorValues } from './services/get-initial-operator-values/get-initial-operator-values'
 import { getUpdatedEnvelopeValues } from './services/get-updated-envelope-values/get-updated-envelope-values'
 import { getRandomizedOperatorValues } from './services/get-randomized-operator-values/get-randomized-operator-values'
+import { backgroundsLight, backgroundsDark, iconsLight, iconsDark } from './constants'
 
 type Props = {
   id: 1 | 2 | 3 | 4
@@ -57,7 +57,6 @@ export const Operator = ({ id: numId, onChange }: Props) => {
   const [scaleControlsOpen, setScaleControlsOpen] = useState(false)
   const [ADSRControlsOpen, setADSRControlsOpen] = useState(true)
   const [adsrEnvelopeWidth, setADSREnvelopeWidth] = useState(600)
-  const [containerWidth, setContainerWidth] = useState(0)
   const [ratioMode, setRatioMode] = useState<RatioMode>('default')
   const [pitchEnvChecked, setPitchEnvChecked] = useState(false)
   const [fixed, setFixed] = useState(false)
@@ -246,15 +245,13 @@ export const Operator = ({ id: numId, onChange }: Props) => {
 
   const handleResize = useDebouncedCallback(() => {
     if (containerRef.current) {
-      const clientWidth = containerRef.current.clientWidth
       const minWidth = 385
-      const maxWidth = clientWidth > 800 ? 450 : 385
-      const width = clamp(clientWidth, minWidth, maxWidth)
+      const maxWidth = viewport.width >= 970 ? 450 : minWidth
+      const width = clamp(containerRef.current.clientWidth, minWidth, maxWidth)
 
-      setContainerWidth(clientWidth)
       setADSREnvelopeWidth(width)
     }
-  }, 1000)
+  }, 250)
 
   useEffect(() => {
     window.addEventListener('resize', handleResize)
@@ -537,11 +534,10 @@ export const Operator = ({ id: numId, onChange }: Props) => {
               <ADSREnvelope
                 initialState={initialOperatorValues.values}
                 width={adsrEnvelopeWidth}
-                containerWidth={containerWidth}
                 height={165}
                 onChange={updateEnvelope}
                 ref={adsrRef}
-                knobSize='2rem'
+                knobSize={viewport.width >= 970 ? '2.2rem' : '1.8rem'}
                 pathBase={`${opId}.`}
               />
             )}
