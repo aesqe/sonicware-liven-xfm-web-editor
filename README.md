@@ -52,7 +52,11 @@ If you don't have a Github account and don't want to create one, you can contact
 
 ## Screenshots
 
-<img src='src/assets/screenshot-default.png' width='33%'>
-<img src='src/assets/screenshot-midi-mapping.png' width='33%'>
-<img src='src/assets/screenshot-dark-mode.png' width='33%'>
+<img src='src/assets/screenshot-default.png' />
+<img src='src/assets/screenshot-midi-mapping.png' /> 
+<img src='src/assets/screenshot-dark-mode.png' />
+
+
+
+
 
