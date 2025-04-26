@@ -17,10 +17,12 @@ import { IconExternalLink, IconTerminal2 } from '@tabler/icons-react'
 import initPatch from '../../assets/presets/initpatch.json'
 import githubMark from '../../assets/github-mark.svg'
 import { MainButton } from '../MainButton/MainButton'
+import { useMidiMap } from '../../services/use-midi-map/use-midi-map'
 import { logSysExAtom } from '../../store/atoms'
 import { ADSREnvelope } from '../ADSREnvelope/ADSREnvelope'
 import { PatchNameEditor } from '../PatchNameEditor/PatchNameEditor'
 import { UndoRedoControls } from '../UndoRedoControls/UndoRedoControls'
+import { MIDIMappingManager } from '../MIDIMappingManager/MIDIMappingManager'
 import { DownloadPatchButton } from '../DownloadPatchButton/DownloadPatchButton'
 import { GlobalRandomization } from '../GlobalRandomization/GlobalRandomization'
 import { MidiDevicesSelection } from '../MidiDevicesSelection/MidiDevicesSelection'
@@ -40,6 +42,9 @@ export const AppHeader = ({ onChange, handlePatchChange }: Props) => {
   const [adsrEnvelopeWidth, setADSREnvelopeWidth] = useState(600)
   const containerRef = useRef<HTMLDivElement>(null)
   const { colorScheme } = useMantineColorScheme()
+  const [showMIDIMappingManager, { toggle: toggleMIDIMappingManager }] = useDisclosure(false)
+
+  useMidiMap()
 
   const updatePitchEnvelope = (values: ADSRValues) => {
     onChange(getUpdatedEnvelopeValues('Pitch', values))
@@ -136,7 +141,16 @@ export const AppHeader = ({ onChange, handlePatchChange }: Props) => {
             viewportWidth={viewport.width}
           />
           <Stack align='start' gap={4} w='100%'>
-            <AppHeaderToggleControls />
+            <AppHeaderToggleControls>
+              <MainButton
+                active={showMIDIMappingManager}
+                w='calc(50% - 2.5px)'
+                onClick={toggleMIDIMappingManager}
+                flex=''
+              >
+                MIDI Mapping
+              </MainButton>
+            </AppHeaderToggleControls>
           </Stack>
 
           <UndoRedoControls handlePatchChange={handlePatchChange} />
@@ -166,6 +180,13 @@ export const AppHeader = ({ onChange, handlePatchChange }: Props) => {
           mx={-8}
           pathBase='Pitch.'
         />
+
+        {showMIDIMappingManager && (
+          <>
+            <Divider w='100%' orientation='horizontal' my={20} />
+            <MIDIMappingManager />
+          </>
+        )}
       </Flex>
     </>
   )
