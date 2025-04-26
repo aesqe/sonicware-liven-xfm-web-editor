@@ -44,6 +44,16 @@ export const MIDIMappingManager = () => {
   >({ duration: 150 })
 
   useEffect(() => {
+    return () =>
+      setMidiMappingMode({
+        refName: '',
+        propertyPath: '',
+        active: false,
+        controlRange: { min: 0, max: 127, center: 64 }
+      })
+  }, [setMidiMappingMode])
+
+  useEffect(() => {
     if (midiMappingMode.propertyPath) {
       scrollIntoView()
     }
