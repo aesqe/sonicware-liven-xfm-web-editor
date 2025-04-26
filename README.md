@@ -19,7 +19,7 @@ Visit the online version of the web editor on Github pages https://aesqe.github.
 * You can drag and drop a JSON or SYX patch file anywhere on the page and the editor will read it, update its values, and send the patch to the device. You can drag a single preset, single bank with multiple presets, or a whole XFM backup dump SYX file and you will be presented with a list of banks and patches in a modal popup, from where you'll be able to load any patch into memory.
   * You can find all original patches that come with the device in JSON format in the Python editor repo: https://github.com/wrightflyer/XFM/tree/master/factory
   * And here is a very nice set of 50 basic waveforms in SYX format by Chris Lody: https://www.youtube.com/watch?v=sm_kKbW1FNo
-* If you work on a patch in the web editor and then change a parameter value on the device, that will not be automatically reflected in the web editor. You'll need to press the `MIDI EXPORT` button on the device and then confirm by pressing the `OK` button to send the updated values to the web editor.
+* If you work on a patch in the web editor and then change a parameter value on the device, that change will not be automatically reflected in the web editor. You'll need to press the `MIDI EXPORT` button on the device and then confirm by pressing the `OK` button to send the updated values to the web editor.
 * To toggle logging of `Sysex` messages to the browser console, click the button next to the `XFM Web Editor` title in the top left corner of the page. You can open the browser developer tools and switch to the console tab to view `Sysex` messages when the button is green.
 * The points on the ADSR envelope can be dragged around to change time/level values. Just have in mind that the line/curve display is for illustrative purposes only, as it would take a much bigger area and more complex calculations to display the envelope accurately.
 * There are 4 buttons and a switch in the leftmost block, under each operator's name:
@@ -28,6 +28,21 @@ Visit the online version of the web editor on Github pages https://aesqe.github.
   * The next two buttons will `Copy` and `Paste` values from one operator to another
   * The last button will `randomize` *some* of the parameters of the operator:
     * Ratio, Frequency, Detune, Feedback and other operator inputs
+* The randomizer and undo/redo functionalities are works in progress, so don't expect them to work flawlessly yet.
+* The editor supports switching between dark and light modes. By default, it will follow your system preferences.
+
+### MIDI Mapping
+
+* Click the MIDI Mapping button in the page header to toggle the mappings editor
+* Select a MIDI controller device from the dropdown
+* Click the `Mapping: OFF` button to enable editing
+* Click on a control to select it, then move a knob on your MIDI controller to map it
+* A single control can be mapped to any number of CCs
+* Multiple controls can be mapped to a single CC
+* There might be some performance issues if you try to adjust many controls at once
+* Last used CC number will be displayed in the top area of the mappings editor and indicators related to that CC will change color in the mappings list so they can be easily spotted.
+* To remove a CC mapping, simply click the `X` button next to it.
+* Clicking a control or a row in the listings table will select the appropriate control and/or automatically scroll to its table row.
 
 ## Troubleshooting
 
@@ -35,6 +50,9 @@ If you run into any trouble with the editor, please create a new issue in the [i
 
 If you don't have a Github account and don't want to create one, you can contact me on [Reddit](https://www.reddit.com/user/aesqe/)
 
-## Screenshot
+## Screenshots
 
-<img src='src/assets/screenshot-01.png'>
+<img src='src/assets/screenshot-default.png' width='33%'>
+<img src='src/assets/screenshot-midi-mapping.png' width='33%'>
+<img src='src/assets/screenshot-dark-mode.png' width='33%'>
+
