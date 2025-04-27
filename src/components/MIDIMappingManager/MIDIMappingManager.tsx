@@ -9,6 +9,7 @@ import {
   Table,
   Select,
   Flex,
+  Switch,
   useMantineColorScheme
 } from '@mantine/core'
 import { useScrollIntoView } from '@mantine/hooks'
@@ -49,6 +50,7 @@ export const MIDIMappingManager = () => {
         refName: '',
         propertyPath: '',
         active: false,
+        enableControlWhileMapping: false,
         controlRange: { min: 0, max: 127, center: 64 }
       })
   }, [setMidiMappingMode])
@@ -58,6 +60,12 @@ export const MIDIMappingManager = () => {
       scrollIntoView()
     }
   }, [midiMappingMode.propertyPath, scrollIntoView])
+
+  const handleToggleMIDIControl = () =>
+    setMidiMappingMode((prev) => ({
+      ...prev,
+      enableControlWhileMapping: !prev.enableControlWhileMapping
+    }))
 
   const handleToggleMappingMode = () => {
     setMidiMappingMode((prev) => ({
@@ -85,7 +93,7 @@ export const MIDIMappingManager = () => {
 
   return (
     <Paper w='100%' mx='auto' px='16' mb={20}>
-      <Flex justify='space-between' mb='md' wrap='wrap' align='center'>
+      <Flex justify='space-between' mb='md' wrap='wrap' align='center' gap={5}>
         <Flex flex={2} mb={10}>
           <Title order={3} w='170' m={0}>
             MIDI Mapping
@@ -104,9 +112,29 @@ export const MIDIMappingManager = () => {
           />
         </Flex>
         <Flex flex={1} align='center' fz='xs' mb={10} miw={60}>
-          Last CC:
-          <Text span fw={700} fz='xs' ml={5}>
-            {lastCCUsed}
+          <Switch
+            label='Affect values while mapping'
+            checked={midiMappingMode.enableControlWhileMapping}
+            onChange={handleToggleMIDIControl}
+            styles={{ label: { fontSize: '13px' } }}
+          />
+        </Flex>
+        <Flex
+          flex={0.5}
+          align='center'
+          fz='xs'
+          mb={10}
+          miw={60}
+          p='2px 5px'
+          bd={colorScheme === 'dark' ? '1px solid gray.6' : '1px solid gray.4'}
+          bg={colorScheme === 'dark' ? 'gray.7' : 'gray.1'}
+          style={{ borderRadius: '2px' }}
+        >
+          <Text fz='xs' mt={2}>
+            Last CC:
+            <Text span fw={700} fz='xs' ml={5} mt={2}>
+              {lastCCUsed === -1 ? <>&mdash;</> : lastCCUsed}
+            </Text>
           </Text>
         </Flex>
         <Button.Group miw={370} flex={1} mb={10}>

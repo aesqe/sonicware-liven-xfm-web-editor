@@ -53,6 +53,7 @@ export const midiMappingModeAtom = atom({
   active: false,
   propertyPath: '',
   refName: '',
+  enableControlWhileMapping: false,
   controlRange: {
     min: 0,
     max: 127,

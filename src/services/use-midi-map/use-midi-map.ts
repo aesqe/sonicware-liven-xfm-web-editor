@@ -74,7 +74,11 @@ export const useMidiMap = () => {
           set(lastCCUsedAtom, event.controller.number)
 
           if (midiMappingMode.active) {
-            return addMapItem(event)
+            if (midiMappingMode.enableControlWhileMapping) {
+              addMapItem(event)
+            } else {
+              return addMapItem(event)
+            }
           }
 
           const mappings = midiMap.filter((item) =>
