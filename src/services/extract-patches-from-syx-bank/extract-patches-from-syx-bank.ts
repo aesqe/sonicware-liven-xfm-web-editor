@@ -17,6 +17,7 @@ export const extractPatchesFromSyxBank = (syx: ArrayBuffer): Banks => {
 
   let identifier = String.fromCharCode(...ui8Arr.slice(10, 14))
 
+  // single patch
   if (identifier === 'FMTC') {
     const patch = decode8bit(convert78(Array.from(ui8Arr)))
 
@@ -29,6 +30,7 @@ export const extractPatchesFromSyxBank = (syx: ArrayBuffer): Banks => {
     identifier = String.fromCharCode(...ui8Arr.slice(0, 20)).replace(/[^PREF$]/g, '')
   }
 
+  // banks data
   for (let i = 0; i < ui8Arr.length; i += BLOCK_SIZE) {
     const block = ui8Arr.slice(i, i + BLOCK_SIZE)
     const data = convert78(Array.from(block))
@@ -36,6 +38,7 @@ export const extractPatchesFromSyxBank = (syx: ArrayBuffer): Banks => {
     numArr.push(...data)
   }
 
+  // whole dump
   if (identifier === 'PREF$') {
     const banksData = numArr.slice(BANKS_OFFSET)
     const bankIndexes = findSequenceIndexes(banksData, 'FMBC')

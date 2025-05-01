@@ -29,7 +29,10 @@ Visit the online version of the web editor on Github pages https://aesqe.github.
   * The last button will `randomize` *some* of the parameters of the operator:
     * Ratio, Frequency, Detune, Feedback and other operator inputs
 * The randomizer and undo/redo functionalities are works in progress, so don't expect them to work flawlessly yet.
-* The editor supports switching between dark and light modes. By default, it will follow your system preferences.
+* The editor automatically follows your system's color scheme preferences
+* Manual dark/light mode switching is available
+* Responsive design adapts to different screen sizes
+* All controls are accessible on both desktop and mobile devices
 
 ### MIDI Mapping
 
@@ -43,6 +46,9 @@ Visit the online version of the web editor on Github pages https://aesqe.github.
 * Last used CC number will be displayed in the top area of the mappings editor and indicators related to that CC will change color in the mappings list so they can be easily spotted.
 * To remove a CC mapping, simply click the `X` button next to it.
 * Clicking a control or a row in the listings table will select the appropriate control and/or automatically scroll to its table row.
+* You can save and load MIDI mappings as JSON files
+* Enable/disable parameter values control while mapping
+* The editor provides visual feedback showing active CC numbers
 
 ## Troubleshooting
 

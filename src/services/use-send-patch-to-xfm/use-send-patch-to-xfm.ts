@@ -20,7 +20,7 @@ export const useSendPatchToXFM = () => {
 
     try {
       // Create the three separate SysEx messages
-      const messages = encodeBytes(patch)
+      const messages = encodeBytes(patch).slice(0, 3)
 
       // Send each message with a short delay between them (50ms)
       messages.forEach((msg, index) => {
