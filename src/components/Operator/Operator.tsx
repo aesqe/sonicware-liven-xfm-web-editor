@@ -410,7 +410,7 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                     valueMax={97550}
                     valueDefault={initialOperatorValues.values.Freq}
                     formatterFn={Math.round}
-                    valueRawDisplayFn={(val) => `${Math.round(val / 10)}`}
+                    valueRawDisplayFn={(val) => `${(Math.round(val) / 10).toFixed(1)}`}
                     disabled={!fixed}
                     ref={freqRef}
                     refName='freqRef'
@@ -490,14 +490,14 @@ export const Operator = ({ id: numId, onChange }: Props) => {
                   label='Feedback'
                   propertyPath={`${opId}.Feedback`}
                   onChange={onChange}
-                  valueMin={-630}
+                  valueMin={-640}
                   valueMax={640}
-                  stepFn={() => 10}
-                  stepLargerFn={() => 100}
+                  stepFn={() => 1}
+                  stepLargerFn={() => 10}
                   valueDefault={initialOperatorValues.values.Feedback}
                   center={0}
                   formatterFn={Math.round}
-                  valueRawDisplayFn={(val) => `${Math.round(val / 10)}`}
+                  valueRawDisplayFn={(val) => `${(Math.round(val) / 10).toFixed(1)}`}
                   ref={feedbackRef}
                   refName='feedbackRef'
                 />

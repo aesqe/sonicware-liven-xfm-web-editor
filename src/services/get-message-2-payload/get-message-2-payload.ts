@@ -4,7 +4,7 @@ import { XFMPatch } from '../../types'
 // is simply 0xFF .. 0xCD but the fractional part is also stored signed so -.1 to -.9 needs
 // special handling. The following strips the overall sign, converts to absolute then does the %10 to
 // split the fraction then re-applies the sign to the result and converts to 1 byte
-const getFeedbackValue = (fb: number) => ((Math.abs(fb) % 10) * fb < 0 ? -1 : 1) & 0xff // -63.0 .. +64.0 (+1.0)
+const getFeedbackValue = (fb: number) => ((Math.abs(fb) % 10) * (fb < 0 ? -1 : 1)) & 0xff // -63.0 .. +64.0 (+1.0)
 
 export const getMessage2Payload = ({ OP1, OP2, OP3, OP4, Pitch, Mixer }: XFMPatch) => {
   // payload is 0x88 because TPDT is always 0x98 bytes (from TPDT onwards) and header is 0x10
